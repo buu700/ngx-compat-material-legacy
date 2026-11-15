@@ -1,0 +1,132 @@
+diff --git a/src/cdk/table/sticky-styler.ts b/src/cdk/table/sticky-styler.ts
+index 0355eebe6..d1d43426e 100644
+--- a/src/cdk/table/sticky-styler.ts
++++ b/src/cdk/table/sticky-styler.ts
+@@ -263,10 +263,12 @@ export class StickyStyler {
+     this._coalescedStyleScheduler.schedule(() => {
+       const tfoot = tableElement.querySelector('tfoot')!;
+ 
+-      if (stickyStates.some(state => !state)) {
+-        this._removeStickyStyle(tfoot, ['bottom']);
+-      } else {
+-        this._addStickyStyle(tfoot, 'bottom', 0, false);
++      if (tfoot) {
++        if (stickyStates.some(state => !state)) {
++          this._removeStickyStyle(tfoot, ['bottom']);
++        } else {
++          this._addStickyStyle(tfoot, 'bottom', 0, false);
++        }
+       }
+     });
+   }
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index 21a93949c..2d6d8576a 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -24,6 +24,7 @@ import {ViewportRuler} from '@angular/cdk/scrolling';
+ import {DOCUMENT} from '@angular/common';
+ import {
+   AfterContentChecked,
++  AfterContentInit,
+   Attribute,
+   ChangeDetectionStrategy,
+   ChangeDetectorRef,
+@@ -285,7 +286,9 @@ export interface RenderRow<T> {
+   standalone: true,
+   imports: [HeaderRowOutlet, DataRowOutlet, NoDataRowOutlet, FooterRowOutlet],
+ })
+-export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDestroy, OnInit {
++export class CdkTable<T>
++  implements AfterContentInit, AfterContentChecked, CollectionViewer, OnDestroy, OnInit
++{
+   private _document: Document;
+ 
+   /** Latest data provided by the data source. */
+@@ -433,7 +436,10 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+   private _isShowingNoDataRow = false;
+ 
+   /** Whether the table has rendered out all the outlets for the first time. */
+-  private _hasRendered = false;
++  private _hasAllOutlets = false;
++
++  /** Whether the table is done initializing. */
++  private _hasInitialized = false;
+ 
+   /** Aria role to apply to the table's cells based on the table's own role. */
+   _getCellRole(): string | null {
+@@ -641,9 +647,13 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+       });
+   }
+ 
++  ngAfterContentInit() {
++    this._hasInitialized = true;
++  }
++
+   ngAfterContentChecked() {
+     // Only start re-rendering in `ngAfterContentChecked` after the first render.
+-    if (this._hasRendered) {
++    if (this._canRender()) {
+       this._render();
+     }
+   }
+@@ -902,17 +912,27 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+     // Also we can't use queries to resolve the outlets, because they're wrapped in a
+     // conditional, so we have to rely on them being assigned via DI.
+     if (
+-      !this._hasRendered &&
++      !this._hasAllOutlets &&
+       this._rowOutlet &&
+       this._headerRowOutlet &&
+       this._footerRowOutlet &&
+       this._noDataRowOutlet
+     ) {
+-      this._hasRendered = true;
+-      this._render();
++      this._hasAllOutlets = true;
++
++      // In some setups this may fire before `ngAfterContentInit`
++      // so we need a check here. See #28538.
++      if (this._canRender()) {
++        this._render();
++      }
+     }
+   }
+ 
++  /** Whether the table has all the information to start rendering. */
++  private _canRender(): boolean {
++    return this._hasAllOutlets && this._hasInitialized;
++  }
++
+   /** Renders the table if its state has changed. */
+   private _render(): void {
+     // Cache the row and column definitions gathered by ContentChildren and programmatic injection.
+diff --git a/tools/public_api_guard/cdk/table.md b/tools/public_api_guard/cdk/table.md
+index 55c88f6f3..42f989d87 100644
+--- a/tools/public_api_guard/cdk/table.md
++++ b/tools/public_api_guard/cdk/table.md
+@@ -5,6 +5,7 @@
+ ```ts
+ 
+ import { AfterContentChecked } from '@angular/core';
++import { AfterContentInit } from '@angular/core';
+ import { BehaviorSubject } from 'rxjs';
+ import { ChangeDetectorRef } from '@angular/core';
+ import { CollectionViewer } from '@angular/cdk/collections';
+@@ -288,7 +289,7 @@ export class CdkRowDef<T> extends BaseRowDef {
+ }
+ 
+ // @public
+-export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDestroy, OnInit {
++export class CdkTable<T> implements AfterContentInit, AfterContentChecked, CollectionViewer, OnDestroy, OnInit {
+     constructor(_differs: IterableDiffers, _changeDetectorRef: ChangeDetectorRef, _elementRef: ElementRef, role: string, _dir: Directionality, _document: any, _platform: Platform, _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>, _coalescedStyleScheduler: _CoalescedStyleScheduler, _viewportRuler: ViewportRuler,
+     _stickyPositioningListener: StickyPositioningListener,
+     _ngZone?: NgZone | undefined);
+@@ -337,6 +338,8 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+     // (undocumented)
+     ngAfterContentChecked(): void;
+     // (undocumented)
++    ngAfterContentInit(): void;
++    // (undocumented)
+     ngOnDestroy(): void;
+     // (undocumented)
+     ngOnInit(): void;

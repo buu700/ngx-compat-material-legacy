@@ -1,0 +1,176 @@
+diff --git a/src/cdk/table/sticky-position-listener.ts b/src/cdk/table/sticky-position-listener.ts
+index dffc3c60f..1c9b1f1d7 100644
+--- a/src/cdk/table/sticky-position-listener.ts
++++ b/src/cdk/table/sticky-position-listener.ts
+@@ -9,7 +9,9 @@
+ import {InjectionToken} from '@angular/core';
+ 
+ /** The injection token used to specify the StickyPositioningListener. */
+-export const STICKY_POSITIONING_LISTENER = new InjectionToken<StickyPositioningListener>('CDK_SPL');
++export const STICKY_POSITIONING_LISTENER = new InjectionToken<StickyPositioningListener>(
++  'STICKY_POSITIONING_LISTENER',
++);
+ 
+ export type StickySize = number | null | undefined;
+ export type StickyOffset = number | null | undefined;
+diff --git a/src/cdk/table/sticky-styler.ts b/src/cdk/table/sticky-styler.ts
+index 372b37da1..90c301d53 100644
+--- a/src/cdk/table/sticky-styler.ts
++++ b/src/cdk/table/sticky-styler.ts
+@@ -64,7 +64,7 @@ export class StickyStyler {
+     private _isBrowser = true,
+     private readonly _needsPositionStickyOnElement = true,
+     public direction: Direction,
+-    private readonly _positionListener: StickyPositioningListener,
++    private readonly _positionListener: StickyPositioningListener | null,
+     private readonly _tableInjector: Injector,
+   ) {
+     this._borderCellCss = {
+diff --git a/src/cdk/table/table-virtual-scroll.ts b/src/cdk/table/table-virtual-scroll.ts
+index 3680abafe..a021c3c06 100644
+--- a/src/cdk/table/table-virtual-scroll.ts
++++ b/src/cdk/table/table-virtual-scroll.ts
+@@ -25,46 +25,6 @@ import {
+ } from './sticky-position-listener';
+ import {_TABLE_VIEW_CHANGE_STRATEGY, CdkTable, RenderRow, RowContext} from './table';
+ 
+-/**
+- * An implementation of {@link StickyPositioningListener} that forwards sticky updates to another
+- * listener.
+- *
+- * The {@link CdkTableVirtualScroll} directive cannot provide itself as a
+- * {@link StickyPositioningListener} because the providers for both entities would point to the same
+- * instance. The {@link CdkTable} depends on the sticky positioning listener and the table virtual
+- * scroll depends on the table. Since the sticky positioning listener and table virtual scroll would
+- * be the same instance, this would create a circular dependency.
+- *
+- * The {@link CdkTableVirtualScroll} instead provides this class and attaches itself as the
+- * receiving listener so {@link StickyPositioningListener} and {@link CdkTableVirtualScroll} are
+- * provided as separate instances.
+- *
+- * @docs-private
+- */
+-export class _PositioningListenerProxy implements StickyPositioningListener {
+-  private _listener?: StickyPositioningListener;
+-
+-  setListener(listener: StickyPositioningListener) {
+-    this._listener = listener;
+-  }
+-
+-  stickyColumnsUpdated(update: StickyUpdate): void {
+-    this._listener?.stickyColumnsUpdated(update);
+-  }
+-
+-  stickyEndColumnsUpdated(update: StickyUpdate): void {
+-    this._listener?.stickyEndColumnsUpdated(update);
+-  }
+-
+-  stickyFooterRowsUpdated(update: StickyUpdate): void {
+-    this._listener?.stickyFooterRowsUpdated(update);
+-  }
+-
+-  stickyHeaderRowsUpdated(update: StickyUpdate): void {
+-    this._listener?.stickyHeaderRowsUpdated(update);
+-  }
+-}
+-
+ /** @docs-private */
+ export const _TABLE_VIRTUAL_SCROLL_COLLECTION_VIEWER_FACTORY = () =>
+   new BehaviorSubject<ListRange>({start: 0, end: 0});
+@@ -84,12 +44,10 @@ const SCROLL_SCHEDULER =
+  */
+ @Directive({
+   selector: 'cdk-table[virtualScroll], table[cdk-table][virtualScroll]',
+-  exportAs: 'cdkVirtualScroll',
++  exportAs: 'cdkTableVirtualScroll',
+   providers: [
+     {provide: _VIEW_REPEATER_STRATEGY, useClass: _RecycleViewRepeaterStrategy},
+-    // The directive cannot provide itself as the sticky positions listener because it introduces
+-    // a circular dependency. Use an intermediate listener as a proxy.
+-    {provide: STICKY_POSITIONING_LISTENER, useClass: _PositioningListenerProxy},
++    {provide: STICKY_POSITIONING_LISTENER, useExisting: CdkTableVirtualScroll},
+     // Initially emit an empty range. The virtual scroll viewport will update the range after it is
+     // initialized.
+     {
+@@ -141,9 +99,6 @@ export class CdkTableVirtualScroll<T>
+   }
+ 
+   constructor() {
+-    const positioningListener = inject<_PositioningListenerProxy>(STICKY_POSITIONING_LISTENER);
+-    positioningListener.setListener(this);
+-
+     // Force the table to enable `fixedLayout` to prevent column widths from changing as the user
+     // scrolls. This also enables caching in the table's sticky styler which reduces calls to
+     // expensive DOM APIs, such as `getBoundingClientRect()`, and improves overall performance.
+@@ -193,13 +148,9 @@ export class CdkTableVirtualScroll<T>
+     return 0;
+   }
+ 
+-  stickyColumnsUpdated(update: StickyUpdate): void {
+-    // no-op
+-  }
++  stickyColumnsUpdated(): void {}
+ 
+-  stickyEndColumnsUpdated(update: StickyUpdate): void {
+-    // no-op
+-  }
++  stickyEndColumnsUpdated(): void {}
+ 
+   stickyHeaderRowsUpdated(update: StickyUpdate): void {
+     this._headerRowStickyUpdates.next(update);
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index 83ae70925..7f90bf8df 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -304,11 +304,7 @@ export class CdkTable<T>
+   private _platform = inject(Platform);
+   protected _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>;
+   private readonly _viewportRuler = inject(ViewportRuler);
+-  protected readonly _positioningListener = inject(STICKY_POSITIONING_LISTENER, {optional: true});
+-  protected readonly _parentPositioningListener = inject<StickyPositioningListener>(
+-    STICKY_POSITIONING_LISTENER,
+-    {optional: true, skipSelf: true},
+-  )!;
++  private _injector = inject(Injector);
+ 
+   private _document = inject(DOCUMENT);
+ 
+@@ -625,8 +621,6 @@ export class CdkTable<T>
+   /** Row definition that will only be rendered if there's no data in the table. */
+   @ContentChild(CdkNoDataRow) _noDataRow: CdkNoDataRow;
+ 
+-  private _injector = inject(Injector);
+-
+   constructor(...args: unknown[]);
+ 
+   constructor() {
+@@ -638,7 +632,6 @@ export class CdkTable<T>
+ 
+     this._isServer = !this._platform.isBrowser;
+     this._isNativeHtmlTable = this._elementRef.nativeElement.nodeName === 'TABLE';
+-    this._parentPositioningListener = this._positioningListener ?? this._parentPositioningListener;
+     this.viewChange =
+       this.viewChange ?? new BehaviorSubject<ListRange>({start: 0, end: Number.MAX_VALUE});
+ 
+@@ -1415,14 +1408,19 @@ export class CdkTable<T>
+    */
+   private _setupStickyStyler() {
+     const direction: Direction = this._dir ? this._dir.value : 'ltr';
++    const injector = this._injector;
++    const positioningListener =
++      injector.get(STICKY_POSITIONING_LISTENER, null, {optional: true}) ||
++      injector.get(STICKY_POSITIONING_LISTENER, null, {optional: true, skipSelf: true});
++
+     this._stickyStyler = new StickyStyler(
+       this._isNativeHtmlTable,
+       this.stickyCssClass,
+       this._platform.isBrowser,
+       this.needsPositionStickyOnElement,
+       direction,
+-      this._parentPositioningListener,
+-      this._injector,
++      positioningListener,
++      injector,
+     );
+     (this._dir ? this._dir.change : observableOf<Direction>())
+       .pipe(takeUntil(this._onDestroy))

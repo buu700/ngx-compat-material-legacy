@@ -1,0 +1,2134 @@
+diff --git a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
+index 58de3a09b..8d4d378a4 100644
+--- a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
++++ b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts
+@@ -1,26 +1,25 @@
+ import {ESCAPE} from '../../keycodes';
+ import {ComponentPortal} from '../../portal';
+-import {ApplicationRef, Component} from '@angular/core';
++import {ApplicationRef, Component, Injector} from '@angular/core';
+ import {TestBed} from '@angular/core/testing';
+ import {dispatchKeyboardEvent} from '../../testing/private';
+-import {Overlay, OverlayModule} from '../index';
++import {createOverlayRef} from '../index';
+ import {OverlayKeyboardDispatcher} from './overlay-keyboard-dispatcher';
+ 
+ describe('OverlayKeyboardDispatcher', () => {
+   let appRef: ApplicationRef;
+   let keyboardDispatcher: OverlayKeyboardDispatcher;
+-  let overlay: Overlay;
++  let injector: Injector;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({imports: [OverlayModule, TestComponent]});
+     appRef = TestBed.inject(ApplicationRef);
+     keyboardDispatcher = TestBed.inject(OverlayKeyboardDispatcher);
+-    overlay = TestBed.inject(Overlay);
++    injector = TestBed.inject(Injector);
+   });
+ 
+   it('should track overlays in order as they are attached and detached', () => {
+-    const overlayOne = overlay.create();
+-    const overlayTwo = overlay.create();
++    const overlayOne = createOverlayRef(injector);
++    const overlayTwo = createOverlayRef(injector);
+ 
+     // Attach overlays
+     keyboardDispatcher.add(overlayOne);
+@@ -49,8 +48,8 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should dispatch body keyboard events to the most recently attached overlay', () => {
+-    const overlayOne = overlay.create();
+-    const overlayTwo = overlay.create();
++    const overlayOne = createOverlayRef(injector);
++    const overlayTwo = createOverlayRef(injector);
+     const overlayOneSpy = jasmine.createSpy('overlayOne keyboard event spy');
+     const overlayTwoSpy = jasmine.createSpy('overlayTwo keyboard event spy');
+ 
+@@ -69,7 +68,7 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should not dispatch keyboard events when propagation is stopped', () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const spy = jasmine.createSpy('keyboard event spy');
+     const button = document.createElement('button');
+ 
+@@ -85,7 +84,7 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should complete the keydown stream on dispose', () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const completeSpy = jasmine.createSpy('keydown complete spy');
+ 
+     overlayRef.keydownEvents().subscribe({complete: completeSpy});
+@@ -96,7 +95,7 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should stop emitting events to detached overlays', () => {
+-    const instance = overlay.create();
++    const instance = createOverlayRef(injector);
+     const spy = jasmine.createSpy('keyboard event spy');
+ 
+     instance.attach(new ComponentPortal(TestComponent));
+@@ -112,7 +111,7 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should stop emitting events to disposed overlays', () => {
+-    const instance = overlay.create();
++    const instance = createOverlayRef(injector);
+     const spy = jasmine.createSpy('keyboard event spy');
+ 
+     instance.attach(new ComponentPortal(TestComponent));
+@@ -128,7 +127,7 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should dispose of the global keyboard event handler correctly', () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const body = document.body;
+     spyOn(body, 'addEventListener');
+     spyOn(body, 'removeEventListener');
+@@ -145,8 +144,8 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should skip overlays that do not have keydown event subscriptions', () => {
+-    const overlayOne = overlay.create();
+-    const overlayTwo = overlay.create();
++    const overlayOne = createOverlayRef(injector);
++    const overlayTwo = createOverlayRef(injector);
+     const overlayOneSpy = jasmine.createSpy('overlayOne keyboard event spy');
+ 
+     overlayOne.keydownEvents().subscribe(overlayOneSpy);
+@@ -159,8 +158,8 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ 
+   it('should not add the same overlay to the stack multiple times', () => {
+-    const overlayOne = overlay.create();
+-    const overlayTwo = overlay.create();
++    const overlayOne = createOverlayRef(injector);
++    const overlayTwo = createOverlayRef(injector);
+     const overlayOneSpy = jasmine.createSpy('overlayOne keyboard event spy');
+     const overlayTwoSpy = jasmine.createSpy('overlayTwo keyboard event spy');
+ 
+@@ -181,7 +180,7 @@ describe('OverlayKeyboardDispatcher', () => {
+ 
+   it('should not run change detection if there are no `keydownEvents` observers', () => {
+     spyOn(appRef, 'tick');
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     keyboardDispatcher.add(overlayRef);
+ 
+     expect(appRef.tick).toHaveBeenCalledTimes(0);
+@@ -190,8 +189,5 @@ describe('OverlayKeyboardDispatcher', () => {
+   });
+ });
+ 
+-@Component({
+-  template: 'Hello',
+-  imports: [OverlayModule],
+-})
++@Component({template: 'Hello'})
+ class TestComponent {}
+diff --git a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+index c07dab731..b9ff3647b 100644
+--- a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
++++ b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+@@ -1,26 +1,25 @@
+-import {ApplicationRef, Component} from '@angular/core';
++import {ApplicationRef, Component, Injector} from '@angular/core';
+ import {TestBed} from '@angular/core/testing';
+ import {filter, take} from 'rxjs/operators';
+ import {ComponentPortal} from '../../portal';
+ import {dispatchFakeEvent, dispatchMouseEvent} from '../../testing/private';
+-import {Overlay, OverlayModule} from '../index';
++import {createOverlayRef} from '../index';
+ import {OverlayOutsideClickDispatcher} from './overlay-outside-click-dispatcher';
+ 
+ describe('OverlayOutsideClickDispatcher', () => {
+   let appRef: ApplicationRef;
+   let outsideClickDispatcher: OverlayOutsideClickDispatcher;
+-  let overlay: Overlay;
++  let injector: Injector;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({imports: [OverlayModule, TestComponent]});
+     appRef = TestBed.inject(ApplicationRef);
+     outsideClickDispatcher = TestBed.inject(OverlayOutsideClickDispatcher);
+-    overlay = TestBed.inject(Overlay);
++    injector = TestBed.inject(Injector);
+   });
+ 
+   it('should track overlays in order as they are attached and detached', () => {
+-    const overlayOne = overlay.create();
+-    const overlayTwo = overlay.create();
++    const overlayOne = createOverlayRef(injector);
++    const overlayTwo = createOverlayRef(injector);
+ 
+     outsideClickDispatcher.add(overlayOne);
+     outsideClickDispatcher.add(overlayTwo);
+@@ -50,9 +49,9 @@ describe('OverlayOutsideClickDispatcher', () => {
+   });
+ 
+   it('should dispatch mouse click events to the attached overlays', () => {
+-    const overlayOne = overlay.create();
++    const overlayOne = createOverlayRef(injector);
+     overlayOne.attach(new ComponentPortal(TestComponent));
+-    const overlayTwo = overlay.create();
++    const overlayTwo = createOverlayRef(injector);
+     overlayTwo.attach(new ComponentPortal(TestComponent));
+ 
+     const overlayOneSpy = jasmine.createSpy('overlayOne mouse click event spy');
+@@ -77,9 +76,9 @@ describe('OverlayOutsideClickDispatcher', () => {
+   });
+ 
+   it('should dispatch auxiliary button click events to the attached overlays', () => {
+-    const overlayOne = overlay.create();
++    const overlayOne = createOverlayRef(injector);
+     overlayOne.attach(new ComponentPortal(TestComponent));
+-    const overlayTwo = overlay.create();
++    const overlayTwo = createOverlayRef(injector);
+     overlayTwo.attach(new ComponentPortal(TestComponent));
+ 
+     const overlayOneSpy = jasmine.createSpy('overlayOne auxiliary click event spy');
+@@ -104,7 +103,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+   });
+ 
+   it('should dispatch mouse click events to the attached overlays even when propagation is stopped', () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     overlayRef.attach(new ComponentPortal(TestComponent));
+     const spy = jasmine.createSpy('overlay mouse click event spy');
+     overlayRef.outsidePointerEvents().subscribe(spy);
+@@ -123,7 +122,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+   });
+ 
+   it('should dispose of the global click event handler correctly', () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const body = document.body;
+ 
+     spyOn(body, 'addEventListener');
+@@ -145,8 +144,8 @@ describe('OverlayOutsideClickDispatcher', () => {
+   });
+ 
+   it('should not add the same overlay to the stack multiple times', () => {
+-    const overlayOne = overlay.create();
+-    const overlayTwo = overlay.create();
++    const overlayOne = createOverlayRef(injector);
++    const overlayTwo = createOverlayRef(injector);
+ 
+     outsideClickDispatcher.add(overlayOne);
+     outsideClickDispatcher.add(overlayTwo);
+@@ -160,7 +159,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+ 
+   it('should dispatch the click event when click is on an element outside the overlay', () => {
+     const portal = new ComponentPortal(TestComponent);
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     overlayRef.attach(portal);
+     const button = document.createElement('button');
+     document.body.appendChild(button);
+@@ -177,7 +176,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+ 
+   it('should not dispatch the click event when click is on an element inside the overlay', () => {
+     const portal = new ComponentPortal(TestComponent);
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     overlayRef.attach(portal);
+ 
+     const spy = jasmine.createSpy('overlay mouse click event spy');
+@@ -194,7 +193,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+       'released outside of it',
+     () => {
+       const portal = new ComponentPortal(TestComponent);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(portal);
+       const context = document.createElement('div');
+       document.body.appendChild(context);
+@@ -216,7 +215,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+       'released inside of it',
+     () => {
+       const portal = new ComponentPortal(TestComponent);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(portal);
+ 
+       const spy = jasmine.createSpy('overlay mouse click event spy');
+@@ -235,7 +234,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+       'released outside of it',
+     () => {
+       const portal = new ComponentPortal(TestComponent);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(portal);
+       const context = document.createElement('div');
+       document.body.appendChild(context);
+@@ -257,7 +256,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+       'released inside of it',
+     () => {
+       const portal = new ComponentPortal(TestComponent);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(portal);
+       const context = document.createElement('div');
+       document.body.appendChild(context);
+@@ -276,7 +275,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+ 
+   it('should dispatch an event when a context menu is triggered outside the overlay', () => {
+     const portal = new ComponentPortal(TestComponent);
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     overlayRef.attach(portal);
+     const context = document.createElement('div');
+     document.body.appendChild(context);
+@@ -293,7 +292,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+ 
+   it('should not dispatch an event when a context menu is triggered inside the overlay', () => {
+     const portal = new ComponentPortal(TestComponent);
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     overlayRef.attach(portal);
+ 
+     const spy = jasmine.createSpy('overlay contextmenu spy');
+@@ -306,11 +305,11 @@ describe('OverlayOutsideClickDispatcher', () => {
+   });
+ 
+   it('should not throw an error when closing out related components via the outsidePointerEvents emitter on background click', () => {
+-    const firstOverlayRef = overlay.create();
++    const firstOverlayRef = createOverlayRef(injector);
+     firstOverlayRef.attach(new ComponentPortal(TestComponent));
+-    const secondOverlayRef = overlay.create();
++    const secondOverlayRef = createOverlayRef(injector);
+     secondOverlayRef.attach(new ComponentPortal(TestComponent));
+-    const thirdOverlayRef = overlay.create();
++    const thirdOverlayRef = createOverlayRef(injector);
+     thirdOverlayRef.attach(new ComponentPortal(TestComponent));
+ 
+     const spy = jasmine.createSpy('background click handler spy').and.callFake(() => {
+@@ -338,7 +337,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+   describe('change detection behavior', () => {
+     it('should not run change detection if there is no portal attached to the overlay', () => {
+       spyOn(appRef, 'tick');
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       outsideClickDispatcher.add(overlayRef);
+ 
+       const context = document.createElement('div');
+@@ -353,7 +352,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+     it('should not run change detection if the click was made outside the overlay but there are no `outsidePointerEvents` observers', () => {
+       spyOn(appRef, 'tick');
+       const portal = new ComponentPortal(TestComponent);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(portal);
+       outsideClickDispatcher.add(overlayRef);
+ 
+@@ -368,7 +367,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+     it('should not run change detection if the click was made inside the overlay and there are `outsidePointerEvents` observers', () => {
+       spyOn(appRef, 'tick');
+       const portal = new ComponentPortal(TestComponent);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(portal);
+       outsideClickDispatcher.add(overlayRef);
+ 
+@@ -399,7 +398,7 @@ describe('OverlayOutsideClickDispatcher', () => {
+       renders = 0;
+       expect(renders).toEqual(0);
+       const portal = new ComponentPortal(TestComponent);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(portal);
+       outsideClickDispatcher.add(overlayRef);
+ 
+@@ -421,8 +420,5 @@ describe('OverlayOutsideClickDispatcher', () => {
+   });
+ });
+ 
+-@Component({
+-  template: 'Hello',
+-  imports: [OverlayModule],
+-})
++@Component({template: 'Hello'})
+ class TestComponent {}
+diff --git a/src/cdk/overlay/fullscreen-overlay-container.spec.ts b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+index 3a9942acc..2fd2af0fc 100644
+--- a/src/cdk/overlay/fullscreen-overlay-container.spec.ts
++++ b/src/cdk/overlay/fullscreen-overlay-container.spec.ts
+@@ -1,11 +1,11 @@
+ import {waitForAsync, TestBed} from '@angular/core/testing';
+-import {Component, NgModule, ViewChild, ViewContainerRef, inject, DOCUMENT} from '@angular/core';
+-import {PortalModule, CdkPortal} from '../portal';
+-import {Overlay, OverlayContainer, OverlayModule, FullscreenOverlayContainer} from './index';
++import {Component, ViewChild, ViewContainerRef, inject, DOCUMENT, Injector} from '@angular/core';
++import {CdkPortal} from '../portal';
++import {OverlayContainer, FullscreenOverlayContainer, createOverlayRef} from './index';
+ import {TemplatePortalDirective} from '../portal/portal-directives';
+ 
+ describe('FullscreenOverlayContainer', () => {
+-  let overlay: Overlay;
++  let injector: Injector;
+   let fullscreenListeners: Set<Function>;
+   let fakeDocument: any;
+ 
+@@ -13,8 +13,11 @@ describe('FullscreenOverlayContainer', () => {
+     fullscreenListeners = new Set();
+ 
+     TestBed.configureTestingModule({
+-      imports: [OverlayTestModule],
+       providers: [
++        {
++          provide: OverlayContainer,
++          useClass: FullscreenOverlayContainer,
++        },
+         {
+           provide: DOCUMENT,
+           useFactory: () => {
+@@ -56,14 +59,14 @@ describe('FullscreenOverlayContainer', () => {
+       ],
+     });
+ 
+-    overlay = TestBed.inject(Overlay);
++    injector = TestBed.inject(Injector);
+     fakeDocument = TestBed.inject(DOCUMENT);
+   }));
+ 
+   it('should open an overlay inside a fullscreen element and move it to the body', () => {
+     const fixture = TestBed.createComponent(TestComponentWithTemplatePortals);
+     fixture.detectChanges();
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const fullscreenElement = fakeDocument.fullscreenElement;
+ 
+     overlayRef.attach(fixture.componentInstance.templatePortal);
+@@ -85,7 +88,7 @@ describe('FullscreenOverlayContainer', () => {
+ 
+     const fixture = TestBed.createComponent(TestComponentWithTemplatePortals);
+     fixture.detectChanges();
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+ 
+     overlayRef.attach(fixture.componentInstance.templatePortal);
+     fixture.detectChanges();
+@@ -104,7 +107,6 @@ describe('FullscreenOverlayContainer', () => {
+ /** Test-bed component that contains a TempatePortal and an ElementRef. */
+ @Component({
+   template: `<ng-template cdk-portal>Cake</ng-template>`,
+-  providers: [Overlay],
+   imports: [TemplatePortalDirective],
+ })
+ class TestComponentWithTemplatePortals {
+@@ -112,14 +114,3 @@ class TestComponentWithTemplatePortals {
+ 
+   @ViewChild(CdkPortal) templatePortal: CdkPortal;
+ }
+-
+-@NgModule({
+-  imports: [OverlayModule, PortalModule, TestComponentWithTemplatePortals],
+-  providers: [
+-    {
+-      provide: OverlayContainer,
+-      useClass: FullscreenOverlayContainer,
+-    },
+-  ],
+-})
+-class OverlayTestModule {}
+diff --git a/src/cdk/overlay/overlay-container.spec.ts b/src/cdk/overlay/overlay-container.spec.ts
+index 698726afa..04af6b069 100644
+--- a/src/cdk/overlay/overlay-container.spec.ts
++++ b/src/cdk/overlay/overlay-container.spec.ts
+@@ -1,25 +1,19 @@
+ import {waitForAsync, TestBed} from '@angular/core/testing';
+-import {Component, NgModule, ViewChild, ViewContainerRef, inject} from '@angular/core';
+-import {PortalModule, CdkPortal} from '../portal';
+-import {Overlay, OverlayContainer, OverlayModule} from './index';
++import {Component, Injector, ViewChild, ViewContainerRef, inject} from '@angular/core';
++import {CdkPortal} from '../portal';
++import {createOverlayRef, OverlayContainer} from './index';
+ 
+ describe('OverlayContainer', () => {
+-  let overlay: Overlay;
+   let overlayContainer: OverlayContainer;
+ 
+   beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [OverlayTestModule],
+-    });
+-
+-    overlay = TestBed.inject(Overlay);
+     overlayContainer = TestBed.inject(OverlayContainer);
+   }));
+ 
+   it('should remove the overlay container element from the DOM on destruction', () => {
+     const fixture = TestBed.createComponent(TestComponentWithTemplatePortals);
+     fixture.detectChanges();
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(TestBed.inject(Injector));
+     overlayRef.attach(fixture.componentInstance.templatePortal);
+     fixture.detectChanges();
+ 
+@@ -88,7 +82,6 @@ describe('OverlayContainer', () => {
+ /** Test-bed component that contains a TempatePortal and an ElementRef. */
+ @Component({
+   template: `<ng-template cdkPortal>Cake</ng-template>`,
+-  providers: [Overlay],
+   imports: [CdkPortal],
+ })
+ class TestComponentWithTemplatePortals {
+@@ -96,8 +89,3 @@ class TestComponentWithTemplatePortals {
+ 
+   @ViewChild(CdkPortal) templatePortal: CdkPortal;
+ }
+-
+-@NgModule({
+-  imports: [OverlayModule, PortalModule, TestComponentWithTemplatePortals],
+-})
+-class OverlayTestModule {}
+diff --git a/src/cdk/overlay/overlay-directives.spec.ts b/src/cdk/overlay/overlay-directives.spec.ts
+index a2b967507..434b57500 100644
+--- a/src/cdk/overlay/overlay-directives.spec.ts
++++ b/src/cdk/overlay/overlay-directives.spec.ts
+@@ -1,6 +1,6 @@
+ import {Directionality} from '../bidi';
+ import {A, ESCAPE} from '../keycodes';
+-import {Component, ElementRef, ViewChild} from '@angular/core';
++import {Component, ElementRef, Injector, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {Subject} from 'rxjs';
+@@ -8,7 +8,7 @@ import {createKeyboardEvent, dispatchEvent, dispatchKeyboardEvent} from '../test
+ import {
+   CdkConnectedOverlay,
+   CdkOverlayOrigin,
+-  Overlay,
++  createCloseScrollStrategy,
+   OverlayModule,
+   ScrollDispatcher,
+   ScrollStrategy,
+@@ -19,12 +19,12 @@ import {
+   ConnectionPositionPair,
+ } from './position/connected-position';
+ import {
++  createFlexibleConnectedPositionStrategy,
+   FlexibleConnectedPositionStrategy,
+   FlexibleConnectedPositionStrategyOrigin,
+ } from './position/flexible-connected-position-strategy';
+ 
+ describe('Overlay directives', () => {
+-  let overlay: Overlay;
+   let overlayContainerElement: HTMLElement;
+   let fixture: ComponentFixture<ConnectedOverlayDirectiveTest>;
+   let dir: {value: string};
+@@ -44,7 +44,6 @@ describe('Overlay directives', () => {
+       ],
+     });
+ 
+-    overlay = TestBed.inject(Overlay);
+     overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+     fixture = TestBed.createComponent(ConnectedOverlayDirectiveTest);
+     fixture.detectChanges();
+@@ -70,9 +69,10 @@ describe('Overlay directives', () => {
+   });
+ 
+   it('can change positionStrategy via input', () => {
+-    const expectedPositionStrategy = overlay
+-      .position()
+-      .flexibleConnectedTo(document.body)
++    const expectedPositionStrategy = createFlexibleConnectedPositionStrategy(
++      TestBed.inject(Injector),
++      document.body,
++    )
+       .withFlexibleDimensions(true)
+       .withPositions([{originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'top'}]);
+     fixture.componentInstance.isOpen = true;
+@@ -705,7 +705,9 @@ describe('Overlay directives', () => {
+ 
+     it('should emit when detached externally', () => {
+       expect(fixture.componentInstance.detachHandler).not.toHaveBeenCalled();
+-      fixture.componentInstance.scrollStrategy = overlay.scrollStrategies.close();
++      fixture.componentInstance.scrollStrategy = createCloseScrollStrategy(
++        TestBed.inject(Injector),
++      );
+       fixture.componentInstance.isOpen = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+diff --git a/src/cdk/overlay/overlay-directives.ts b/src/cdk/overlay/overlay-directives.ts
+index af43e10c5..48a1a1a57 100644
+--- a/src/cdk/overlay/overlay-directives.ts
++++ b/src/cdk/overlay/overlay-directives.ts
+@@ -14,6 +14,7 @@ import {
+   ElementRef,
+   EventEmitter,
+   InjectionToken,
++  Injector,
+   Input,
+   NgZone,
+   OnChanges,
+@@ -28,16 +29,21 @@ import {
+ import {_getEventTarget} from '../platform';
+ import {Subscription} from 'rxjs';
+ import {takeWhile} from 'rxjs/operators';
+-import {Overlay} from './overlay';
++import {createOverlayRef} from './overlay';
+ import {OverlayConfig} from './overlay-config';
+ import {OverlayRef} from './overlay-ref';
+ import {ConnectedOverlayPositionChange} from './position/connected-position';
+ import {
+   ConnectedPosition,
++  createFlexibleConnectedPositionStrategy,
+   FlexibleConnectedPositionStrategy,
+   FlexibleConnectedPositionStrategyOrigin,
+ } from './position/flexible-connected-position-strategy';
+-import {RepositionScrollStrategy, ScrollStrategy} from './scroll/index';
++import {
++  createRepositionScrollStrategy,
++  RepositionScrollStrategy,
++  ScrollStrategy,
++} from './scroll/index';
+ 
+ /** Default set of positions for the overlay. Follows the behavior of a dropdown. */
+ const defaultPositionList: ConnectedPosition[] = [
+@@ -73,8 +79,8 @@ export const CDK_CONNECTED_OVERLAY_SCROLL_STRATEGY = new InjectionToken<() => Sc
+   {
+     providedIn: 'root',
+     factory: () => {
+-      const overlay = inject(Overlay);
+-      return () => overlay.scrollStrategies.reposition();
++      const injector = inject(Injector);
++      return () => createRepositionScrollStrategy(injector);
+     },
+   },
+ );
+@@ -103,8 +109,8 @@ export class CdkOverlayOrigin {
+   exportAs: 'cdkConnectedOverlay',
+ })
+ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+-  private _overlay = inject(Overlay);
+   private _dir = inject(Directionality, {optional: true});
++  private _injector = inject(Injector);
+ 
+   private _overlayRef: OverlayRef | undefined;
+   private _templatePortal: TemplatePortal;
+@@ -293,7 +299,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+       this.positions = defaultPositionList;
+     }
+ 
+-    const overlayRef = (this._overlayRef = this._overlay.create(this._buildConfig()));
++    const overlayRef = (this._overlayRef = createOverlayRef(this._injector, this._buildConfig()));
+     this._attachSubscription = overlayRef.attachments().subscribe(() => this.attach.emit());
+     this._detachSubscription = overlayRef.detachments().subscribe(() => this.detach.emit());
+     overlayRef.keydownEvents().subscribe((event: KeyboardEvent) => {
+@@ -379,7 +385,7 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+ 
+   /** Returns the position strategy of the overlay to be set on the overlay config */
+   private _createPositionStrategy(): FlexibleConnectedPositionStrategy {
+-    const strategy = this._overlay.position().flexibleConnectedTo(this._getOrigin());
++    const strategy = createFlexibleConnectedPositionStrategy(this._injector, this._getOrigin());
+     this._updatePositionStrategy(strategy);
+     return strategy;
+   }
+@@ -463,9 +469,10 @@ export class CdkConnectedOverlay implements OnDestroy, OnChanges {
+  * @breaking-change 21.0.0
+  */
+ export function CDK_CONNECTED_OVERLAY_SCROLL_STRATEGY_PROVIDER_FACTORY(
+-  overlay: Overlay,
++  overlay: unknown,
+ ): () => RepositionScrollStrategy {
+-  return () => overlay.scrollStrategies.reposition();
++  const injector = inject(Injector);
++  return () => createRepositionScrollStrategy(injector);
+ }
+ 
+ /**
+@@ -475,6 +482,5 @@ export function CDK_CONNECTED_OVERLAY_SCROLL_STRATEGY_PROVIDER_FACTORY(
+  */
+ export const CDK_CONNECTED_OVERLAY_SCROLL_STRATEGY_PROVIDER = {
+   provide: CDK_CONNECTED_OVERLAY_SCROLL_STRATEGY,
+-  deps: [Overlay],
+   useFactory: CDK_CONNECTED_OVERLAY_SCROLL_STRATEGY_PROVIDER_FACTORY,
+ };
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index 53f6b36fa..b723d2fe3 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -5,6 +5,7 @@ import {
+   ErrorHandler,
+   EventEmitter,
+   Injectable,
++  Injector,
+   Type,
+   ViewChild,
+   ViewContainerRef,
+@@ -23,6 +24,7 @@ import {Direction, Directionality} from '../bidi';
+ import {CdkPortal, ComponentPortal, TemplatePortal} from '../portal';
+ import {dispatchFakeEvent} from '../testing/private';
+ import {
++  createOverlayRef,
+   Overlay,
+   OverlayConfig,
+   OverlayContainer,
+@@ -33,7 +35,7 @@ import {
+ } from './index';
+ 
+ describe('Overlay', () => {
+-  let overlay: Overlay;
++  let injector: Injector;
+   let componentPortal: ComponentPortal<PizzaMsg>;
+   let templatePortal: TemplatePortal;
+   let overlayContainerElement: HTMLElement;
+@@ -62,7 +64,7 @@ describe('Overlay', () => {
+       ],
+     });
+ 
+-    overlay = TestBed.inject(Overlay);
++    injector = TestBed.inject(Injector);
+     overlayContainer = TestBed.inject(OverlayContainer);
+     overlayContainerElement = overlayContainer.getContainerElement();
+ 
+@@ -82,7 +84,7 @@ describe('Overlay', () => {
+   afterEach(cleanup);
+ 
+   it('should load a component into an overlay', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     overlayRef.attach(componentPortal);
+ 
+     expect(overlayContainerElement.textContent).toContain('Pizza');
+@@ -93,7 +95,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should load a template portal into an overlay', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     overlayRef.attach(templatePortal);
+ 
+     expect(overlayContainerElement.textContent).toContain('Cake');
+@@ -104,7 +106,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should disable pointer events of the pane element if detached', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     let paneElement = overlayRef.overlayElement;
+ 
+     overlayRef.attach(componentPortal);
+@@ -124,10 +126,10 @@ describe('Overlay', () => {
+   });
+ 
+   it('should open multiple overlays', () => {
+-    let pizzaOverlayRef = overlay.create();
++    let pizzaOverlayRef = createOverlayRef(injector);
+     pizzaOverlayRef.attach(componentPortal);
+ 
+-    let cakeOverlayRef = overlay.create();
++    let cakeOverlayRef = createOverlayRef(injector);
+     cakeOverlayRef.attach(templatePortal);
+ 
+     expect(overlayContainerElement.childNodes.length).toBe(2);
+@@ -144,8 +146,8 @@ describe('Overlay', () => {
+   });
+ 
+   it('should ensure that the most-recently-attached overlay is on top', () => {
+-    let pizzaOverlayRef = overlay.create();
+-    let cakeOverlayRef = overlay.create();
++    let pizzaOverlayRef = createOverlayRef(injector);
++    let cakeOverlayRef = createOverlayRef(injector);
+ 
+     pizzaOverlayRef.attach(componentPortal);
+     cakeOverlayRef.attach(templatePortal);
+@@ -160,7 +162,7 @@ describe('Overlay', () => {
+     pizzaOverlayRef.dispose();
+     cakeOverlayRef.detach();
+ 
+-    pizzaOverlayRef = overlay.create();
++    pizzaOverlayRef = createOverlayRef(injector);
+     pizzaOverlayRef.attach(componentPortal);
+     cakeOverlayRef.attach(templatePortal);
+ 
+@@ -174,7 +176,7 @@ describe('Overlay', () => {
+ 
+   it('should take the default direction from the global Directionality', () => {
+     dir = 'rtl';
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+ 
+     overlayRef.attach(componentPortal);
+     expect(overlayRef.hostElement.getAttribute('dir')).toBe('rtl');
+@@ -182,7 +184,7 @@ describe('Overlay', () => {
+ 
+   it('should set the direction', () => {
+     const config = new OverlayConfig({direction: 'rtl'});
+-    const overlayRef = overlay.create(config);
++    const overlayRef = createOverlayRef(injector, config);
+ 
+     overlayRef.attach(componentPortal);
+ 
+@@ -190,7 +192,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should emit when an overlay is attached', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     let spy = jasmine.createSpy('attachments spy');
+ 
+     overlayRef.attachments().subscribe(spy);
+@@ -201,7 +203,7 @@ describe('Overlay', () => {
+ 
+   it('should emit the attachment event after everything is added to the DOM', () => {
+     let config = new OverlayConfig({hasBackdrop: true});
+-    let overlayRef = overlay.create(config);
++    let overlayRef = createOverlayRef(injector, config);
+ 
+     overlayRef.attachments().subscribe(() => {
+       expect(overlayContainerElement.querySelector('pizza'))
+@@ -217,7 +219,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should emit when an overlay is detached', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     let spy = jasmine.createSpy('detachments spy');
+ 
+     overlayRef.detachments().subscribe(spy);
+@@ -228,7 +230,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should not emit to the detach stream if the overlay has not been attached', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     let spy = jasmine.createSpy('detachments spy');
+ 
+     overlayRef.detachments().subscribe(spy);
+@@ -238,7 +240,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should not emit to the detach stream on dispose if the overlay was not attached', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     let spy = jasmine.createSpy('detachments spy');
+ 
+     overlayRef.detachments().subscribe(spy);
+@@ -248,7 +250,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should emit the detachment event after the overlay is removed from the DOM', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+ 
+     overlayRef.detachments().subscribe(() => {
+       expect(overlayContainerElement.querySelector('pizza'))
+@@ -261,7 +263,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should emit and complete the observables when an overlay is disposed', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     let disposeSpy = jasmine.createSpy('dispose spy');
+     let attachCompleteSpy = jasmine.createSpy('attachCompleteSpy spy');
+     let detachCompleteSpy = jasmine.createSpy('detachCompleteSpy spy');
+@@ -278,7 +280,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should complete the attachment observable before the detachment one', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     let callbackOrder: string[] = [];
+ 
+     overlayRef.attachments().subscribe({complete: () => callbackOrder.push('attach')});
+@@ -291,17 +293,17 @@ describe('Overlay', () => {
+   });
+ 
+   it('should default to the ltr direction', () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     expect(overlayRef.getConfig().direction).toBe('ltr');
+   });
+ 
+   it('should skip undefined values when applying the defaults', () => {
+-    const overlayRef = overlay.create({direction: undefined});
++    const overlayRef = createOverlayRef(injector, {direction: undefined});
+     expect(overlayRef.getConfig().direction).toBe('ltr');
+   });
+ 
+   it('should clear out all DOM element references on dispose', fakeAsync(() => {
+-    const overlayRef = overlay.create({hasBackdrop: true});
++    const overlayRef = createOverlayRef(injector, {hasBackdrop: true});
+     overlayRef.attach(componentPortal);
+ 
+     expect(overlayRef.hostElement).withContext('Expected overlay host to be defined.').toBeTruthy();
+@@ -327,7 +329,7 @@ describe('Overlay', () => {
+   }));
+ 
+   it('should clear the backdrop timeout if the transition finishes first', fakeAsync(() => {
+-    const overlayRef = overlay.create({hasBackdrop: true});
++    const overlayRef = createOverlayRef(injector, {hasBackdrop: true});
+ 
+     overlayRef.attach(componentPortal);
+     overlayRef.detach();
+@@ -340,7 +342,7 @@ describe('Overlay', () => {
+   }));
+ 
+   it('should clear the backdrop timeout if the overlay is disposed', fakeAsync(() => {
+-    const overlayRef = overlay.create({hasBackdrop: true});
++    const overlayRef = createOverlayRef(injector, {hasBackdrop: true});
+     overlayRef.attach(componentPortal);
+     overlayRef.detach();
+     overlayRef.dispose();
+@@ -373,7 +375,9 @@ describe('Overlay', () => {
+ 
+   it('should keep the direction in sync with the passed in Directionality', () => {
+     const customDirectionality = {value: 'rtl', change: new EventEmitter<Direction>()};
+-    const overlayRef = overlay.create({direction: customDirectionality as Directionality});
++    const overlayRef = createOverlayRef(injector, {
++      direction: customDirectionality as Directionality,
++    });
+ 
+     expect(overlayRef.getDirection()).toBe('rtl');
+     customDirectionality.value = 'ltr';
+@@ -381,7 +385,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should add and remove the overlay host as the ref is being attached and detached', async () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+ 
+     overlayRef.attach(componentPortal);
+@@ -416,7 +420,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should be able to dispose an overlay on navigation', () => {
+-    const overlayRef = overlay.create({disposeOnNavigation: true});
++    const overlayRef = createOverlayRef(injector, {disposeOnNavigation: true});
+     overlayRef.attach(componentPortal);
+ 
+     expect(overlayContainerElement.textContent).toContain('Pizza');
+@@ -427,7 +431,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should add and remove classes while open', () => {
+-    let overlayRef = overlay.create();
++    let overlayRef = createOverlayRef(injector);
+     overlayRef.attach(componentPortal);
+ 
+     const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+@@ -449,7 +453,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should not throw when trying to add or remove and empty string class', () => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     overlayRef.attach(componentPortal);
+ 
+     // Empty string
+@@ -466,7 +470,7 @@ describe('Overlay', () => {
+   });
+ 
+   it('should detach a component-based overlay when the view is destroyed', fakeAsync(() => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const paneElement = overlayRef.overlayElement;
+ 
+     overlayRef.attach(componentPortal);
+@@ -481,7 +485,7 @@ describe('Overlay', () => {
+   }));
+ 
+   it('should detach a template-based overlay when the view is destroyed', fakeAsync(() => {
+-    const overlayRef = overlay.create();
++    const overlayRef = createOverlayRef(injector);
+     const paneElement = overlayRef.overlayElement;
+ 
+     overlayRef.attach(templatePortal);
+@@ -505,7 +509,7 @@ describe('Overlay', () => {
+     it('should apply the positioning strategy', fakeAsync(() => {
+       config.positionStrategy = new FakePositionStrategy();
+ 
+-      overlay.create(config).attach(componentPortal);
++      createOverlayRef(injector, config).attach(componentPortal);
+       viewContainerFixture.detectChanges();
+       tick();
+ 
+@@ -521,7 +525,7 @@ describe('Overlay', () => {
+         dispose: () => {},
+       };
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayPresentInDom)
+@@ -542,7 +546,7 @@ describe('Overlay', () => {
+     it('should not apply the position if it detaches before the zone stabilizes', fakeAsync(() => {
+       config.positionStrategy = new FakePositionStrategy();
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       spyOn(config.positionStrategy, 'apply');
+ 
+@@ -566,7 +570,7 @@ describe('Overlay', () => {
+ 
+       config.positionStrategy = firstStrategy;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+       tick();
+@@ -598,7 +602,7 @@ describe('Overlay', () => {
+ 
+       config.positionStrategy = strategy;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+       tick();
+@@ -617,7 +621,7 @@ describe('Overlay', () => {
+     }));
+ 
+     it('should not throw when disposing multiple times in a row', () => {
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(injector);
+       overlayRef.attach(componentPortal);
+ 
+       expect(overlayContainerElement.textContent).toContain('Pizza');
+@@ -630,7 +634,7 @@ describe('Overlay', () => {
+     });
+ 
+     it('should not trigger timers when disposing of an overlay', fakeAsync(() => {
+-      const overlayRef = overlay.create({hasBackdrop: true});
++      const overlayRef = createOverlayRef(injector, {hasBackdrop: true});
+       overlayRef.attach(templatePortal);
+       overlayRef.dispose();
+ 
+@@ -649,7 +653,7 @@ describe('Overlay', () => {
+     it('should apply the width set in the config', () => {
+       config.width = 500;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.width).toBe('500px');
+@@ -658,7 +662,7 @@ describe('Overlay', () => {
+     it('should support using other units if a string width is provided', () => {
+       config.width = '200%';
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.width).toBe('200%');
+@@ -667,7 +671,7 @@ describe('Overlay', () => {
+     it('should apply the height set in the config', () => {
+       config.height = 500;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.height).toBe('500px');
+@@ -676,7 +680,7 @@ describe('Overlay', () => {
+     it('should support using other units if a string height is provided', () => {
+       config.height = '100vh';
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.height).toBe('100vh');
+@@ -685,7 +689,7 @@ describe('Overlay', () => {
+     it('should apply the min width set in the config', () => {
+       config.minWidth = 200;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.minWidth).toBe('200px');
+@@ -694,7 +698,7 @@ describe('Overlay', () => {
+     it('should apply the min height set in the config', () => {
+       config.minHeight = 500;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.minHeight).toBe('500px');
+@@ -703,7 +707,7 @@ describe('Overlay', () => {
+     it('should apply the max width set in the config', () => {
+       config.maxWidth = 200;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.maxWidth).toBe('200px');
+@@ -712,7 +716,7 @@ describe('Overlay', () => {
+     it('should apply the max height set in the config', () => {
+       config.maxHeight = 500;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.maxHeight).toBe('500px');
+@@ -722,7 +726,7 @@ describe('Overlay', () => {
+       config.width = 0;
+       config.height = 0;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(overlayRef.overlayElement.style.width).toBe('0px');
+@@ -734,7 +738,7 @@ describe('Overlay', () => {
+       config.width = config.height = 200;
+       config.maxWidth = config.maxHeight = 300;
+ 
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+       const style = overlayRef.overlayElement.style;
+ 
+@@ -774,7 +778,7 @@ describe('Overlay', () => {
+     });
+ 
+     it('should create and destroy an overlay backdrop', () => {
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+ 
+       viewContainerFixture.detectChanges();
+@@ -790,7 +794,7 @@ describe('Overlay', () => {
+     });
+ 
+     it('should complete the backdrop click stream once the overlay is destroyed', () => {
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+@@ -804,7 +808,7 @@ describe('Overlay', () => {
+     });
+ 
+     it('should apply the default overlay backdrop class', () => {
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+ 
+@@ -815,7 +819,7 @@ describe('Overlay', () => {
+     it('should apply a custom class to the backdrop', () => {
+       config.backdropClass = 'cdk-overlay-transparent-backdrop';
+ 
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+ 
+@@ -826,7 +830,7 @@ describe('Overlay', () => {
+     it('should apply multiple custom classes to the overlay', () => {
+       config.backdropClass = ['custom-class-1', 'custom-class-2'];
+ 
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+ 
+@@ -836,7 +840,7 @@ describe('Overlay', () => {
+     });
+ 
+     it('should disable the pointer events of a backdrop that is being removed', () => {
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+ 
+       viewContainerFixture.detectChanges();
+@@ -850,7 +854,7 @@ describe('Overlay', () => {
+     });
+ 
+     it('should insert the backdrop before the overlay host in the DOM order', () => {
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+@@ -867,7 +871,7 @@ describe('Overlay', () => {
+     });
+ 
+     it('should remove the event listener from the backdrop', () => {
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+ 
+       viewContainerFixture.detectChanges();
+@@ -894,7 +898,7 @@ describe('Overlay', () => {
+       TestBed.resetTestingModule();
+       setup([NoopAnimationsModule]);
+ 
+-      let overlayRef = overlay.create(config);
++      let overlayRef = createOverlayRef(injector, config);
+       overlayRef.attach(componentPortal);
+ 
+       viewContainerFixture.detectChanges();
+@@ -908,7 +912,7 @@ describe('Overlay', () => {
+     it('should apply a custom overlay pane class', () => {
+       const config = new OverlayConfig({panelClass: 'custom-panel-class'});
+ 
+-      overlay.create(config).attach(componentPortal);
++      createOverlayRef(injector, config).attach(componentPortal);
+       viewContainerFixture.detectChanges();
+ 
+       const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+@@ -918,7 +922,7 @@ describe('Overlay', () => {
+     it('should be able to apply multiple classes', () => {
+       const config = new OverlayConfig({panelClass: ['custom-class-one', 'custom-class-two']});
+ 
+-      overlay.create(config).attach(componentPortal);
++      createOverlayRef(injector, config).attach(componentPortal);
+       viewContainerFixture.detectChanges();
+ 
+       const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+@@ -929,7 +933,7 @@ describe('Overlay', () => {
+ 
+     it('should remove the custom panel class when the overlay is detached', async () => {
+       const config = new OverlayConfig({panelClass: 'custom-panel-class'});
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+@@ -952,7 +956,7 @@ describe('Overlay', () => {
+ 
+     it('should wait for the overlay to be detached before removing the panelClass', async () => {
+       const config = new OverlayConfig({panelClass: 'custom-panel-class'});
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+ 
+@@ -980,7 +984,7 @@ describe('Overlay', () => {
+     it('should attach the overlay ref to the scroll strategy', () => {
+       const fakeScrollStrategy = new FakeScrollStrategy();
+       const config = new OverlayConfig({scrollStrategy: fakeScrollStrategy});
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       expect(fakeScrollStrategy.overlayRef)
+         .withContext('Expected scroll strategy to have been attached to the current overlay ref.')
+@@ -990,7 +994,7 @@ describe('Overlay', () => {
+     it('should enable the scroll strategy when the overlay is attached', () => {
+       const fakeScrollStrategy = new FakeScrollStrategy();
+       const config = new OverlayConfig({scrollStrategy: fakeScrollStrategy});
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(fakeScrollStrategy.isEnabled)
+@@ -1001,7 +1005,7 @@ describe('Overlay', () => {
+     it('should disable the scroll strategy once the overlay is detached', () => {
+       const fakeScrollStrategy = new FakeScrollStrategy();
+       const config = new OverlayConfig({scrollStrategy: fakeScrollStrategy});
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.attach(componentPortal);
+       expect(fakeScrollStrategy.isEnabled)
+@@ -1017,7 +1021,7 @@ describe('Overlay', () => {
+     it('should disable the scroll strategy when the overlay is destroyed', () => {
+       const fakeScrollStrategy = new FakeScrollStrategy();
+       const config = new OverlayConfig({scrollStrategy: fakeScrollStrategy});
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       overlayRef.dispose();
+       expect(fakeScrollStrategy.isEnabled)
+@@ -1028,7 +1032,7 @@ describe('Overlay', () => {
+     it('should detach the scroll strategy when the overlay is destroyed', () => {
+       const fakeScrollStrategy = new FakeScrollStrategy();
+       const config = new OverlayConfig({scrollStrategy: fakeScrollStrategy});
+-      const overlayRef = overlay.create(config);
++      const overlayRef = createOverlayRef(injector, config);
+ 
+       expect(fakeScrollStrategy.overlayRef).toBe(overlayRef);
+ 
+@@ -1048,7 +1052,7 @@ describe('Overlay', () => {
+         spyOn(strategy, 'detach');
+       });
+ 
+-      const overlayRef = overlay.create({scrollStrategy: firstStrategy});
++      const overlayRef = createOverlayRef(injector, {scrollStrategy: firstStrategy});
+ 
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+@@ -1081,7 +1085,7 @@ describe('Overlay', () => {
+       spyOn(strategy, 'disable');
+       spyOn(strategy, 'detach');
+ 
+-      const overlayRef = overlay.create({scrollStrategy: strategy});
++      const overlayRef = createOverlayRef(injector, {scrollStrategy: strategy});
+ 
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+index cc06ed69e..757dd8f92 100644
+--- a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+@@ -15,8 +15,9 @@ import {Subscription} from 'rxjs';
+ import {map} from 'rxjs/operators';
+ import {
+   ConnectedOverlayPositionChange,
++  createFlexibleConnectedPositionStrategy,
++  createOverlayRef,
+   FlexibleConnectedPositionStrategy,
+-  Overlay,
+   OverlayConfig,
+   OverlayContainer,
+   OverlayModule,
+@@ -28,17 +29,17 @@ const DEFAULT_HEIGHT = 30;
+ const DEFAULT_WIDTH = 60;
+ 
+ describe('FlexibleConnectedPositionStrategy', () => {
+-  let overlay: Overlay;
+   let overlayContainer: OverlayContainer;
+   let overlayRef: OverlayRef;
+   let viewport: ViewportRuler;
++  let injector: Injector;
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [ScrollingModule, OverlayModule, PortalModule, TestOverlay],
+     });
+ 
+-    overlay = TestBed.inject(Overlay);
++    injector = TestBed.inject(Injector);
+     overlayContainer = TestBed.inject(OverlayContainer);
+     viewport = TestBed.inject(ViewportRuler);
+   });
+@@ -52,24 +53,24 @@ describe('FlexibleConnectedPositionStrategy', () => {
+   });
+ 
+   function attachOverlay(config: OverlayConfig) {
+-    overlayRef = overlay.create(config);
++    overlayRef = createOverlayRef(injector, config);
+     overlayRef.attach(new ComponentPortal(TestOverlay));
+     TestBed.inject(ApplicationRef).tick();
+   }
+ 
+   it('should throw when attempting to attach to multiple different overlays', () => {
+     const origin = document.createElement('div');
+-    const positionStrategy = overlay
+-      .position()
+-      .flexibleConnectedTo(origin)
+-      .withPositions([
+-        {
+-          overlayX: 'start',
+-          overlayY: 'top',
+-          originX: 'start',
+-          originY: 'bottom',
+-        },
+-      ]);
++    const positionStrategy = createFlexibleConnectedPositionStrategy(
++      injector,
++      origin,
++    ).withPositions([
++      {
++        overlayX: 'start',
++        overlayY: 'top',
++        originX: 'start',
++        originY: 'bottom',
++      },
++    ]);
+ 
+     // Needs to be in the DOM for IE not to throw an "Unspecified error".
+     document.body.appendChild(origin);
+@@ -82,17 +83,17 @@ describe('FlexibleConnectedPositionStrategy', () => {
+ 
+   it('should not throw when trying to apply after being disposed', () => {
+     const origin = document.createElement('div');
+-    const positionStrategy = overlay
+-      .position()
+-      .flexibleConnectedTo(origin)
+-      .withPositions([
+-        {
+-          overlayX: 'start',
+-          overlayY: 'top',
+-          originX: 'start',
+-          originY: 'bottom',
+-        },
+-      ]);
++    const positionStrategy = createFlexibleConnectedPositionStrategy(
++      injector,
++      origin,
++    ).withPositions([
++      {
++        overlayX: 'start',
++        overlayY: 'top',
++        originX: 'start',
++        originY: 'bottom',
++      },
++    ]);
+ 
+     // Needs to be in the DOM for IE not to throw an "Unspecified error".
+     document.body.appendChild(origin);
+@@ -106,17 +107,17 @@ describe('FlexibleConnectedPositionStrategy', () => {
+ 
+   it('should not throw when trying to re-apply the last position after being disposed', () => {
+     const origin = document.createElement('div');
+-    const positionStrategy = overlay
+-      .position()
+-      .flexibleConnectedTo(origin)
+-      .withPositions([
+-        {
+-          overlayX: 'start',
+-          overlayY: 'top',
+-          originX: 'start',
+-          originY: 'bottom',
+-        },
+-      ]);
++    const positionStrategy = createFlexibleConnectedPositionStrategy(
++      injector,
++      origin,
++    ).withPositions([
++      {
++        overlayX: 'start',
++        overlayY: 'top',
++        originX: 'start',
++        originY: 'bottom',
++      },
++    ]);
+ 
+     // Needs to be in the DOM for IE not to throw an "Unspecified error".
+     document.body.appendChild(origin);
+@@ -141,9 +142,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+     overlayContainer.getContainerElement().style.top = '-100px';
+ 
+     attachOverlay({
+-      positionStrategy: overlay
+-        .position()
+-        .flexibleConnectedTo(originElement)
++      positionStrategy: createFlexibleConnectedPositionStrategy(injector, originElement)
+         .withFlexibleDimensions(false)
+         .withPush(false)
+         .withPositions([
+@@ -183,9 +182,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+     originElement.style.left = '70px';
+ 
+     attachOverlay({
+-      positionStrategy: overlay
+-        .position()
+-        .flexibleConnectedTo(originElement)
++      positionStrategy: createFlexibleConnectedPositionStrategy(injector, originElement)
+         .withFlexibleDimensions(false)
+         .withPush(false)
+         .withPositions([
+@@ -206,19 +203,19 @@ describe('FlexibleConnectedPositionStrategy', () => {
+ 
+   it('should clean up after itself when disposed', () => {
+     const origin = document.createElement('div');
+-    const positionStrategy = overlay
+-      .position()
+-      .flexibleConnectedTo(origin)
+-      .withPositions([
+-        {
+-          overlayX: 'start',
+-          overlayY: 'top',
+-          originX: 'start',
+-          originY: 'bottom',
+-          offsetX: 10,
+-          offsetY: 20,
+-        },
+-      ]);
++    const positionStrategy = createFlexibleConnectedPositionStrategy(
++      injector,
++      origin,
++    ).withPositions([
++      {
++        overlayX: 'start',
++        overlayY: 'top',
++        originX: 'start',
++        originY: 'bottom',
++        offsetX: 10,
++        offsetY: 20,
++      },
++    ]);
+ 
+     // Needs to be in the DOM for IE not to throw an "Unspecified error".
+     document.body.appendChild(origin);
+@@ -263,9 +260,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+       // The origin and overlay elements need to be in the document body in order to have geometry.
+       originElement = createPositionedBlockElement();
+       document.body.appendChild(originElement);
+-      positionStrategy = overlay
+-        .position()
+-        .flexibleConnectedTo(originElement)
++      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement)
+         .withFlexibleDimensions(false)
+         .withPush(false);
+     });
+@@ -1248,9 +1243,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+     beforeEach(() => {
+       originElement = createPositionedBlockElement();
+       document.body.appendChild(originElement);
+-      positionStrategy = overlay
+-        .position()
+-        .flexibleConnectedTo(originElement)
++      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement)
+         .withFlexibleDimensions(false)
+         .withPush();
+     });
+@@ -1573,7 +1566,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+     beforeEach(() => {
+       originElement = createPositionedBlockElement();
+       document.body.appendChild(originElement);
+-      positionStrategy = overlay.position().flexibleConnectedTo(originElement);
++      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement);
+     });
+ 
+     afterEach(() => {
+@@ -2482,20 +2475,6 @@ describe('FlexibleConnectedPositionStrategy', () => {
+       document.body.appendChild(scrollable);
+       scrollable.appendChild(originElement);
+ 
+-      // Create a strategy with knowledge of the scrollable container
+-      const strategy = overlay
+-        .position()
+-        .flexibleConnectedTo(originElement)
+-        .withPush(false)
+-        .withPositions([
+-          {
+-            originX: 'start',
+-            originY: 'bottom',
+-            overlayX: 'start',
+-            overlayY: 'top',
+-          },
+-        ]);
+-
+       const injector = Injector.create({
+         parent: TestBed.inject(Injector),
+         providers: [
+@@ -2510,6 +2489,18 @@ describe('FlexibleConnectedPositionStrategy', () => {
+         ],
+       });
+ 
++      // Create a strategy with knowledge of the scrollable container
++      const strategy = createFlexibleConnectedPositionStrategy(injector, originElement)
++        .withPush(false)
++        .withPositions([
++          {
++            originX: 'start',
++            originY: 'bottom',
++            overlayX: 'start',
++            overlayY: 'top',
++          },
++        ]);
++
+       runInInjectionContext(injector, () => {
+         strategy.withScrollableContainers([new CdkScrollable()]);
+       });
+@@ -2588,7 +2579,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+     beforeEach(() => {
+       originElement = createPositionedBlockElement();
+       document.body.appendChild(originElement);
+-      positionStrategy = overlay.position().flexibleConnectedTo(originElement);
++      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement);
+     });
+ 
+     afterEach(() => {
+@@ -2708,7 +2699,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+     beforeEach(() => {
+       originElement = createPositionedBlockElement();
+       document.body.appendChild(originElement);
+-      positionStrategy = overlay.position().flexibleConnectedTo(originElement);
++      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement);
+     });
+ 
+     afterEach(() => {
+@@ -2766,9 +2757,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+     beforeEach(() => {
+       originElement = createPositionedBlockElement();
+       document.body.appendChild(originElement);
+-      positionStrategy = overlay
+-        .position()
+-        .flexibleConnectedTo(originElement)
++      positionStrategy = createFlexibleConnectedPositionStrategy(injector, originElement)
+         .withFlexibleDimensions(false)
+         .withPush(false);
+     });
+diff --git a/src/cdk/overlay/position/global-position-strategy.spec.ts b/src/cdk/overlay/position/global-position-strategy.spec.ts
+index 5588702b1..e0c7f8080 100644
+--- a/src/cdk/overlay/position/global-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/global-position-strategy.spec.ts
+@@ -1,18 +1,24 @@
+-import {Component, ApplicationRef} from '@angular/core';
++import {Component, ApplicationRef, Injector} from '@angular/core';
+ import {TestBed} from '@angular/core/testing';
+ import {PortalModule, ComponentPortal} from '../../portal';
+-import {OverlayModule, Overlay, OverlayConfig, OverlayRef} from '../index';
++import {
++  OverlayModule,
++  OverlayConfig,
++  OverlayRef,
++  createOverlayRef,
++  createGlobalPositionStrategy,
++} from '../index';
+ 
+ describe('GlobalPositonStrategy', () => {
+   let overlayRef: OverlayRef;
+-  let overlay: Overlay;
++  let injector: Injector;
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [OverlayModule, PortalModule, BlankPortal],
+     });
+ 
+-    overlay = TestBed.inject(Overlay);
++    injector = TestBed.inject(Injector);
+   });
+ 
+   afterEach(() => {
+@@ -24,7 +30,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   function attachOverlay(config: OverlayConfig): OverlayRef {
+     const portal = new ComponentPortal(BlankPortal);
+-    overlayRef = overlay.create(config);
++    overlayRef = createOverlayRef(injector, config);
+     overlayRef.attach(portal);
+     TestBed.inject(ApplicationRef).tick();
+     return overlayRef;
+@@ -32,7 +38,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should position the element to the (top, left) with an offset', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().top('10px').left('40px'),
++      positionStrategy: createGlobalPositionStrategy(injector).top('10px').left('40px'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+@@ -49,7 +55,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should position the element to the (bottom, right) with an offset', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().bottom('70px').right('15em'),
++      positionStrategy: createGlobalPositionStrategy(injector).bottom('70px').right('15em'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+@@ -65,7 +71,9 @@ describe('GlobalPositonStrategy', () => {
+   });
+ 
+   it('should overwrite previously applied positioning', () => {
+-    const positionStrategy = overlay.position().global().centerHorizontally().centerVertically();
++    const positionStrategy = createGlobalPositionStrategy(injector)
++      .centerHorizontally()
++      .centerVertically();
+ 
+     attachOverlay({positionStrategy});
+     positionStrategy.top('10px').left('40%');
+@@ -96,7 +104,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should not set any alignment by default', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global(),
++      positionStrategy: createGlobalPositionStrategy(injector),
+     });
+ 
+     const parentStyle = (overlayRef.overlayElement.parentNode as HTMLElement).style;
+@@ -107,7 +115,9 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should center the element', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().centerHorizontally().centerVertically(),
++      positionStrategy: createGlobalPositionStrategy(injector)
++        .centerHorizontally()
++        .centerVertically(),
+     });
+ 
+     const parentStyle = (overlayRef.overlayElement.parentNode as HTMLElement).style;
+@@ -118,9 +128,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should center the element with an offset', () => {
+     attachOverlay({
+-      positionStrategy: overlay
+-        .position()
+-        .global()
++      positionStrategy: createGlobalPositionStrategy(injector)
+         .centerHorizontally('10px')
+         .centerVertically('15px'),
+     });
+@@ -140,9 +148,7 @@ describe('GlobalPositonStrategy', () => {
+   it('should center the element with an offset in rtl', () => {
+     attachOverlay({
+       direction: 'rtl',
+-      positionStrategy: overlay
+-        .position()
+-        .global()
++      positionStrategy: createGlobalPositionStrategy(injector)
+         .centerHorizontally('10px')
+         .centerVertically('15px'),
+     });
+@@ -160,7 +166,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should make the element position: static', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global(),
++      positionStrategy: createGlobalPositionStrategy(injector),
+     });
+ 
+     expect(overlayRef.overlayElement.style.position).toBe('static');
+@@ -168,7 +174,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should wrap the element in a `cdk-global-overlay-wrapper`', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global(),
++      positionStrategy: createGlobalPositionStrategy(injector),
+     });
+ 
+     const parent = overlayRef.overlayElement.parentNode as HTMLElement;
+@@ -178,7 +184,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should remove the parent wrapper from the DOM', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global(),
++      positionStrategy: createGlobalPositionStrategy(injector),
+     });
+ 
+     const parent = overlayRef.overlayElement.parentNode!;
+@@ -192,7 +198,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should set the element width', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().width('100px'),
++      positionStrategy: createGlobalPositionStrategy(injector).width('100px'),
+     });
+ 
+     expect(overlayRef.overlayElement.style.width).toBe('100px');
+@@ -200,7 +206,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should set the element height', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().height('100px'),
++      positionStrategy: createGlobalPositionStrategy(injector).height('100px'),
+     });
+ 
+     expect(overlayRef.overlayElement.style.height).toBe('100px');
+@@ -208,7 +214,9 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should reset the horizontal position and offset when the width is 100%', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().centerHorizontally('10px').width('100%'),
++      positionStrategy: createGlobalPositionStrategy(injector)
++        .centerHorizontally('10px')
++        .width('100%'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+@@ -224,7 +232,9 @@ describe('GlobalPositonStrategy', () => {
+     () => {
+       attachOverlay({
+         maxWidth: '100%',
+-        positionStrategy: overlay.position().global().centerHorizontally('10px').width('100%'),
++        positionStrategy: createGlobalPositionStrategy(injector)
++          .centerHorizontally('10px')
++          .width('100%'),
+       });
+ 
+       const elementStyle = overlayRef.overlayElement.style;
+@@ -241,7 +251,9 @@ describe('GlobalPositonStrategy', () => {
+     () => {
+       attachOverlay({
+         maxWidth: '500px',
+-        positionStrategy: overlay.position().global().centerHorizontally('10px').width('100%'),
++        positionStrategy: createGlobalPositionStrategy(injector)
++          .centerHorizontally('10px')
++          .width('100%'),
+       });
+ 
+       const elementStyle = overlayRef.overlayElement.style;
+@@ -254,7 +266,9 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should reset the vertical position and offset when the height is 100%', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().centerVertically('10px').height('100%'),
++      positionStrategy: createGlobalPositionStrategy(injector)
++        .centerVertically('10px')
++        .height('100%'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+@@ -270,7 +284,9 @@ describe('GlobalPositonStrategy', () => {
+     () => {
+       attachOverlay({
+         maxHeight: '100%',
+-        positionStrategy: overlay.position().global().centerVertically('10px').height('100%'),
++        positionStrategy: createGlobalPositionStrategy(injector)
++          .centerVertically('10px')
++          .height('100%'),
+       });
+ 
+       const elementStyle = overlayRef.overlayElement.style;
+@@ -287,7 +303,9 @@ describe('GlobalPositonStrategy', () => {
+     () => {
+       attachOverlay({
+         maxHeight: '500px',
+-        positionStrategy: overlay.position().global().centerVertically('10px').height('100%'),
++        positionStrategy: createGlobalPositionStrategy(injector)
++          .centerVertically('10px')
++          .height('100%'),
+       });
+ 
+       const elementStyle = overlayRef.overlayElement.style;
+@@ -299,7 +317,7 @@ describe('GlobalPositonStrategy', () => {
+   );
+ 
+   it('should not throw when attempting to apply after the overlay has been disposed', () => {
+-    const positionStrategy = overlay.position().global();
++    const positionStrategy = createGlobalPositionStrategy(injector);
+ 
+     attachOverlay({positionStrategy});
+ 
+@@ -310,7 +328,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should take its width and height from the overlay config', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global(),
++      positionStrategy: createGlobalPositionStrategy(injector),
+       width: '500px',
+       height: '300px',
+     });
+@@ -323,7 +341,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should update the overlay size when setting it through the position strategy', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().width('500px').height('300px'),
++      positionStrategy: createGlobalPositionStrategy(injector).width('500px').height('300px'),
+     });
+ 
+     expect(overlayRef.getConfig().width).toBe('500px');
+@@ -335,7 +353,7 @@ describe('GlobalPositonStrategy', () => {
+       'config and the strategy',
+     () => {
+       attachOverlay({
+-        positionStrategy: overlay.position().global().width('200px').height('100px'),
++        positionStrategy: createGlobalPositionStrategy(injector).width('200px').height('100px'),
+         width: '500px',
+         height: '300px',
+       });
+@@ -350,7 +368,9 @@ describe('GlobalPositonStrategy', () => {
+   it('should center the element in RTL', () => {
+     attachOverlay({
+       direction: 'rtl',
+-      positionStrategy: overlay.position().global().centerHorizontally().centerVertically(),
++      positionStrategy: createGlobalPositionStrategy(injector)
++        .centerHorizontally()
++        .centerVertically(),
+     });
+ 
+     const parentStyle = (overlayRef.overlayElement.parentNode as HTMLElement).style;
+@@ -360,7 +380,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should invert `justify-content` when using `left` in RTL', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().left('0'),
++      positionStrategy: createGlobalPositionStrategy(injector).left('0'),
+       direction: 'rtl',
+     });
+ 
+@@ -370,7 +390,7 @@ describe('GlobalPositonStrategy', () => {
+ 
+   it('should invert `justify-content` when using `right` in RTL', () => {
+     attachOverlay({
+-      positionStrategy: overlay.position().global().right('0'),
++      positionStrategy: createGlobalPositionStrategy(injector).right('0'),
+       direction: 'rtl',
+     });
+ 
+@@ -379,7 +399,7 @@ describe('GlobalPositonStrategy', () => {
+   });
+ 
+   it('should clean up after itself when it has been disposed', () => {
+-    const positionStrategy = overlay.position().global().top('10px').left('40px');
++    const positionStrategy = createGlobalPositionStrategy(injector).top('10px').left('40px');
+ 
+     attachOverlay({positionStrategy});
+ 
+@@ -401,7 +421,7 @@ describe('GlobalPositonStrategy', () => {
+   it('should position the overlay to the start in ltr', () => {
+     attachOverlay({
+       direction: 'ltr',
+-      positionStrategy: overlay.position().global().start('40px'),
++      positionStrategy: createGlobalPositionStrategy(injector).start('40px'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+@@ -415,7 +435,7 @@ describe('GlobalPositonStrategy', () => {
+   it('should position the overlay to the start in rtl', () => {
+     attachOverlay({
+       direction: 'rtl',
+-      positionStrategy: overlay.position().global().start('50px'),
++      positionStrategy: createGlobalPositionStrategy(injector).start('50px'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+@@ -429,7 +449,7 @@ describe('GlobalPositonStrategy', () => {
+   it('should position the overlay to the end in ltr', () => {
+     attachOverlay({
+       direction: 'ltr',
+-      positionStrategy: overlay.position().global().end('60px'),
++      positionStrategy: createGlobalPositionStrategy(injector).end('60px'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+@@ -443,7 +463,7 @@ describe('GlobalPositonStrategy', () => {
+   it('should position the overlay to the end in rtl', () => {
+     attachOverlay({
+       direction: 'rtl',
+-      positionStrategy: overlay.position().global().end('70px'),
++      positionStrategy: createGlobalPositionStrategy(injector).end('70px'),
+     });
+ 
+     const elementStyle = overlayRef.overlayElement.style;
+diff --git a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+index f7353e3f7..c7aaa6a2b 100644
+--- a/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/block-scroll-strategy.spec.ts
+@@ -1,9 +1,16 @@
+-import {Component} from '@angular/core';
++import {Component, Injector} from '@angular/core';
+ import {waitForAsync, TestBed} from '@angular/core/testing';
+ import {ComponentPortal, PortalModule} from '../../portal';
+ import {Platform} from '../../platform';
+ import {ViewportRuler} from '../../scrolling';
+-import {Overlay, OverlayContainer, OverlayModule, OverlayRef, OverlayConfig} from '../index';
++import {
++  OverlayContainer,
++  OverlayModule,
++  OverlayRef,
++  OverlayConfig,
++  createBlockScrollStrategy,
++  createOverlayRef,
++} from '../index';
+ 
+ describe('BlockScrollStrategy', () => {
+   let platform: Platform;
+@@ -17,13 +24,13 @@ describe('BlockScrollStrategy', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({imports: [OverlayModule, PortalModule, FocacciaMsg]});
+ 
+-    const overlay = TestBed.inject(Overlay);
+-    const overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.block()});
++    const injector = TestBed.inject(Injector);
++    const overlayConfig = new OverlayConfig({scrollStrategy: createBlockScrollStrategy(injector)});
+ 
+     viewport = TestBed.inject(ViewportRuler);
+     platform = TestBed.inject(Platform);
+     overlayContainer = TestBed.inject(OverlayContainer);
+-    overlayRef = overlay.create(overlayConfig);
++    overlayRef = createOverlayRef(injector, overlayConfig);
+     componentPortal = new ComponentPortal(FocacciaMsg);
+     documentElement = document.documentElement!;
+     documentElement.classList.remove('cdk-global-scrollblock');
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+index 2eac586b2..60c338a39 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.spec.ts
+@@ -1,9 +1,16 @@
+ import {ComponentPortal, PortalModule} from '../../portal';
+ import {CdkScrollable, ScrollDispatcher, ViewportRuler} from '../../scrolling';
+-import {Component, ElementRef} from '@angular/core';
++import {Component, ElementRef, Injector} from '@angular/core';
+ import {TestBed, fakeAsync} from '@angular/core/testing';
+ import {Subject} from 'rxjs';
+-import {Overlay, OverlayConfig, OverlayContainer, OverlayModule, OverlayRef} from '../index';
++import {
++  createCloseScrollStrategy,
++  createOverlayRef,
++  OverlayConfig,
++  OverlayContainer,
++  OverlayModule,
++  OverlayRef,
++} from '../index';
+ 
+ describe('CloseScrollStrategy', () => {
+   let overlayRef: OverlayRef;
+@@ -11,7 +18,7 @@ describe('CloseScrollStrategy', () => {
+   let scrolledSubject = new Subject<CdkScrollable | undefined>();
+   let scrollPosition: number;
+   let overlayContainer: OverlayContainer;
+-  let overlay: Overlay;
++  let injector: Injector;
+ 
+   beforeEach(fakeAsync(() => {
+     scrollPosition = 0;
+@@ -35,9 +42,9 @@ describe('CloseScrollStrategy', () => {
+     });
+ 
+     overlayContainer = TestBed.inject(OverlayContainer);
+-    overlay = TestBed.inject(Overlay);
+-    const overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.close()});
+-    overlayRef = overlay.create(overlayConfig);
++    injector = TestBed.inject(Injector);
++    const overlayConfig = new OverlayConfig({scrollStrategy: createCloseScrollStrategy(injector)});
++    overlayRef = createOverlayRef(injector, overlayConfig);
+     componentPortal = new ComponentPortal(MozarellaMsg);
+   }));
+ 
+@@ -77,8 +84,8 @@ describe('CloseScrollStrategy', () => {
+   it('should be able to reposition the overlay up to a certain threshold before closing', () => {
+     overlayRef.dispose();
+ 
+-    overlayRef = overlay.create({
+-      scrollStrategy: overlay.scrollStrategies.close({threshold: 50}),
++    overlayRef = createOverlayRef(injector, {
++      scrollStrategy: createCloseScrollStrategy(injector, {threshold: 50}),
+     });
+ 
+     overlayRef.attach(componentPortal);
+@@ -103,8 +110,8 @@ describe('CloseScrollStrategy', () => {
+     overlayRef.dispose();
+     scrollPosition = 100;
+ 
+-    overlayRef = overlay.create({
+-      scrollStrategy: overlay.scrollStrategies.close({threshold: 50}),
++    overlayRef = createOverlayRef(injector, {
++      scrollStrategy: createCloseScrollStrategy(injector, {threshold: 50}),
+     });
+ 
+     overlayRef.attach(componentPortal);
+diff --git a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+index 99a2572bc..d695f1a30 100644
+--- a/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
++++ b/src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts
+@@ -1,13 +1,18 @@
+ import {ComponentPortal, PortalModule} from '../../portal';
+-import {Component, NgZone, provideZoneChangeDetection} from '@angular/core';
++import {Component, Injector, NgZone, provideZoneChangeDetection} from '@angular/core';
+ import {TestBed, fakeAsync} from '@angular/core/testing';
+ import {Subject} from 'rxjs';
+-import {Overlay} from '../overlay';
+ import {OverlayConfig} from '../overlay-config';
+ import {OverlayContainer} from '../overlay-container';
+ import {OverlayModule} from '../overlay-module';
+ import {OverlayRef} from '../overlay-ref';
+-import {CdkScrollable, ScrollDispatcher, ViewportRuler} from '../public-api';
++import {
++  CdkScrollable,
++  createCloseScrollStrategy,
++  createOverlayRef,
++  ScrollDispatcher,
++  ViewportRuler,
++} from '../public-api';
+ 
+ describe('CloseScrollStrategy Zone.js integration', () => {
+   let overlayRef: OverlayRef;
+@@ -38,9 +43,9 @@ describe('CloseScrollStrategy Zone.js integration', () => {
+       ],
+     });
+ 
+-    const overlay = TestBed.inject(Overlay);
+-    const overlayConfig = new OverlayConfig({scrollStrategy: overlay.scrollStrategies.close()});
+-    overlayRef = overlay.create(overlayConfig);
++    const injector = TestBed.inject(Injector);
++    const overlayConfig = new OverlayConfig({scrollStrategy: createCloseScrollStrategy(injector)});
++    overlayRef = createOverlayRef(injector, overlayConfig);
+     componentPortal = new ComponentPortal(MozarellaMsg);
+     overlayContainer = TestBed.inject(OverlayContainer);
+   }));
+diff --git a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+index 412051b9f..8a1c9effc 100644
+--- a/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
++++ b/src/cdk/overlay/scroll/reposition-scroll-strategy.spec.ts
+@@ -1,19 +1,20 @@
+ import {waitForAsync, TestBed} from '@angular/core/testing';
+-import {Component} from '@angular/core';
++import {Component, Injector} from '@angular/core';
+ import {Subject} from 'rxjs';
+ import {ComponentPortal, PortalModule} from '../../portal';
+ import {
+-  Overlay,
+   OverlayContainer,
+   OverlayModule,
+   OverlayRef,
+   OverlayConfig,
+   ScrollDispatcher,
++  createRepositionScrollStrategy,
++  createOverlayRef,
+ } from '../index';
+ 
+ describe('RepositionScrollStrategy', () => {
++  let injector: Injector;
+   let overlayRef: OverlayRef;
+-  let overlay: Overlay;
+   let overlayContainer: OverlayContainer;
+   let componentPortal: ComponentPortal<PastaMsg>;
+   let scrolledSubject = new Subject();
+@@ -31,7 +32,7 @@ describe('RepositionScrollStrategy', () => {
+       ],
+     });
+ 
+-    overlay = TestBed.inject(Overlay);
++    injector = TestBed.inject(Injector);
+     overlayContainer = TestBed.inject(OverlayContainer);
+     componentPortal = new ComponentPortal(PastaMsg);
+   }));
+@@ -43,10 +44,10 @@ describe('RepositionScrollStrategy', () => {
+ 
+   it('should update the overlay position when the page is scrolled', () => {
+     const overlayConfig = new OverlayConfig({
+-      scrollStrategy: overlay.scrollStrategies.reposition(),
++      scrollStrategy: createRepositionScrollStrategy(injector),
+     });
+ 
+-    overlayRef = overlay.create(overlayConfig);
++    overlayRef = createOverlayRef(injector, overlayConfig);
+     overlayRef.attach(componentPortal);
+     spyOn(overlayRef, 'updatePosition');
+ 
+@@ -59,10 +60,10 @@ describe('RepositionScrollStrategy', () => {
+ 
+   it('should not be updating the position after the overlay is detached', () => {
+     const overlayConfig = new OverlayConfig({
+-      scrollStrategy: overlay.scrollStrategies.reposition(),
++      scrollStrategy: createRepositionScrollStrategy(injector),
+     });
+ 
+-    overlayRef = overlay.create(overlayConfig);
++    overlayRef = createOverlayRef(injector, overlayConfig);
+     overlayRef.attach(componentPortal);
+     spyOn(overlayRef, 'updatePosition');
+ 
+@@ -74,10 +75,10 @@ describe('RepositionScrollStrategy', () => {
+ 
+   it('should not be updating the position after the overlay is destroyed', () => {
+     const overlayConfig = new OverlayConfig({
+-      scrollStrategy: overlay.scrollStrategies.reposition(),
++      scrollStrategy: createRepositionScrollStrategy(injector),
+     });
+ 
+-    overlayRef = overlay.create(overlayConfig);
++    overlayRef = createOverlayRef(injector, overlayConfig);
+     overlayRef.attach(componentPortal);
+     spyOn(overlayRef, 'updatePosition');
+ 
+@@ -89,12 +90,12 @@ describe('RepositionScrollStrategy', () => {
+ 
+   it('should be able to close the overlay once it is out of view', () => {
+     const overlayConfig = new OverlayConfig({
+-      scrollStrategy: overlay.scrollStrategies.reposition({
++      scrollStrategy: createRepositionScrollStrategy(injector, {
+         autoClose: true,
+       }),
+     });
+ 
+-    overlayRef = overlay.create(overlayConfig);
++    overlayRef = createOverlayRef(injector, overlayConfig);
+     overlayRef.attach(componentPortal);
+     spyOn(overlayRef, 'updatePosition');
+     spyOn(overlayRef, 'detach');

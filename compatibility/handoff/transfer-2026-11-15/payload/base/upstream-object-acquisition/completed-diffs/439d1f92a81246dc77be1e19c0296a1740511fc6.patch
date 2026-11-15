@@ -1,0 +1,815 @@
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.ts b/src/cdk/scrolling/virtual-scroll-viewport.ts
+index bc241f022..012425944 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.ts
+@@ -35,10 +35,11 @@ import {
+   asapScheduler,
+   Observable,
+   Observer,
++  OperatorFunction,
+   Subject,
+   Subscription,
+ } from 'rxjs';
+-import {auditTime, startWith, takeUntil} from 'rxjs/operators';
++import {auditTime, distinctUntilChanged, filter, startWith, takeUntil} from 'rxjs/operators';
+ import {CdkScrollable, ExtendedScrollToOptions} from './scrollable';
+ import {ViewportRuler} from './viewport-ruler';
+ import {CdkVirtualScrollRepeater} from './virtual-scroll-repeater';
+@@ -103,6 +104,15 @@ export class CdkVirtualScrollViewport extends CdkVirtualScrollable implements On
+   /** Emits when the rendered range changes. */
+   private readonly _renderedRangeSubject = new Subject<ListRange>();
+ 
++  /**
++   * Emits the offset from the start of the viewport to the start of the rendered data (in pixels).
++   */
++  private readonly _renderedContentOffsetRenderedSubject = new Subject<number | null>();
++  readonly _renderedContentOffsetRendered = this._renderedContentOffsetRenderedSubject.pipe(
++    filter(offset => offset !== null) as OperatorFunction<number | null, number>,
++    distinctUntilChanged(),
++  );
++
+   /** The direction the viewport scrolls. */
+   @Input()
+   get orientation() {
+@@ -538,6 +548,10 @@ export class CdkVirtualScrollViewport extends CdkVirtualScrollable implements On
+       // the `Number` function first to coerce it to a numeric value.
+       this._contentWrapper.nativeElement.style.transform = this._renderedContentTransform;
+ 
++      // Emit the offset to rendered content start when it is in sync with what is rendered in the
++      // DOM.
++      this._renderedContentOffsetRenderedSubject.next(this.getOffsetToRenderedContentStart());
++
+       afterNextRender(
+         () => {
+           this._changeDetectionNeeded.set(false);
+diff --git a/src/cdk/table/public-api.ts b/src/cdk/table/public-api.ts
+index 4e8b735c6..4641b353f 100644
+--- a/src/cdk/table/public-api.ts
++++ b/src/cdk/table/public-api.ts
+@@ -13,6 +13,7 @@ export * from './table-module';
+ export * from './sticky-position-listener';
+ export * from './text-column';
+ export * from './tokens';
++export * from './table-virtual-scroll';
+ 
+ /** Re-export DataSource for a more intuitive experience for users of just the table. */
+ export {DataSource} from '../collections';
+diff --git a/src/cdk/table/table-module.ts b/src/cdk/table/table-module.ts
+index c7ec0fab9..011ae4d41 100644
+--- a/src/cdk/table/table-module.ts
++++ b/src/cdk/table/table-module.ts
+@@ -36,6 +36,7 @@ import {
+ } from './cell';
+ import {CdkTextColumn} from './text-column';
+ import {ScrollingModule} from '../scrolling';
++import {CdkTableVirtualScroll} from './table-virtual-scroll';
+ 
+ const EXPORTED_DECLARATIONS = [
+   CdkTable,
+@@ -60,6 +61,7 @@ const EXPORTED_DECLARATIONS = [
+   CdkNoDataRow,
+   CdkRecycleRows,
+   NoDataRowOutlet,
++  CdkTableVirtualScroll,
+ ];
+ 
+ @NgModule({
+diff --git a/src/cdk/table/table-virtual-scroll.ts b/src/cdk/table/table-virtual-scroll.ts
+new file mode 100644
+index 000000000..b994f8bbb
+--- /dev/null
++++ b/src/cdk/table/table-virtual-scroll.ts
+@@ -0,0 +1,247 @@
++/**
++ * @license
++ * Copyright Google LLC All Rights Reserved.
++ *
++ * Use of this source code is governed by an MIT-style license that can be
++ * found in the LICENSE file at https://angular.dev/license
++ */
++import {Directive, inject, Input, OnDestroy} from '@angular/core';
++import {_RecycleViewRepeaterStrategy, _VIEW_REPEATER_STRATEGY, ListRange} from '../collections';
++import {BehaviorSubject, combineLatest, Observable, ReplaySubject, Subject} from 'rxjs';
++import {shareReplay, takeUntil} from 'rxjs/operators';
++import {CdkVirtualScrollRepeater, CdkVirtualScrollViewport} from '../scrolling';
++import {
++  StickyPositioningListener,
++  StickyUpdate,
++  STICKY_POSITIONING_LISTENER,
++} from './sticky-position-listener';
++import {_TABLE_VIEW_CHANGE_STRATEGY, CdkTable, RenderRow, RowContext} from './table';
++
++/**
++ * An implementation of {@link StickyPositioningListener} that forwards sticky updates to another
++ * listener.
++ *
++ * The {@link CdkTableVirtualScroll} directive cannot provide itself as a
++ * {@link StickyPositioningListener} because the providers for both entities would point to the same
++ * instance. The {@link CdkTable} depends on the sticky positioning listener and the table virtual
++ * scroll depends on the table. Since the sticky positioning listener and table virtual scroll would
++ * be the same instance, this would create a circular dependency.
++ *
++ * The {@link CdkTableVirtualScroll} instead provides this class and attaches itself as the
++ * receiving listener so {@link StickyPositioningListener} and {@link CdkTableVirtualScroll} are
++ * provided as separate instances.
++ *
++ * @docs-private
++ */
++export class _PositioningListenerProxy implements StickyPositioningListener {
++  private _listener?: StickyPositioningListener;
++
++  setListener(listener: StickyPositioningListener) {
++    this._listener = listener;
++  }
++
++  stickyColumnsUpdated(update: StickyUpdate): void {
++    this._listener?.stickyColumnsUpdated(update);
++  }
++
++  stickyEndColumnsUpdated(update: StickyUpdate): void {
++    this._listener?.stickyEndColumnsUpdated(update);
++  }
++
++  stickyFooterRowsUpdated(update: StickyUpdate): void {
++    this._listener?.stickyFooterRowsUpdated(update);
++  }
++
++  stickyHeaderRowsUpdated(update: StickyUpdate): void {
++    this._listener?.stickyHeaderRowsUpdated(update);
++  }
++}
++
++/** @docs-private */
++export const _TABLE_VIRTUAL_SCROLL_COLLECTION_VIEWER_FACTORY = () =>
++  new BehaviorSubject<ListRange>({start: 0, end: 0});
++
++/**
++ * A directive that enables virtual scroll for a {@link CdkTable}.
++ */
++@Directive({
++  selector: 'cdk-table[virtualScroll], table[cdk-table][virtualScroll]',
++  exportAs: 'cdkVirtualScroll',
++  providers: [
++    {provide: _VIEW_REPEATER_STRATEGY, useClass: _RecycleViewRepeaterStrategy},
++    // The directive cannot provide itself as the sticky positions listener because it introduces
++    // a circular dependency. Use an intermediate listener as a proxy.
++    {provide: STICKY_POSITIONING_LISTENER, useClass: _PositioningListenerProxy},
++    // Initially emit an empty range. The virtual scroll viewport will update the range after it is
++    // initialized.
++    {
++      provide: _TABLE_VIEW_CHANGE_STRATEGY,
++      useFactory: _TABLE_VIRTUAL_SCROLL_COLLECTION_VIEWER_FACTORY,
++    },
++  ],
++  host: {
++    'class': 'cdk-table-virtual-scroll',
++  },
++})
++export class CdkTableVirtualScroll<T>
++  implements CdkVirtualScrollRepeater<T>, OnDestroy, StickyPositioningListener
++{
++  private readonly _table = inject<CdkTable<T>>(CdkTable);
++  private readonly _viewChange = inject<BehaviorSubject<ListRange>>(_TABLE_VIEW_CHANGE_STRATEGY);
++  private readonly _viewRepeater =
++    inject<_RecycleViewRepeaterStrategy<T, RenderRow<T>, RowContext<T>>>(_VIEW_REPEATER_STRATEGY);
++  private readonly _viewport = inject(CdkVirtualScrollViewport);
++
++  /** Emits when the component is destroyed. */
++  private _destroyed = new ReplaySubject<void>(1);
++
++  /** Emits when the header rows sticky state changes. */
++  private readonly _headerRowStickyUpdates = new Subject<StickyUpdate>();
++
++  /** Emits when the footer rows sticky state changes. */
++  private readonly _footerRowStickyUpdates = new Subject<StickyUpdate>();
++
++  /**
++   * Observable that emits the data source's complete data set. This exists to implement
++   * {@link CdkVirtualScrollRepeater}.
++   */
++  get dataStream(): Observable<readonly T[]> {
++    return this._dataStream;
++  }
++  private _dataStream = this._table._dataStream.pipe(shareReplay(1));
++
++  /**
++   * The size of the cache used to store unused views. Setting the cache size to `0` will disable
++   * caching.
++   */
++  @Input()
++  get viewCacheSize(): number {
++    return this._viewRepeater.viewCacheSize;
++  }
++  set viewCacheSize(size: number) {
++    this._viewRepeater.viewCacheSize = size;
++  }
++
++  constructor() {
++    const positioningListener = inject<_PositioningListenerProxy>(STICKY_POSITIONING_LISTENER);
++    positioningListener.setListener(this);
++
++    // Force the table to enable `fixedLayout` to prevent column widths from changing as the user
++    // scrolls. This also enables caching in the table's sticky styler which reduces calls to
++    // expensive DOM APIs, such as `getBoundingClientRect()`, and improves overall performance.
++    if (!this._table.fixedLayout && (typeof ngDevMode === 'undefined' || ngDevMode)) {
++      throw Error('[virtualScroll] requires input `fixedLayout` to be set on the table.');
++    }
++
++    // Update sticky styles for header rows when either the render range or sticky state change.
++    combineLatest([this._viewport._renderedContentOffsetRendered, this._headerRowStickyUpdates])
++      .pipe(takeUntil(this._destroyed))
++      .subscribe(([offset, update]) => {
++        this._stickHeaderRows(offset, update);
++      });
++
++    // Update sticky styles for footer rows when either the render range or sticky state change.
++    combineLatest([this._viewport._renderedContentOffsetRendered, this._footerRowStickyUpdates])
++      .pipe(takeUntil(this._destroyed))
++      .subscribe(([offset, update]) => {
++        this._stickFooterRows(offset, update);
++      });
++
++    // Forward the rendered range computed by the virtual scroll viewport to the table.
++    this._viewport.renderedRangeStream.pipe(takeUntil(this._destroyed)).subscribe(this._viewChange);
++    this._viewport.attach(this);
++  }
++
++  ngOnDestroy() {
++    this._destroyed.next();
++    this._destroyed.complete();
++  }
++
++  /**
++   * Measures the combined size (width for horizontal orientation, height for vertical) of all items
++   * in the specified range.
++   */
++  measureRangeSize(range: ListRange, orientation: 'horizontal' | 'vertical'): number {
++    // TODO(michaeljamesparsons) Implement method so virtual tables can use the `autosize` virtual
++    //  scroll strategy.
++    if (typeof ngDevMode === 'undefined' || ngDevMode) {
++      throw new Error('autoSize is not supported for tables with virtual scroll enabled.');
++    }
++    return 0;
++  }
++
++  stickyColumnsUpdated(update: StickyUpdate): void {
++    // no-op
++  }
++
++  stickyEndColumnsUpdated(update: StickyUpdate): void {
++    // no-op
++  }
++
++  stickyHeaderRowsUpdated(update: StickyUpdate): void {
++    this._headerRowStickyUpdates.next(update);
++  }
++
++  stickyFooterRowsUpdated(update: StickyUpdate): void {
++    this._footerRowStickyUpdates.next(update);
++  }
++
++  /**
++   * The {@link StickyStyler} sticks elements by applying a `top` position offset to them. However,
++   * the virtual scroll viewport applies a `translateY` offset to a container div that
++   * encapsulates the table. The translation causes the header rows to also be offset by the
++   * distance from the top of the scroll viewport in addition to their `top` offset. This method
++   * negates the translation to move the header rows to their correct positions.
++   *
++   * @param offsetFromTop The distance scrolled from the top of the container.
++   * @param update Metadata about the sticky headers that changed in the last sticky update.
++   * @private
++   */
++  private _stickHeaderRows(offsetFromTop: number, update: StickyUpdate) {
++    if (!update.sizes || !update.offsets || !update.elements) {
++      return;
++    }
++
++    for (let i = 0; i < update.elements.length; i++) {
++      if (!update.elements[i]) {
++        continue;
++      }
++      let offset =
++        offsetFromTop !== 0
++          ? Math.max(offsetFromTop - update.offsets[i]!, update.offsets[i]!)
++          : -update.offsets[i]!;
++
++      this._stickCells(update.elements[i]!, 'top', -offset);
++    }
++  }
++
++  /**
++   * The {@link StickyStyler} sticks elements by applying a `bottom` position offset to them.
++   * However, the virtual scroll viewport applies a `translateY` offset to a container div that
++   * encapsulates the table. The translation causes the footer rows to also be offset by the
++   * distance from the top of the scroll viewport in addition to their `bottom` offset. This method
++   * negates the translation to move the footer rows to their correct positions.
++   *
++   * @param offsetFromTop The distance scrolled from the top of the container.
++   * @param update Metadata about the sticky footers that changed in the last sticky update.
++   * @private
++   */
++  private _stickFooterRows(offsetFromTop: number, update: StickyUpdate) {
++    if (!update.sizes || !update.offsets || !update.elements) {
++      return;
++    }
++
++    for (let i = 0; i < update.elements.length; i++) {
++      if (!update.elements[i]) {
++        continue;
++      }
++      this._stickCells(update.elements[i]!, 'bottom', offsetFromTop + update.offsets[i]!);
++    }
++  }
++
++  private _stickCells(cells: HTMLElement[], position: 'bottom' | 'top', offset: number) {
++    for (const cell of cells) {
++      cell.style[position] = `${offset}px`;
++    }
++  }
++}
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index b129b56b3..83ae70925 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -17,6 +17,7 @@ import {
+   _ViewRepeaterItemChange,
+   _ViewRepeaterItemInsertArgs,
+   _ViewRepeaterOperation,
++  ListRange,
+ } from '../collections';
+ import {Platform} from '../platform';
+ import {ViewportRuler} from '../scrolling';
+@@ -50,9 +51,11 @@ import {
+   Injector,
+   HostAttributeToken,
+   DOCUMENT,
++  InjectionToken,
+ } from '@angular/core';
+ import {
+   BehaviorSubject,
++  combineLatest,
+   isObservable,
+   Observable,
+   of as observableOf,
+@@ -101,6 +104,26 @@ export interface RowOutlet {
+ /** Possible types that can be set as the data source for a `CdkTable`. */
+ export type CdkTableDataSourceInput<T> = readonly T[] | DataSource<T> | Observable<readonly T[]>;
+ 
++/** A strategy that implements the behavior for the table's `viewChange` observable. */
++interface TableViewChangeStrategy {
++  /**
++   * A stream that emits whenever the table starts rendering a subset of the data. The `start` index
++   * is inclusive, while the `end` is exclusive.
++   */
++  viewChange: BehaviorSubject<ListRange>;
++}
++
++/**
++ * Injection token for the `CdkTable` view change strategy.
++ *
++ * The table will emit a `viewChange` range that spans the entire data set. This provider overrides
++ * its `viewChange` observable so its behavior can be overridden from another component or
++ * directive.
++ */
++export const _TABLE_VIEW_CHANGE_STRATEGY = new InjectionToken<TableViewChangeStrategy>(
++  'TABLE_VIEW_CHANGE_STRATEGY',
++);
++
+ /**
+  * Provides a handle for the table to grab the view container's ng-container to insert data rows.
+  * @docs-private
+@@ -281,7 +304,8 @@ export class CdkTable<T>
+   private _platform = inject(Platform);
+   protected _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>;
+   private readonly _viewportRuler = inject(ViewportRuler);
+-  protected readonly _stickyPositioningListener = inject<StickyPositioningListener>(
++  protected readonly _positioningListener = inject(STICKY_POSITIONING_LISTENER, {optional: true});
++  protected readonly _parentPositioningListener = inject<StickyPositioningListener>(
+     STICKY_POSITIONING_LISTENER,
+     {optional: true, skipSelf: true},
+   )!;
+@@ -291,6 +315,9 @@ export class CdkTable<T>
+   /** Latest data provided by the data source. */
+   protected _data: readonly T[] | undefined;
+ 
++  /** Latest range of data rendered. */
++  protected _renderedRange?: ListRange;
++
+   /** Subject that emits when the component has been destroyed. */
+   private readonly _onDestroy = new Subject<void>();
+ 
+@@ -497,9 +524,14 @@ export class CdkTable<T>
+   set dataSource(dataSource: CdkTableDataSourceInput<T>) {
+     if (this._dataSource !== dataSource) {
+       this._switchDataSource(dataSource);
++      this._changeDetectorRef.markForCheck();
+     }
+   }
+   private _dataSource: CdkTableDataSourceInput<T>;
++  /** Emits when the data source changes. */
++  readonly _dataSourceChanges = new Subject<CdkTableDataSourceInput<T>>();
++  /** Observable that emits the data source's complete data set. */
++  readonly _dataStream = new Subject<readonly T[]>();
+ 
+   /**
+    * Whether to allow multiple rows per data object by evaluating which rows evaluate their 'when'
+@@ -553,18 +585,15 @@ export class CdkTable<T>
+   @Output()
+   readonly contentChanged = new EventEmitter<void>();
+ 
+-  // TODO(andrewseguin): Remove max value as the end index
+-  //   and instead calculate the view on init and scroll.
+   /**
+    * Stream containing the latest information on what rows are being displayed on screen.
+    * Can be used by the data source to as a heuristic of what data should be provided.
+    *
+    * @docs-private
+    */
+-  readonly viewChange = new BehaviorSubject<{start: number; end: number}>({
+-    start: 0,
+-    end: Number.MAX_VALUE,
+-  });
++  readonly viewChange =
++    inject<BehaviorSubject<ListRange>>(_TABLE_VIEW_CHANGE_STRATEGY, {optional: true}) ||
++    new BehaviorSubject<ListRange>({start: 0, end: Number.MAX_VALUE});
+ 
+   // Outlets in the table's template where the header, data rows, and footer will be inserted.
+   _rowOutlet: DataRowOutlet;
+@@ -609,6 +638,9 @@ export class CdkTable<T>
+ 
+     this._isServer = !this._platform.isBrowser;
+     this._isNativeHtmlTable = this._elementRef.nativeElement.nodeName === 'TABLE';
++    this._parentPositioningListener = this._positioningListener ?? this._parentPositioningListener;
++    this.viewChange =
++      this.viewChange ?? new BehaviorSubject<ListRange>({start: 0, end: Number.MAX_VALUE});
+ 
+     // Set up the trackBy function so that it uses the `RenderRow` as its identity by default. If
+     // the user has provided a custom trackBy, return the result of that function as evaluated
+@@ -965,6 +997,9 @@ export class CdkTable<T>
+    * so that the differ equates their references.
+    */
+   private _getAllRenderRows(): RenderRow<T>[] {
++    const dataWithinRange = this._renderedRange
++      ? (this._data || []).slice(this._renderedRange.start, this._renderedRange.end)
++      : [];
+     const renderRows: RenderRow<T>[] = [];
+ 
+     // Store the cache and create a new one. Any re-used RenderRow objects will be moved into the
+@@ -978,8 +1013,8 @@ export class CdkTable<T>
+ 
+     // For each data object, get the list of rows that should be rendered, represented by the
+     // respective `RenderRow` object which is the pair of `data` and `CdkRowDef`.
+-    for (let i = 0; i < this._data.length; i++) {
+-      let data = this._data[i];
++    for (let i = 0; i < dataWithinRange.length; i++) {
++      let data = dataWithinRange[i];
+       const renderRowsForData = this._getRenderRowsForData(data, i, prevCachedRenderRows.get(data));
+ 
+       if (!this._cachedRenderRowsMap.has(data)) {
+@@ -1153,10 +1188,12 @@ export class CdkTable<T>
+       throw getTableUnknownDataSourceError();
+     }
+ 
+-    this._renderChangeSubscription = dataStream!
++    this._renderChangeSubscription = combineLatest([dataStream!, this.viewChange])
+       .pipe(takeUntil(this._onDestroy))
+-      .subscribe(data => {
++      .subscribe(([data, range]) => {
+         this._data = data || [];
++        this._renderedRange = range;
++        this._dataStream.next(data);
+         this.renderRows();
+       });
+   }
+@@ -1384,7 +1421,7 @@ export class CdkTable<T>
+       this._platform.isBrowser,
+       this.needsPositionStickyOnElement,
+       direction,
+-      this._stickyPositioningListener,
++      this._parentPositioningListener,
+       this._injector,
+     );
+     (this._dir ? this._dir.change : observableOf<Direction>())
+diff --git a/src/components-examples/cdk/table/BUILD.bazel b/src/components-examples/cdk/table/BUILD.bazel
+index 9db86a6da..c4adba90c 100644
+--- a/src/components-examples/cdk/table/BUILD.bazel
++++ b/src/components-examples/cdk/table/BUILD.bazel
+@@ -13,6 +13,7 @@ ng_project(
+         "//:node_modules/@angular/core",
+         "//:node_modules/rxjs",
+         "//src/cdk/table",
++        "//src/cdk/scrolling",
+     ],
+ )
+ 
+diff --git a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.css b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.css
+new file mode 100644
+index 000000000..c7dfc5ddc
+--- /dev/null
++++ b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.css
+@@ -0,0 +1,39 @@
++.example-container {
++  height: 600px;
++  overflow: auto;
++}
++
++.example-virtual-table {
++  width: 100%;
++}
++
++.example-virtual-table .cdk-header-cell,
++.example-virtual-table .cdk-footer-cell {
++  align-items: center;
++  background: #3f51b5;
++  color: white;
++  display: flex;
++  font-weight: bold;
++  justify-content: center;
++}
++
++.example-virtual-table .cdk-cell,
++.example-virtual-table .cdk-footer-cell,
++.example-virtual-table .cdk-header-cell {
++  height: 48px;
++}
++
++/**
++ * Add basic flex styling so that the cells evenly space themselves in the row.
++ */
++.example-virtual-table cdk-row,
++.example-virtual-table cdk-header-row,
++.example-virtual-table cdk-footer-row {
++  display: flex;
++}
++
++.example-virtual-table cdk-cell,
++.example-virtual-table cdk-header-cell,
++.example-virtual-table cdk-footer-cell {
++  flex: 1;
++}
+diff --git a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.html b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.html
+new file mode 100644
+index 000000000..f2afefcda
+--- /dev/null
++++ b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.html
+@@ -0,0 +1,35 @@
++<cdk-virtual-scroll-viewport class="example-container" [itemSize]="48" [maxBufferPx]="1200" [minBufferPx]="400">
++  <cdk-table class="example-virtual-table" fixedLayout virtualScroll [dataSource]="dataSource" [trackBy]="trackBy">
++    <!-- Position Column -->
++    <ng-container cdkColumnDef="position">
++      <cdk-header-cell *cdkHeaderCellDef> No. </cdk-header-cell>
++      <cdk-cell *cdkCellDef="let element"> {{element.position}} </cdk-cell>
++      <cdk-footer-cell *cdkFooterCellDef> No. </cdk-footer-cell>
++    </ng-container>
++
++    <!-- Name Column -->
++    <ng-container cdkColumnDef="name">
++      <cdk-header-cell *cdkHeaderCellDef> Name </cdk-header-cell>
++      <cdk-cell *cdkCellDef="let element"> {{element.name}} </cdk-cell>
++      <cdk-footer-cell *cdkFooterCellDef> Name </cdk-footer-cell>
++    </ng-container>
++
++    <!-- Weight Column -->
++    <ng-container cdkColumnDef="weight">
++      <cdk-header-cell *cdkHeaderCellDef> Weight </cdk-header-cell>
++      <cdk-cell *cdkCellDef="let element"> {{element.weight}} </cdk-cell>
++      <cdk-footer-cell *cdkFooterCellDef> Weight </cdk-footer-cell>
++    </ng-container>
++
++    <!-- Symbol Column -->
++    <ng-container cdkColumnDef="symbol">
++      <cdk-header-cell *cdkHeaderCellDef> Symbol </cdk-header-cell>
++      <cdk-cell *cdkCellDef="let element"> {{element.symbol}} </cdk-cell>
++      <cdk-footer-cell *cdkFooterCellDef> Symbol </cdk-footer-cell>
++    </ng-container>
++
++    <cdk-header-row *cdkHeaderRowDef="displayedColumns; sticky: true;"></cdk-header-row>
++    <cdk-row *cdkRowDef="let row; columns: displayedColumns;"></cdk-row>
++    <cdk-footer-row *cdkFooterRowDef="displayedColumns; sticky: true;"></cdk-footer-row>
++  </cdk-table>
++</cdk-virtual-scroll-viewport>
+diff --git a/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.ts b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.ts
+new file mode 100644
+index 000000000..15a48a534
+--- /dev/null
++++ b/src/components-examples/cdk/table/cdk-virtual-flex-table/cdk-virtual-flex-table-example.ts
+@@ -0,0 +1,45 @@
++import {Component} from '@angular/core';
++import {CdkTableModule} from '@angular/cdk/table';
++import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
++
++export interface PeriodicElement {
++  name: string;
++  position: number;
++  weight: number;
++  symbol: string;
++}
++
++const ELEMENT_DATA: PeriodicElement[] = [
++  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
++  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
++  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
++  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
++  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
++  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
++  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
++  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
++  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
++  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
++];
++
++const EXPANDED_ELEMENT_DATA: PeriodicElement[] = [];
++for (let x = 0; x < 100; x++) {
++  for (const entry of ELEMENT_DATA) {
++    EXPANDED_ELEMENT_DATA.push({...entry, position: entry.position + 10 * x});
++  }
++}
++
++/**
++ * @title Example of a flex table with virtual scroll enabled.
++ */
++@Component({
++  selector: 'cdk-virtual-flex-table-example',
++  styleUrls: ['cdk-virtual-flex-table-example.css'],
++  templateUrl: 'cdk-virtual-flex-table-example.html',
++  imports: [CdkTableModule, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll],
++})
++export class CdkVirtualFlexTableExample {
++  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
++  dataSource = EXPANDED_ELEMENT_DATA;
++  trackBy = (index: number, el: PeriodicElement) => el.position;
++}
+diff --git a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.css b/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.css
+new file mode 100644
+index 000000000..c5e394c0b
+--- /dev/null
++++ b/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.css
+@@ -0,0 +1,29 @@
++.example-container {
++  height: 600px;
++  overflow: auto;
++}
++
++.example-virtual-table {
++  width: 100%;
++}
++
++.example-virtual-table td,
++.example-virtual-table th {
++  height: 48px;
++  padding: 0;
++}
++
++.example-virtual-table th.cdk-header-cell,
++.example-virtual-table .cdk-footer-row th {
++  background: #3f51b5;
++  color: white;
++}
++
++.example-virtual-table th.mat-column-position,
++.example-virtual-table td.mat-column-position {
++  padding-left: 8px;
++}
++
++.example-virtual-table .cdk-cell.cdk-table-sticky {
++  background: #f0f0f0;
++}
+diff --git a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.html b/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.html
+new file mode 100644
+index 000000000..af0f52852
+--- /dev/null
++++ b/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.html
+@@ -0,0 +1,35 @@
++<cdk-virtual-scroll-viewport class="example-container" [itemSize]="48" [maxBufferPx]="1200" [minBufferPx]="400">
++  <table class="example-virtual-table" cdk-table fixedLayout virtualScroll [dataSource]="dataSource" [trackBy]="trackBy">
++    <!-- Position Column -->
++    <ng-container cdkColumnDef="position">
++      <th cdk-header-cell *cdkHeaderCellDef> No. </th>
++      <td cdk-cell *cdkCellDef="let element"> {{element.position}} </td>
++      <th cdk-footer-cell *cdkFooterCellDef> No. </th>
++    </ng-container>
++
++    <!-- Name Column -->
++    <ng-container cdkColumnDef="name">
++      <th cdk-header-cell *cdkHeaderCellDef> Name </th>
++      <td cdk-cell *cdkCellDef="let element"> {{element.name}} </td>
++      <th cdk-footer-cell *cdkFooterCellDef> Name </th>
++    </ng-container>
++
++    <!-- Weight Column -->
++    <ng-container cdkColumnDef="weight">
++      <th cdk-header-cell *cdkHeaderCellDef> Weight </th>
++      <td cdk-cell *cdkCellDef="let element"> {{element.weight}} </td>
++      <th cdk-footer-cell *cdkFooterCellDef> Weight </th>
++    </ng-container>
++
++    <!-- Symbol Column -->
++    <ng-container cdkColumnDef="symbol">
++      <th cdk-header-cell *cdkHeaderCellDef> Symbol </th>
++      <td cdk-cell *cdkCellDef="let element"> {{element.symbol}} </td>
++      <th cdk-footer-cell *cdkFooterCellDef> Symbol </th>
++    </ng-container>
++
++    <tr cdk-header-row *cdkHeaderRowDef="displayedColumns; sticky: true;"></tr>
++    <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;"></tr>
++    <tr cdk-footer-row *cdkFooterRowDef="displayedColumns; sticky: true;"></tr>
++  </table>
++</cdk-virtual-scroll-viewport>
+diff --git a/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.ts b/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.ts
+new file mode 100644
+index 000000000..c96aed9c4
+--- /dev/null
++++ b/src/components-examples/cdk/table/cdk-virtual-table/cdk-virtual-table-example.ts
+@@ -0,0 +1,46 @@
++import {CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
++import {CdkTableModule} from '@angular/cdk/table';
++import {ChangeDetectionStrategy, Component} from '@angular/core';
++
++export interface PeriodicElement {
++  name: string;
++  position: number;
++  weight: number;
++  symbol: string;
++}
++
++const ELEMENT_DATA: PeriodicElement[] = [
++  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
++  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
++  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
++  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
++  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
++  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
++  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
++  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
++  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
++  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
++];
++
++const EXPANDED_ELEMENT_DATA: PeriodicElement[] = [];
++for (let x = 0; x < 100; x++) {
++  for (const entry of ELEMENT_DATA) {
++    EXPANDED_ELEMENT_DATA.push({...entry, position: entry.position + 10 * x});
++  }
++}
++
++/**
++ * @title Example of a native table with virtual scroll enabled.
++ */
++@Component({
++  selector: 'cdk-virtual-table-example',
++  styleUrls: ['cdk-virtual-table-example.css'],
++  templateUrl: 'cdk-virtual-table-example.html',
++  changeDetection: ChangeDetectionStrategy.OnPush,
++  imports: [CdkTableModule, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll],
++})
++export class CdkVirtualTableExample {
++  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
++  dataSource = EXPANDED_ELEMENT_DATA;
++  trackBy = (index: number, el: PeriodicElement) => el.position;
++}
+diff --git a/src/components-examples/cdk/table/index.ts b/src/components-examples/cdk/table/index.ts
+index e5ec2c63f..e1fe7d02a 100644
+--- a/src/components-examples/cdk/table/index.ts
++++ b/src/components-examples/cdk/table/index.ts
+@@ -2,3 +2,5 @@ export {CdkTableFlexBasicExample} from './cdk-table-flex-basic/cdk-table-flex-ba
+ export {CdkTableBasicExample} from './cdk-table-basic/cdk-table-basic-example';
+ export {CdkTableFixedLayoutExample} from './cdk-table-fixed-layout/cdk-table-fixed-layout-example';
+ export {CdkTableRecycleRowsExample} from './cdk-table-recycle-rows/cdk-table-recycle-rows-example';
++export {CdkVirtualFlexTableExample} from './cdk-virtual-flex-table/cdk-virtual-flex-table-example';
++export {CdkVirtualTableExample} from './cdk-virtual-table/cdk-virtual-table-example';
+diff --git a/src/dev-app/table/table-demo.html b/src/dev-app/table/table-demo.html
+index 478cfd929..85c9537bd 100644
+--- a/src/dev-app/table/table-demo.html
++++ b/src/dev-app/table/table-demo.html
+@@ -84,3 +84,9 @@
+ 
+ <h3>Table wrapped re-orderable columns</h3>
+ <table-reorderable-example></table-reorderable-example>
++
++<h3>Cdk virtual table</h3>
++<cdk-virtual-table-example></cdk-virtual-table-example>
++
++<h3>Cdk virtual flex table</h3>
++<cdk-virtual-flex-table-example></cdk-virtual-flex-table-example>
+diff --git a/src/dev-app/table/table-demo.ts b/src/dev-app/table/table-demo.ts
+index 4fc0c2e85..3561a4449 100644
+--- a/src/dev-app/table/table-demo.ts
++++ b/src/dev-app/table/table-demo.ts
+@@ -11,6 +11,8 @@ import {
+   CdkTableFixedLayoutExample,
+   CdkTableFlexBasicExample,
+   CdkTableRecycleRowsExample,
++  CdkVirtualFlexTableExample,
++  CdkVirtualTableExample,
+ } from '@angular/components-examples/cdk/table';
+ import {
+   TableBasicExample,
+@@ -73,6 +75,8 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
+     TableReorderableExample,
+     TableRecycleRowsExample,
+     TableFlexLargeRowExample,
++    CdkVirtualFlexTableExample,
++    CdkVirtualTableExample,
+   ],
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })

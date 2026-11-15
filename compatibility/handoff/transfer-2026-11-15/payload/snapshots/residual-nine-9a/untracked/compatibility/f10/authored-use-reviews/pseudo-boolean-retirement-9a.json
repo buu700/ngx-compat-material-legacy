@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "scope": "One explicitly removed source use in a still-present file, not a physical file-retirement exception.",
+  "reviews": [
+    {
+      "file": "legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "module": "@angular/core",
+      "symbol": "booleanAttribute",
+      "conclusion": "removed-use",
+      "reviewer": "Codex source review",
+      "candidate_source_sha256": "4f6b201964ddbc12dd4f8ac4cf56125884d6711bdb4e6a44831c5c0cb1db16c2",
+      "prior_source_review": {
+        "path": "compatibility/f10/authored-use-reviews/remaining-core-callers.json",
+        "sha256": "4670965443ab120d862efeb9f92b0b3a16e94bba04bd54a769f95d52f1cda54a"
+      },
+      "historical_source": {
+        "commit": "0c13be12266af3f72960fc220e56ad95a0bfd7fd",
+        "sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758"
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "a6e589d9db9037bb7aa9fccfdaf54695d0801299640647a065d5eaa6410d80e9"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-main.json",
+          "sha256": "0b9480df2f841798d3e7e63680820ecf8e6e3ef6acb205b1c9777d7cc40fc47c"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/pseudo-boolean-retirement-9a-transition.json",
+          "sha256": "857253fc67daad4f3058d6b86ffa94ce830498f6dae4dc4363db289c0ebc4e4e"
+        },
+        {
+          "path": "compatibility/rc/pseudo-boolean-retirement-9a-property-diagnostic.json",
+          "sha256": "b13576c55a53314889a42944044bb504c3bb32008a92cb2bfa8c6ab71f0b62d1"
+        },
+        {
+          "path": "tests/property_decorator_current_f9_probe.mjs",
+          "sha256": "2451457b4d37f73857c28db3c02399c87ed6782769af5994ce8669943b0400b1"
+        },
+        {
+          "path": "tests/pseudo_checkbox_plain_input_f9_probe.mjs",
+          "sha256": "c9f3344661ce58b21b40e550805a41ef46533f36a9920064800529cf8781bb23"
+        },
+        {
+          "path": "tests/pseudo_checkbox_material16_jit_probe.mjs",
+          "sha256": "2754b183325f795cd2efd01e5f6a2f3ce128ad8f688bb11afd6d2cc7bd9e7e75"
+        },
+        {
+          "path": "compatibility/rc/pseudo-property-f9-observations.json",
+          "sha256": "e923dc3a4ae2cf452a299977aedcb78b73482c7f6cbc900b89706f886f8924bd"
+        },
+        {
+          "path": "compatibility/rc/pseudo-property-f9-sources/original-pseudo-checkbox.ts",
+          "sha256": "a9c76e44bd88bf920b5fd77f309e3a841995193c8f2d5fead49b35e33a40ee37"
+        },
+        {
+          "path": "compatibility/rc/pseudo-property-f9-sources/material-16-core.mjs",
+          "sha256": "38b761eb8e9b43297942f6e1412469437bc3ee0291342a766b001f715061d175"
+        },
+        {
+          "path": "compatibility/rc/pseudo-property-f9-sources/packed-25365-core.mjs",
+          "sha256": "ec891ee8e1fa0aeceeb1142eade590fca110ce70f505e3131ecbc0fff8c14d94"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/remaining-core-callers.json",
+          "sha256": "4670965443ab120d862efeb9f92b0b3a16e94bba04bd54a769f95d52f1cda54a"
+        }
+      ],
+      "decision": "The historical candidate had imported booleanAttribute and used it as the disabled Input transform; the complete transition removes that import and transform. Current TypeScript source has no booleanAttribute identifier, and the f9 full property producer checks the surviving plain Input and all 324 annotations. The tagged Material 16 source, captured original emitted metadata and separately observed original JIT support the plain Input restoration; the captured 25365 core member has the same plain input metadata. The earlier public-transform review remains historical evidence. This retires the named Core dependency only; dirty artifact diagnostics do not establish current runtime, floor, native, browser or G11 admission."
+    }
+  ]
+}

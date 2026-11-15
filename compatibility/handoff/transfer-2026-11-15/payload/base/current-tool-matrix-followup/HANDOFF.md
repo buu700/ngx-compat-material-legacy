@@ -1,0 +1,11 @@
+# Current tool matrix source continuation
+
+Private proposal against actual base 9a5fac0b285f5663d1b8e00f9df3ef34b7c26a4c. The patch SHA-256 and all five exact before/after file images are in manifest.json. Canonical git apply --check passed.
+
+The bounded continuation authenticates whole Git before and after images and exact edits across nine real source edges, including matrix commits 2e85a9c7c74102b7307cfcc5dfaec5d6d5c1331c, aa34d99a64b6c02f0b267ccbcb9407f4f9139592, 105e605b5af64f1226202b6e0c9c08d3757cfe5b; input repair 20130e561440b9f44554035b83e5ea3a757f94f9; and option repair f9aac126ea70fd83731b62305c07fdb993aa3334. Each matrix transition permits exactly its ordered required IDs and restores the entire preceding document for equality. Both inventory transitions restore the original candidate row and all other fields including old execution data. Six committed source/roster test files are separately authenticated and bound. No historical test is executed by the owner, and no historical receipt is reattributed.
+
+The previous historical matrix and inventory images remain authenticated comparison inputs; all current physical data, provided callbacks, closing sweeps and swallowed-reentry guards remain enforced. The old 2324-to-2329 registry comparison remains, while the test separately checks 2341 current entries against the real matrix. The independent JS and Python implementations each bound 55 paths and their 54 non-self path references were identical.
+
+In the fixed-HEAD isolated fixture, the final original and new Python unittests passed (2 tests, 33.970 seconds), including original adversarial JS and Python guards. The three source/roster coherence unittests passed (4 tests including the added owner test, 3.638 seconds). Separate JS and Python cold/late physical-drift and recovery controls passed. Node 24.21.0 was used; logs are alongside this handoff. No product execution, packed artifact, audit, G11 or 21.x conclusion follows.
+
+The full inventory caller remains independently blocked in inventoryFiniteToolSuccessor by its frozen Git commit-history array; that owner has been informed. Sass/shared program source bindings must use an actual later adopted commit, not an invented one. No canonical files were edited.

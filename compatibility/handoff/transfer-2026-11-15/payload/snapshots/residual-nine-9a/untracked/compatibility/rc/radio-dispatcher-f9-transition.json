@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "file": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+  "prior_commit": "58093db5f98ca98d8d8489fd2c0fbc5e8151c844",
+  "prior_sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+  "current_commit": "9a5fac0b285f5663d1b8e00f9df3ef34b7c26a4c",
+  "current_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+  "full_diff_sha256": "104ced4d066368294e17c90a4d3ee61eb678b68ad4ae5ae25f7fadbbfcadde38",
+  "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-radio/radio.ts b/projects/ngx-material-legacy/legacy-radio/radio.ts\nindex 26e4f3e0c..48ee777dd 100644\n--- a/projects/ngx-material-legacy/legacy-radio/radio.ts\n+++ b/projects/ngx-material-legacy/legacy-radio/radio.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor} from '@angular/cdk/a11y';\n import {UniqueSelectionDispatcher} from '@angular/cdk/collections';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -103,7 +104,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n     changeDetector: ChangeDetectorRef,\n     focusMonitor: FocusMonitor,\n     radioDispatcher: UniqueSelectionDispatcher,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n     providerOverride?: MatRadioDefaultOptions,\n@@ -115,7 +116,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n       changeDetector,\n       focusMonitor,\n       radioDispatcher,\n-      animationMode,\n+      resolveLegacyAnimationMode(animationMode),\n       providerOverride,\n       tabIndex,\n     );\n",
+  "scope": "Full changed forwarding caller; lifecycle guard in the separately unchanged radio base remains a separate current behavior observation."
+}

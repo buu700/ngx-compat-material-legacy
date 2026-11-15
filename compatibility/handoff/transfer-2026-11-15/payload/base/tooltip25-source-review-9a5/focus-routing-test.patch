@@ -1,0 +1,34 @@
+diff --git a/projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts b/projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts
+index 7ef49a2ba..c187962f0 100644
+--- a/projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts
++++ b/projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts
+@@ -793,6 +793,29 @@ describe('MatTooltip', () => {
+       underlying.attach(new ComponentPortal(BasicTooltipDemo));
+       const keys: number[] = [];
+       underlying.keydownEvents().subscribe(event => keys.push(event.keyCode));
++
++      // A keyboard-origin focus must show the tooltip without swallowing keys
++      // intended for an already open overlay underneath it.
++      patchElementFocus(buttonElement);
++      focusMonitor.focusVia(buttonElement, 'keyboard');
++      tick(0);
++      fixture.detectChanges();
++      expect(tooltipDirective._isTooltipVisible()).toBe(true);
++      dispatchKeyboardEvent(document.body, 'keydown', 65);
++      const modifiedFocusEscape = createKeyboardEvent('keydown', ESCAPE, undefined, {alt: true});
++      dispatchEvent(document.body, modifiedFocusEscape);
++      expect(modifiedFocusEscape.defaultPrevented).toBe(false);
++      expect(keys).toEqual([65, ESCAPE]);
++      expect(tooltipDirective._isTooltipVisible()).toBe(true);
++      const focusEscape = dispatchKeyboardEvent(document.body, 'keydown', ESCAPE);
++      tick(0);
++      fixture.detectChanges();
++      expect(focusEscape.defaultPrevented).toBe(true);
++      expect(tooltipDirective._isTooltipVisible()).toBe(false);
++      expect(keys).toEqual([65, ESCAPE]);
++      finishCurrentTooltipAnimation(overlayContainerElement, false);
++      keys.length = 0;
++
+       tooltipDirective.show(0);
+       tick(0);
+       fixture.detectChanges();

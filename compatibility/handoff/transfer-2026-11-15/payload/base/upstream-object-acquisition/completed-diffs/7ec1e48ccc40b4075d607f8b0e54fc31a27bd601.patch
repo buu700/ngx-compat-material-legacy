@@ -1,0 +1,326 @@
+diff --git a/src/cdk/overlay/overlay-ref.ts b/src/cdk/overlay/overlay-ref.ts
+index da45d31d5..cbc5f57b9 100644
+--- a/src/cdk/overlay/overlay-ref.ts
++++ b/src/cdk/overlay/overlay-ref.ts
+@@ -8,10 +8,16 @@
+ 
+ import {Direction, Directionality} from '@angular/cdk/bidi';
+ import {ComponentPortal, Portal, PortalOutlet, TemplatePortal} from '@angular/cdk/portal';
+-import {ComponentRef, EmbeddedViewRef, NgZone} from '@angular/core';
++import {
++  ComponentRef,
++  EmbeddedViewRef,
++  EnvironmentInjector,
++  NgZone,
++  afterNextRender,
++} from '@angular/core';
+ import {Location} from '@angular/common';
+ import {Observable, Subject, merge, SubscriptionLike, Subscription} from 'rxjs';
+-import {take, takeUntil} from 'rxjs/operators';
++import {takeUntil} from 'rxjs/operators';
+ import {OverlayKeyboardDispatcher} from './dispatchers/overlay-keyboard-dispatcher';
+ import {OverlayOutsideClickDispatcher} from './dispatchers/overlay-outside-click-dispatcher';
+ import {OverlayConfig} from './overlay-config';
+@@ -65,6 +71,7 @@ export class OverlayRef implements PortalOutlet {
+     private _location: Location,
+     private _outsideClickDispatcher: OverlayOutsideClickDispatcher,
+     private _animationsDisabled = false,
++    private _injector: EnvironmentInjector,
+   ) {
+     if (_config.scrollStrategy) {
+       this._scrollStrategy = _config.scrollStrategy;
+@@ -125,15 +132,17 @@ export class OverlayRef implements PortalOutlet {
+       this._scrollStrategy.enable();
+     }
+ 
+-    // Update the position once the zone is stable so that the overlay will be fully rendered
+-    // before attempting to position it, as the position may depend on the size of the rendered
+-    // content.
+-    this._ngZone.onStable.pipe(take(1)).subscribe(() => {
+-      // The overlay could've been detached before the zone has stabilized.
+-      if (this.hasAttached()) {
+-        this.updatePosition();
+-      }
+-    });
++    // Update the position once the overlay is fully rendered before attempting to position it,
++    // as the position may depend on the size of the rendered content.
++    afterNextRender(
++      () => {
++        // The overlay could've been detached before the callback executed.
++        if (this.hasAttached()) {
++          this.updatePosition();
++        }
++      },
++      {injector: this._injector},
++    );
+ 
+     // Enable pointer events for the overlay pane element.
+     this._togglePointerEvents(true);
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index 3c21eeafa..76b19432e 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -17,7 +17,7 @@ import {
+   Type,
+ } from '@angular/core';
+ import {Direction, Directionality} from '@angular/cdk/bidi';
+-import {MockNgZone, dispatchFakeEvent} from '../testing/private';
++import {dispatchFakeEvent} from '../testing/private';
+ import {ComponentPortal, TemplatePortal, CdkPortal} from '@angular/cdk/portal';
+ import {Location} from '@angular/common';
+ import {SpyLocation} from '@angular/common/testing';
+@@ -40,7 +40,6 @@ describe('Overlay', () => {
+   let overlayContainer: OverlayContainer;
+   let viewContainerFixture: ComponentFixture<TestComponentWithTemplatePortals>;
+   let dir: Direction;
+-  let zone: MockNgZone;
+   let mockLocation: SpyLocation;
+ 
+   function setup(imports: Type<unknown>[] = []) {
+@@ -56,10 +55,6 @@ describe('Overlay', () => {
+             return fakeDirectionality;
+           },
+         },
+-        {
+-          provide: NgZone,
+-          useFactory: () => (zone = new MockNgZone()),
+-        },
+         {
+           provide: Location,
+           useClass: SpyLocation,
+@@ -404,7 +399,6 @@ describe('Overlay', () => {
+       .toBeTruthy();
+ 
+     viewContainerFixture.detectChanges();
+-    zone.simulateZoneExit();
+ 
+     expect(overlayRef.hostElement.parentElement)
+       .withContext('Expected host element to have been removed once the zone stabilizes.')
+@@ -510,7 +504,6 @@ describe('Overlay', () => {
+ 
+       overlay.create(config).attach(componentPortal);
+       viewContainerFixture.detectChanges();
+-      zone.simulateZoneExit();
+       tick();
+ 
+       expect(overlayContainerElement.querySelectorAll('.fake-positioned').length).toBe(1);
+@@ -533,7 +526,6 @@ describe('Overlay', () => {
+         .toBeTruthy();
+ 
+       overlayRef.detach();
+-      zone.simulateZoneExit();
+       tick();
+ 
+       overlayRef.attach(componentPortal);
+@@ -573,7 +565,6 @@ describe('Overlay', () => {
+       const overlayRef = overlay.create(config);
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+-      zone.simulateZoneExit();
+       tick();
+ 
+       expect(firstStrategy.attach).toHaveBeenCalledTimes(1);
+@@ -606,7 +597,6 @@ describe('Overlay', () => {
+       const overlayRef = overlay.create(config);
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+-      zone.simulateZoneExit();
+       tick();
+ 
+       expect(strategy.attach).toHaveBeenCalledTimes(1);
+@@ -889,7 +879,6 @@ describe('Overlay', () => {
+ 
+       overlayRef.detach();
+       dispatchFakeEvent(backdrop, 'transitionend');
+-      zone.simulateZoneExit();
+       viewContainerFixture.detectChanges();
+ 
+       backdrop.click();
+@@ -947,7 +936,6 @@ describe('Overlay', () => {
+         .toContain('custom-panel-class');
+ 
+       overlayRef.detach();
+-      zone.simulateZoneExit();
+       viewContainerFixture.detectChanges();
+       expect(pane.classList).not.toContain('custom-panel-class', 'Expected class to be removed');
+ 
+@@ -971,13 +959,13 @@ describe('Overlay', () => {
+         .toContain('custom-panel-class');
+ 
+       overlayRef.detach();
+-      viewContainerFixture.detectChanges();
+-
+-      expect(pane.classList)
+-        .withContext('Expected class not to be removed immediately')
+-        .toContain('custom-panel-class');
+-
+-      zone.simulateZoneExit();
++      // Stable emits after zone.run
++      TestBed.inject(NgZone).run(() => {
++        viewContainerFixture.detectChanges();
++        expect(pane.classList)
++          .withContext('Expected class not to be removed immediately')
++          .toContain('custom-panel-class');
++      });
+ 
+       expect(pane.classList)
+         .not.withContext('Expected class to be removed on stable')
+@@ -1061,7 +1049,6 @@ describe('Overlay', () => {
+ 
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+-      zone.simulateZoneExit();
+       tick();
+ 
+       expect(firstStrategy.attach).toHaveBeenCalledTimes(1);
+@@ -1095,7 +1082,6 @@ describe('Overlay', () => {
+ 
+       overlayRef.attach(componentPortal);
+       viewContainerFixture.detectChanges();
+-      zone.simulateZoneExit();
+       tick();
+ 
+       expect(strategy.attach).toHaveBeenCalledTimes(1);
+diff --git a/src/cdk/overlay/overlay.ts b/src/cdk/overlay/overlay.ts
+index 9b7333d22..be660242b 100644
+--- a/src/cdk/overlay/overlay.ts
++++ b/src/cdk/overlay/overlay.ts
+@@ -18,6 +18,7 @@ import {
+   NgZone,
+   ANIMATION_MODULE_TYPE,
+   Optional,
++  EnvironmentInjector,
+ } from '@angular/core';
+ import {OverlayKeyboardDispatcher} from './dispatchers/overlay-keyboard-dispatcher';
+ import {OverlayOutsideClickDispatcher} from './dispatchers/overlay-outside-click-dispatcher';
+@@ -85,6 +86,7 @@ export class Overlay {
+       this._location,
+       this._outsideClickDispatcher,
+       this._animationsModuleType === 'NoopAnimations',
++      this._injector.get(EnvironmentInjector),
+     );
+   }
+ 
+diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+index 5321c066c..32fdf92cc 100644
+--- a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts
+@@ -1,8 +1,8 @@
+ import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
+ import {CdkScrollable, ScrollingModule, ViewportRuler} from '@angular/cdk/scrolling';
+-import {dispatchFakeEvent, MockNgZone} from '../../testing/private';
+-import {Component, ElementRef, NgZone} from '@angular/core';
+-import {fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
++import {dispatchFakeEvent} from '../../testing/private';
++import {ApplicationRef, Component, ElementRef} from '@angular/core';
++import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+ import {Subscription} from 'rxjs';
+ import {map} from 'rxjs/operators';
+ import {
+@@ -22,24 +22,17 @@ const DEFAULT_WIDTH = 60;
+ describe('FlexibleConnectedPositionStrategy', () => {
+   let overlay: Overlay;
+   let overlayContainer: OverlayContainer;
+-  let zone: MockNgZone;
+   let overlayRef: OverlayRef;
+   let viewport: ViewportRuler;
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [ScrollingModule, OverlayModule, PortalModule, TestOverlay],
+-      providers: [{provide: NgZone, useFactory: () => (zone = new MockNgZone())}],
+     });
+ 
+-    inject(
+-      [Overlay, OverlayContainer, ViewportRuler],
+-      (o: Overlay, oc: OverlayContainer, v: ViewportRuler) => {
+-        overlay = o;
+-        overlayContainer = oc;
+-        viewport = v;
+-      },
+-    )();
++    overlay = TestBed.inject(Overlay);
++    overlayContainer = TestBed.inject(OverlayContainer);
++    viewport = TestBed.inject(ViewportRuler);
+   });
+ 
+   afterEach(() => {
+@@ -53,7 +46,7 @@ describe('FlexibleConnectedPositionStrategy', () => {
+   function attachOverlay(config: OverlayConfig) {
+     overlayRef = overlay.create(config);
+     overlayRef.attach(new ComponentPortal(TestOverlay));
+-    zone.simulateZoneExit();
++    TestBed.inject(ApplicationRef).tick();
+   }
+ 
+   it('should throw when attempting to attach to multiple different overlays', () => {
+@@ -1499,7 +1492,6 @@ describe('FlexibleConnectedPositionStrategy', () => {
+ 
+         window.scroll(0, 100);
+         overlayRef.updatePosition();
+-        zone.simulateZoneExit();
+ 
+         overlayRect = overlayRef.overlayElement.getBoundingClientRect();
+         expect(Math.floor(overlayRect.top))
+@@ -1547,7 +1539,6 @@ describe('FlexibleConnectedPositionStrategy', () => {
+ 
+         window.scroll(0, scrollBy);
+         overlayRef.updatePosition();
+-        zone.simulateZoneExit();
+ 
+         let currentOverlayTop = Math.floor(overlayRef.overlayElement.getBoundingClientRect().top);
+ 
+diff --git a/src/cdk/overlay/position/global-position-strategy.spec.ts b/src/cdk/overlay/position/global-position-strategy.spec.ts
+index 973a0dc47..0e7b6d2ef 100644
+--- a/src/cdk/overlay/position/global-position-strategy.spec.ts
++++ b/src/cdk/overlay/position/global-position-strategy.spec.ts
+@@ -1,18 +1,15 @@
+-import {NgZone, Component} from '@angular/core';
++import {Component, ApplicationRef} from '@angular/core';
+ import {TestBed} from '@angular/core/testing';
+-import {MockNgZone} from '../../testing/private';
+ import {PortalModule, ComponentPortal} from '@angular/cdk/portal';
+ import {OverlayModule, Overlay, OverlayConfig, OverlayRef} from '../index';
+ 
+ describe('GlobalPositonStrategy', () => {
+   let overlayRef: OverlayRef;
+   let overlay: Overlay;
+-  let zone: MockNgZone;
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [OverlayModule, PortalModule, BlankPortal],
+-      providers: [{provide: NgZone, useFactory: () => (zone = new MockNgZone())}],
+     });
+ 
+     overlay = TestBed.inject(Overlay);
+@@ -29,7 +26,7 @@ describe('GlobalPositonStrategy', () => {
+     const portal = new ComponentPortal(BlankPortal);
+     overlayRef = overlay.create(config);
+     overlayRef.attach(portal);
+-    zone.simulateZoneExit();
++    TestBed.inject(ApplicationRef).tick();
+     return overlayRef;
+   }
+ 
+diff --git a/tools/public_api_guard/cdk/overlay.md b/tools/public_api_guard/cdk/overlay.md
+index 6138afdbd..7d101e8d3 100644
+--- a/tools/public_api_guard/cdk/overlay.md
++++ b/tools/public_api_guard/cdk/overlay.md
+@@ -13,6 +13,7 @@ import { Direction } from '@angular/cdk/bidi';
+ import { Directionality } from '@angular/cdk/bidi';
+ import { ElementRef } from '@angular/core';
+ import { EmbeddedViewRef } from '@angular/core';
++import { EnvironmentInjector } from '@angular/core';
+ import { EventEmitter } from '@angular/core';
+ import * as i0 from '@angular/core';
+ import * as i1 from '@angular/cdk/bidi';
+@@ -359,7 +360,7 @@ export class OverlayPositionBuilder {
+ 
+ // @public
+ export class OverlayRef implements PortalOutlet {
+-    constructor(_portalOutlet: PortalOutlet, _host: HTMLElement, _pane: HTMLElement, _config: ImmutableObject<OverlayConfig>, _ngZone: NgZone, _keyboardDispatcher: OverlayKeyboardDispatcher, _document: Document, _location: Location_2, _outsideClickDispatcher: OverlayOutsideClickDispatcher, _animationsDisabled?: boolean);
++    constructor(_portalOutlet: PortalOutlet, _host: HTMLElement, _pane: HTMLElement, _config: ImmutableObject<OverlayConfig>, _ngZone: NgZone, _keyboardDispatcher: OverlayKeyboardDispatcher, _document: Document, _location: Location_2, _outsideClickDispatcher: OverlayOutsideClickDispatcher, _animationsDisabled: boolean, _injector: EnvironmentInjector);
+     addPanelClass(classes: string | string[]): void;
+     // (undocumented)
+     attach<T>(portal: ComponentPortal<T>): ComponentRef<T>;

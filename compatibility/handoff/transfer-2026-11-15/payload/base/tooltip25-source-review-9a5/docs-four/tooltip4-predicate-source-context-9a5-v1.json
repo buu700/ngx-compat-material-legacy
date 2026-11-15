@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "role": "review proposal; explicit historical cross-overlay routing difference, not equivalence",
+  "source_head": "9a5fac0b285f5663d1b8e00f9df3ef34b7c26a4c",
+  "source_sha256": "da877c1342fb1f8b73e8c33750d94bfac9629ca07dd57c44c92751e674e1b8ed",
+  "test_before_sha256": "fbbc7c87c7fa3d09bd95556dc8da1702b72bc9b41e0a06b9f9d5b5d79096dc25",
+  "test_after_sha256": "53b44d1d3bc18dc1db6b84bc375cb6888174041db192b6e5515c153c222eb99a",
+  "test_patch_sha256": "af3ed0b7478a39543c604d8ae3a68be0a9427170cd3719ca05c15282bd44fdc1",
+  "current_material": {
+    "version": "22.1.7",
+    "implementation": "node_modules/@angular/material/fesm2022/_tooltip-chunk.mjs",
+    "sha256": "1a5490c23d4c6673b5d365e942dd3f74e2a3ab3a3c77d6434f20469c80f600e8",
+    "location": "_overlayEventPredicate, lines 572-577",
+    "observation": "Same visible unmodified Escape key predicate and true for non-keydown events; comparative implementation evidence only, no dependency on private symbol."
+  },
+  "current_cdk": {
+    "version": "22.1.7",
+    "declaration_sha256": "8f6af024f02ebd819c54fa1e5568d6992f4be9cda2f17b331cd7a765f04568ae",
+    "runtime_sha256": "19811e7834a48d0a7358b5489487d8c025e51d0efe2f14c7881a0d91be736c8b",
+    "observation": "Public OverlayConfig.eventPredicate directs dispatch to next eligible overlay. The keyboard and outside-pointer dispatchers both consult it."
+  },
+  "tag16": {
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "behavior": "The tooltip hides/prevents/stops on visible unmodified Escape; CDK keyboard dispatcher nevertheless directs any key to top subscribed overlay and stops. Current code deliberately changes cross-overlay dispatch for other keys."
+  },
+  "risk": "Ordinary and modified keydowns now reach an underlying overlay and may activate it; applications relying on former swallowing can observe a change. Visible unmodified Escape still closes tooltip first, non-keydown predicate remains true, and mouse/touch outside routing is not rejected. Recommendation: retain the minimal public predicate for current Material/CDK integration under delegated conservative source judgment, with the cross-overlay difference explicitly recorded; this is not a claim of exact tagged dispatcher equivalence.",
+  "focus_test": {
+    "report": "/home/parallels/.codex/closeout-state/2026-11-14-resume/tooltip25-source-review-9a5/focus-run/reports/legacy-tooltip-20261115T145139Z.json",
+    "report_sha256": "666270d7a1e82ebcd1206d41b0aae47f9686542940a1a9ba9df538d26af953b2",
+    "lifecycle_sha256": "c4498c4ca39fb245cb2518a0f2c5e1b49ed08798aa9f267cbcb67c6564dca607",
+    "karma_outcome_sha256": "55756f7804ba51905c564989535c9858b750282e791a5959d46d697c58ed4bc4",
+    "artifact_sha256": "25365d61d3caf5a3adb933e7ee84ea12e5d1facf9e574a1c7607a565680860c5",
+    "totals": {
+      "executed": 80,
+      "passed": 80,
+      "failed": 0,
+      "skipped": 0
+    },
+    "negative_report_sha256": "10a4b7728f4bd0195898e22cb7d69caaad605c01c21b704e923af3119c6bbae9",
+    "negative_totals": {
+      "executed": 80,
+      "passed": 79,
+      "failed": 1,
+      "skipped": 0
+    },
+    "scope": "One extended existing family case, public FocusMonitor.focusVia keyboard origin with test shim producing synthetic focus; synthetic DOM keys; not trusted OS focus or input, current clean run, all-family run, or native matrix."
+  },
+  "limitations": [
+    "Original 16 top-overlay swallowing changes; do not claim equivalence or hide interoperability risk.",
+    "Full shared motion/provider lifecycle remains independently held.",
+    "No CSS, selector, product, ledger or consumer API change; prior approved multi-app style-order limitation remains.",
+    "Readiness requires adoption of the exact test patch and explicit review of this recorded behavioral difference."
+  ]
+}

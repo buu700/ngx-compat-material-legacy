@@ -1,0 +1,1216 @@
+diff --git a/src/components-examples/material/datepicker/date-range-picker-comparison/date-range-picker-comparison-example.ts b/src/components-examples/material/datepicker/date-range-picker-comparison/date-range-picker-comparison-example.ts
+index 4f5fce33b..ecfb71bbb 100644
+--- a/src/components-examples/material/datepicker/date-range-picker-comparison/date-range-picker-comparison-example.ts
++++ b/src/components-examples/material/datepicker/date-range-picker-comparison/date-range-picker-comparison-example.ts
+@@ -1,6 +1,6 @@
+ import {Component} from '@angular/core';
+ import {FormGroup, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+ 
+@@ -14,13 +14,8 @@ const year = today.getFullYear();
+   templateUrl: 'date-range-picker-comparison-example.html',
+   styleUrls: ['date-range-picker-comparison-example.css'],
+   standalone: true,
+-  imports: [
+-    MatFormFieldModule,
+-    MatDatepickerModule,
+-    MatNativeDateModule,
+-    FormsModule,
+-    ReactiveFormsModule,
+-  ],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatDatepickerModule, FormsModule, ReactiveFormsModule],
+ })
+ export class DateRangePickerComparisonExample {
+   campaignOne = new FormGroup({
+diff --git a/src/components-examples/material/datepicker/date-range-picker-forms/date-range-picker-forms-example.ts b/src/components-examples/material/datepicker/date-range-picker-forms/date-range-picker-forms-example.ts
+index b1b4d92a3..93f7559f0 100644
+--- a/src/components-examples/material/datepicker/date-range-picker-forms/date-range-picker-forms-example.ts
++++ b/src/components-examples/material/datepicker/date-range-picker-forms/date-range-picker-forms-example.ts
+@@ -3,21 +3,15 @@ import {FormGroup, FormControl, FormsModule, ReactiveFormsModule} from '@angular
+ import {JsonPipe} from '@angular/common';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Date range picker forms integration */
+ @Component({
+   selector: 'date-range-picker-forms-example',
+   templateUrl: 'date-range-picker-forms-example.html',
+   standalone: true,
+-  imports: [
+-    MatFormFieldModule,
+-    MatDatepickerModule,
+-    FormsModule,
+-    ReactiveFormsModule,
+-    JsonPipe,
+-    MatNativeDateModule,
+-  ],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatDatepickerModule, FormsModule, ReactiveFormsModule, JsonPipe],
+ })
+ export class DateRangePickerFormsExample {
+   range = new FormGroup({
+diff --git a/src/components-examples/material/datepicker/date-range-picker-overview/date-range-picker-overview-example.ts b/src/components-examples/material/datepicker/date-range-picker-overview/date-range-picker-overview-example.ts
+index e419347d8..2b59e0a15 100644
+--- a/src/components-examples/material/datepicker/date-range-picker-overview/date-range-picker-overview-example.ts
++++ b/src/components-examples/material/datepicker/date-range-picker-overview/date-range-picker-overview-example.ts
+@@ -1,5 +1,5 @@
+ import {Component} from '@angular/core';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+ 
+@@ -8,6 +8,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
+   selector: 'date-range-picker-overview-example',
+   templateUrl: 'date-range-picker-overview-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatDatepickerModule, MatNativeDateModule],
++  imports: [MatFormFieldModule, MatDatepickerModule],
++  providers: [provideNativeDateAdapter()],
+ })
+ export class DateRangePickerOverviewExample {}
+diff --git a/src/components-examples/material/datepicker/date-range-picker-selection-strategy/date-range-picker-selection-strategy-example.ts b/src/components-examples/material/datepicker/date-range-picker-selection-strategy/date-range-picker-selection-strategy-example.ts
+index 34bcdcdd9..075be05b1 100644
+--- a/src/components-examples/material/datepicker/date-range-picker-selection-strategy/date-range-picker-selection-strategy-example.ts
++++ b/src/components-examples/material/datepicker/date-range-picker-selection-strategy/date-range-picker-selection-strategy-example.ts
+@@ -1,5 +1,5 @@
+ import {Component, Injectable} from '@angular/core';
+-import {DateAdapter, MatNativeDateModule} from '@angular/material/core';
++import {DateAdapter, provideNativeDateAdapter} from '@angular/material/core';
+ import {
+   MatDateRangeSelectionStrategy,
+   DateRange,
+@@ -40,8 +40,9 @@ export class FiveDayRangeSelectionStrategy<D> implements MatDateRangeSelectionSt
+       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
+       useClass: FiveDayRangeSelectionStrategy,
+     },
++    provideNativeDateAdapter(),
+   ],
+   standalone: true,
+-  imports: [MatFormFieldModule, MatDatepickerModule, MatNativeDateModule],
++  imports: [MatFormFieldModule, MatDatepickerModule],
+ })
+ export class DateRangePickerSelectionStrategyExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.ts b/src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.ts
+index 0a02af677..47ce41d4e 100644
+--- a/src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-actions/datepicker-actions-example.ts
+@@ -3,7 +3,7 @@ import {MatButtonModule} from '@angular/material/button';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker action buttons */
+ @Component({
+@@ -11,12 +11,7 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'datepicker-actions-example.html',
+   styleUrls: ['datepicker-actions-example.css'],
+   standalone: true,
+-  imports: [
+-    MatFormFieldModule,
+-    MatInputModule,
+-    MatDatepickerModule,
+-    MatNativeDateModule,
+-    MatButtonModule,
+-  ],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatButtonModule],
+ })
+ export class DatepickerActionsExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-api/datepicker-api-example.ts b/src/components-examples/material/datepicker/datepicker-api/datepicker-api-example.ts
+index 2e7525a2e..da555dce0 100644
+--- a/src/components-examples/material/datepicker/datepicker-api/datepicker-api-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-api/datepicker-api-example.ts
+@@ -3,7 +3,7 @@ import {MatButtonModule} from '@angular/material/button';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker open method */
+ @Component({
+@@ -11,12 +11,7 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'datepicker-api-example.html',
+   styleUrls: ['datepicker-api-example.css'],
+   standalone: true,
+-  imports: [
+-    MatFormFieldModule,
+-    MatInputModule,
+-    MatNativeDateModule,
+-    MatDatepickerModule,
+-    MatButtonModule,
+-  ],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatButtonModule],
+ })
+ export class DatepickerApiExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.ts b/src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.ts
+index 356d31a12..c3a66c453 100644
+--- a/src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-color/datepicker-color-example.ts
+@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker palette colors */
+ @Component({
+@@ -10,6 +10,7 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'datepicker-color-example.html',
+   styleUrls: ['datepicker-color-example.css'],
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatNativeDateModule, MatDatepickerModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerColorExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-custom-header/datepicker-custom-header-example.ts b/src/components-examples/material/datepicker/datepicker-custom-header/datepicker-custom-header-example.ts
+index 8d965c9ff..54eb0d62d 100644
+--- a/src/components-examples/material/datepicker/datepicker-custom-header/datepicker-custom-header-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-custom-header/datepicker-custom-header-example.ts
+@@ -10,7 +10,7 @@ import {
+   DateAdapter,
+   MAT_DATE_FORMATS,
+   MatDateFormats,
+-  MatNativeDateModule,
++  provideNativeDateAdapter,
+ } from '@angular/material/core';
+ import {Subject} from 'rxjs';
+ import {takeUntil} from 'rxjs/operators';
+@@ -25,7 +25,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
+   templateUrl: 'datepicker-custom-header-example.html',
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatNativeDateModule, MatDatepickerModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerCustomHeaderExample {
+   exampleHeader = ExampleHeader;
+diff --git a/src/components-examples/material/datepicker/datepicker-custom-icon/datepicker-custom-icon-example.ts b/src/components-examples/material/datepicker/datepicker-custom-icon/datepicker-custom-icon-example.ts
+index 8ee1f8854..752846e38 100644
+--- a/src/components-examples/material/datepicker/datepicker-custom-icon/datepicker-custom-icon-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-custom-icon/datepicker-custom-icon-example.ts
+@@ -3,19 +3,14 @@ import {MatIconModule} from '@angular/material/icon';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker with custom icon */
+ @Component({
+   selector: 'datepicker-custom-icon-example',
+   templateUrl: 'datepicker-custom-icon-example.html',
+   standalone: true,
+-  imports: [
+-    MatFormFieldModule,
+-    MatInputModule,
+-    MatDatepickerModule,
+-    MatNativeDateModule,
+-    MatIconModule,
+-  ],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatIconModule],
+ })
+ export class DatepickerCustomIconExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-date-class/datepicker-date-class-example.ts b/src/components-examples/material/datepicker/datepicker-date-class/datepicker-date-class-example.ts
+index 8be72da6f..b444e78aa 100644
+--- a/src/components-examples/material/datepicker/datepicker-date-class/datepicker-date-class-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-date-class/datepicker-date-class-example.ts
+@@ -2,7 +2,7 @@ import {Component, ViewEncapsulation} from '@angular/core';
+ import {MatCalendarCellClassFunction, MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker with custom date classes */
+ @Component({
+@@ -11,7 +11,8 @@ import {MatNativeDateModule} from '@angular/material/core';
+   styleUrls: ['datepicker-date-class-example.css'],
+   encapsulation: ViewEncapsulation.None,
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatNativeDateModule, MatDatepickerModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerDateClassExample {
+   dateClass: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
+diff --git a/src/components-examples/material/datepicker/datepicker-disabled/datepicker-disabled-example.ts b/src/components-examples/material/datepicker/datepicker-disabled/datepicker-disabled-example.ts
+index 40ce38c8a..bc49b2d75 100644
+--- a/src/components-examples/material/datepicker/datepicker-disabled/datepicker-disabled-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-disabled/datepicker-disabled-example.ts
+@@ -2,13 +2,14 @@ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Disabled datepicker */
+ @Component({
+   selector: 'datepicker-disabled-example',
+   templateUrl: 'datepicker-disabled-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatNativeDateModule, MatDatepickerModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerDisabledExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.ts b/src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.ts
+index beed6b8c2..cd0d1e159 100644
+--- a/src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-events/datepicker-events-example.ts
+@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
+ import {MatDatepickerInputEvent, MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker input and change events */
+ @Component({
+@@ -10,7 +10,8 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'datepicker-events-example.html',
+   styleUrls: ['datepicker-events-example.css'],
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatNativeDateModule, MatDatepickerModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerEventsExample {
+   events: string[] = [];
+diff --git a/src/components-examples/material/datepicker/datepicker-filter/datepicker-filter-example.ts b/src/components-examples/material/datepicker/datepicker-filter/datepicker-filter-example.ts
+index 4438af253..48deeac15 100644
+--- a/src/components-examples/material/datepicker/datepicker-filter/datepicker-filter-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-filter/datepicker-filter-example.ts
+@@ -2,14 +2,15 @@ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker with filter validation */
+ @Component({
+   selector: 'datepicker-filter-example',
+   templateUrl: 'datepicker-filter-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatNativeDateModule, MatDatepickerModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerFilterExample {
+   myFilter = (d: Date | null): boolean => {
+diff --git a/src/components-examples/material/datepicker/datepicker-formats/datepicker-formats-example.ts b/src/components-examples/material/datepicker/datepicker-formats/datepicker-formats-example.ts
+index 08201c0fd..b2291812c 100644
+--- a/src/components-examples/material/datepicker/datepicker-formats/datepicker-formats-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-formats/datepicker-formats-example.ts
+@@ -1,7 +1,6 @@
+ import {Component} from '@angular/core';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
+-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
++import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+ 
+ // Depending on whether rollup is used, moment needs to be imported differently.
+ // Since Moment.js doesn't have a default export, we normally need to import using the `* as`
+@@ -35,15 +34,10 @@ export const MY_FORMATS = {
+   selector: 'datepicker-formats-example',
+   templateUrl: 'datepicker-formats-example.html',
+   providers: [
+-    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
+-    // application's root module. We provide it at the component level here, due to limitations of
+-    // our example generation script.
+-    {
+-      provide: DateAdapter,
+-      useClass: MomentDateAdapter,
+-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
+-    },
+-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
++    // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
++    // to your app config. We provide it at the component level here, due to limitations
++    // of our example generation script.
++    provideMomentDateAdapter(MY_FORMATS),
+   ],
+   standalone: true,
+   imports: [
+diff --git a/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.ts b/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.ts
+index d82a98c60..d9bc85633 100644
+--- a/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.ts
+@@ -1,6 +1,6 @@
+ import {Component} from '@angular/core';
+ import {FormsModule} from '@angular/forms';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ 
+@@ -11,7 +11,8 @@ import {MatInputModule} from '@angular/material/input';
+   selector: 'datepicker-harness-example',
+   templateUrl: 'datepicker-harness-example.html',
+   standalone: true,
+-  imports: [MatInputModule, MatDatepickerModule, MatNativeDateModule, FormsModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatInputModule, MatDatepickerModule, FormsModule],
+ })
+ export class DatepickerHarnessExample {
+   date: Date | null = null;
+diff --git a/src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.ts b/src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.ts
+index 0a06aa727..a2eeebe4a 100644
+--- a/src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-inline-calendar/datepicker-inline-calendar-example.ts
+@@ -1,7 +1,7 @@
+ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatCardModule} from '@angular/material/card';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker inline calendar example */
+ @Component({
+@@ -9,7 +9,8 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'datepicker-inline-calendar-example.html',
+   styleUrls: ['datepicker-inline-calendar-example.css'],
+   standalone: true,
+-  imports: [MatCardModule, MatDatepickerModule, MatNativeDateModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatCardModule, MatDatepickerModule],
+ })
+ export class DatepickerInlineCalendarExample {
+   selected: Date | null;
+diff --git a/src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.ts b/src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.ts
+index 699a5f856..a39dc31ef 100644
+--- a/src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-locale/datepicker-locale-example.ts
+@@ -1,10 +1,6 @@
+ import {Component, Inject, OnInit} from '@angular/core';
+-import {
+-  MAT_MOMENT_DATE_FORMATS,
+-  MomentDateAdapter,
+-  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+-} from '@angular/material-moment-adapter';
+-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
++import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
++import {DateAdapter, MAT_DATE_LOCALE} from '@angular/material/core';
+ import {MatButtonModule} from '@angular/material/button';
+ import {MatDatepickerModule, MatDatepickerIntl} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+@@ -21,15 +17,11 @@ import 'moment/locale/fr';
+     // The locale would typically be provided on the root module of your application. We do it at
+     // the component level here, due to limitations of our example generation script.
+     {provide: MAT_DATE_LOCALE, useValue: 'ja-JP'},
+-    // `MomentDateAdapter` and `MAT_MOMENT_DATE_FORMATS` can be automatically provided by importing
+-    // `MatMomentDateModule` in your applications root module. We provide it at the component level
+-    // here, due to limitations of our example generation script.
+-    {
+-      provide: DateAdapter,
+-      useClass: MomentDateAdapter,
+-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
+-    },
+-    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS},
++
++    // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
++    // to your app config. We provide it at the component level here, due to limitations
++    // of our example generation script.
++    provideMomentDateAdapter(),
+   ],
+   standalone: true,
+   imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatButtonModule],
+diff --git a/src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.ts b/src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.ts
+index 2dc0f0f99..0d71676c0 100644
+--- a/src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-min-max/datepicker-min-max-example.ts
+@@ -2,14 +2,15 @@ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker with min & max validation */
+ @Component({
+   selector: 'datepicker-min-max-example',
+   templateUrl: 'datepicker-min-max-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerMinMaxExample {
+   minDate: Date;
+diff --git a/src/components-examples/material/datepicker/datepicker-moment/datepicker-moment-example.ts b/src/components-examples/material/datepicker/datepicker-moment/datepicker-moment-example.ts
+index 2a76c59ed..003ded4a8 100644
+--- a/src/components-examples/material/datepicker/datepicker-moment/datepicker-moment-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-moment/datepicker-moment-example.ts
+@@ -1,7 +1,6 @@
+ import {Component} from '@angular/core';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {MAT_MOMENT_DATE_FORMATS, MomentDateAdapter} from '@angular/material-moment-adapter';
+-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
++import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+ 
+ // Depending on whether rollup is used, moment needs to be imported differently.
+ // Since Moment.js doesn't have a default export, we normally need to import using the `* as`
+@@ -21,11 +20,10 @@ const moment = _rollupMoment || _moment;
+   selector: 'datepicker-moment-example',
+   templateUrl: 'datepicker-moment-example.html',
+   providers: [
+-    // `MomentDateAdapter` and `MAT_MOMENT_DATE_FORMATS` can be automatically provided by importing
+-    // `MatMomentDateModule` in your applications root module. We provide it at the component level
+-    // here, due to limitations of our example generation script.
+-    {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
+-    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS},
++    // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
++    // to your app config. We provide it at the component level here, due to limitations
++    // of our example generation script.
++    provideMomentDateAdapter(),
+   ],
+   standalone: true,
+   imports: [
+diff --git a/src/components-examples/material/datepicker/datepicker-overview/datepicker-overview-example.ts b/src/components-examples/material/datepicker/datepicker-overview/datepicker-overview-example.ts
+index 0b0411c75..635278caf 100644
+--- a/src/components-examples/material/datepicker/datepicker-overview/datepicker-overview-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-overview/datepicker-overview-example.ts
+@@ -2,13 +2,14 @@ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Basic datepicker */
+ @Component({
+   selector: 'datepicker-overview-example',
+   templateUrl: 'datepicker-overview-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerOverviewExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-start-view/datepicker-start-view-example.ts b/src/components-examples/material/datepicker/datepicker-start-view/datepicker-start-view-example.ts
+index e284cea7a..9ac8dc7bd 100644
+--- a/src/components-examples/material/datepicker/datepicker-start-view/datepicker-start-view-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-start-view/datepicker-start-view-example.ts
+@@ -2,14 +2,15 @@ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker start date */
+ @Component({
+   selector: 'datepicker-start-view-example',
+   templateUrl: 'datepicker-start-view-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerStartViewExample {
+   startDate = new Date(1990, 0, 1);
+diff --git a/src/components-examples/material/datepicker/datepicker-touch/datepicker-touch-example.ts b/src/components-examples/material/datepicker/datepicker-touch/datepicker-touch-example.ts
+index 708f58635..b4346df5c 100644
+--- a/src/components-examples/material/datepicker/datepicker-touch/datepicker-touch-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-touch/datepicker-touch-example.ts
+@@ -2,13 +2,14 @@ import {Component} from '@angular/core';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker touch UI */
+ @Component({
+   selector: 'datepicker-touch-example',
+   templateUrl: 'datepicker-touch-example.html',
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule],
++  providers: [provideNativeDateAdapter()],
++  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
+ })
+ export class DatepickerTouchExample {}
+diff --git a/src/components-examples/material/datepicker/datepicker-value/datepicker-value-example.ts b/src/components-examples/material/datepicker/datepicker-value/datepicker-value-example.ts
+index 0b4ab0538..d1921b974 100644
+--- a/src/components-examples/material/datepicker/datepicker-value/datepicker-value-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-value/datepicker-value-example.ts
+@@ -3,7 +3,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+ import {MatDatepickerModule} from '@angular/material/datepicker';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /** @title Datepicker selected value */
+ @Component({
+@@ -11,11 +11,11 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'datepicker-value-example.html',
+   styleUrls: ['datepicker-value-example.css'],
+   standalone: true,
++  providers: [provideNativeDateAdapter()],
+   imports: [
+     MatFormFieldModule,
+     MatInputModule,
+     MatDatepickerModule,
+-    MatNativeDateModule,
+     FormsModule,
+     ReactiveFormsModule,
+   ],
+diff --git a/src/components-examples/material/datepicker/datepicker-views-selection/datepicker-views-selection-example.ts b/src/components-examples/material/datepicker/datepicker-views-selection/datepicker-views-selection-example.ts
+index a35dbbbcd..2138bccdf 100644
+--- a/src/components-examples/material/datepicker/datepicker-views-selection/datepicker-views-selection-example.ts
++++ b/src/components-examples/material/datepicker/datepicker-views-selection/datepicker-views-selection-example.ts
+@@ -1,7 +1,6 @@
+ import {Component, ViewEncapsulation} from '@angular/core';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
+-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
++import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+ import {MatDatepicker, MatDatepickerModule} from '@angular/material/datepicker';
+ 
+ // Depending on whether rollup is used, moment needs to be imported differently.
+@@ -36,15 +35,10 @@ export const MY_FORMATS = {
+   templateUrl: 'datepicker-views-selection-example.html',
+   styleUrls: ['datepicker-views-selection-example.css'],
+   providers: [
+-    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
+-    // application's root module. We provide it at the component level here, due to limitations of
+-    // our example generation script.
+-    {
+-      provide: DateAdapter,
+-      useClass: MomentDateAdapter,
+-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
+-    },
+-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
++    // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
++    // to your app config. We provide it at the component level here, due to limitations
++    // of our example generation script.
++    provideMomentDateAdapter(MY_FORMATS),
+   ],
+   encapsulation: ViewEncapsulation.None,
+   standalone: true,
+diff --git a/src/components-examples/material/expansion/expansion-expand-collapse-all/expansion-expand-collapse-all-example.ts b/src/components-examples/material/expansion/expansion-expand-collapse-all/expansion-expand-collapse-all-example.ts
+index 69709a251..f1a49f468 100644
+--- a/src/components-examples/material/expansion/expansion-expand-collapse-all/expansion-expand-collapse-all-example.ts
++++ b/src/components-examples/material/expansion/expansion-expand-collapse-all/expansion-expand-collapse-all-example.ts
+@@ -5,7 +5,7 @@ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+ import {MatIconModule} from '@angular/material/icon';
+ import {MatButtonModule} from '@angular/material/button';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /**
+  * @title Accordion with expand/collapse all toggles
+@@ -15,6 +15,7 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'expansion-expand-collapse-all-example.html',
+   styleUrls: ['expansion-expand-collapse-all-example.css'],
+   standalone: true,
++  providers: [provideNativeDateAdapter()],
+   imports: [
+     MatButtonModule,
+     MatExpansionModule,
+@@ -22,7 +23,6 @@ import {MatNativeDateModule} from '@angular/material/core';
+     MatFormFieldModule,
+     MatInputModule,
+     MatDatepickerModule,
+-    MatNativeDateModule,
+   ],
+ })
+ export class ExpansionExpandCollapseAllExample {
+diff --git a/src/components-examples/material/expansion/expansion-steps/expansion-steps-example.ts b/src/components-examples/material/expansion/expansion-steps/expansion-steps-example.ts
+index da05d0652..77b3f2772 100644
+--- a/src/components-examples/material/expansion/expansion-steps/expansion-steps-example.ts
++++ b/src/components-examples/material/expansion/expansion-steps/expansion-steps-example.ts
+@@ -5,7 +5,7 @@ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+ import {MatIconModule} from '@angular/material/icon';
+ import {MatExpansionModule} from '@angular/material/expansion';
+-import {MatNativeDateModule} from '@angular/material/core';
++import {provideNativeDateAdapter} from '@angular/material/core';
+ 
+ /**
+  * @title Expansion panel as accordion
+@@ -15,6 +15,7 @@ import {MatNativeDateModule} from '@angular/material/core';
+   templateUrl: 'expansion-steps-example.html',
+   styleUrls: ['expansion-steps-example.css'],
+   standalone: true,
++  providers: [provideNativeDateAdapter()],
+   imports: [
+     MatExpansionModule,
+     MatIconModule,
+@@ -22,7 +23,6 @@ import {MatNativeDateModule} from '@angular/material/core';
+     MatInputModule,
+     MatButtonModule,
+     MatDatepickerModule,
+-    MatNativeDateModule,
+   ],
+ })
+ export class ExpansionStepsExample {
+diff --git a/src/dev-app/datepicker/datepicker-demo.ts b/src/dev-app/datepicker/datepicker-demo.ts
+index eafb6b5ea..3ddedb81f 100644
+--- a/src/dev-app/datepicker/datepicker-demo.ts
++++ b/src/dev-app/datepicker/datepicker-demo.ts
+@@ -22,13 +22,7 @@ import {CommonModule} from '@angular/common';
+ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+ import {MatButtonModule} from '@angular/material/button';
+ import {MatCheckboxModule} from '@angular/material/checkbox';
+-import {
+-  DateAdapter,
+-  MAT_DATE_FORMATS,
+-  MatDateFormats,
+-  ThemePalette,
+-  MatNativeDateModule,
+-} from '@angular/material/core';
++import {DateAdapter, MAT_DATE_FORMATS, MatDateFormats, ThemePalette} from '@angular/material/core';
+ import {
+   MatCalendar,
+   MatCalendarHeader,
+@@ -191,7 +185,6 @@ export class CustomHeaderNgContent<D> {
+     MatFormFieldModule,
+     MatIconModule,
+     MatInputModule,
+-    MatNativeDateModule,
+     MatSelectModule,
+     ReactiveFormsModule,
+     CustomHeader,
+diff --git a/src/dev-app/main.ts b/src/dev-app/main.ts
+index 9faf01126..a9c1d8a23 100644
+--- a/src/dev-app/main.ts
++++ b/src/dev-app/main.ts
+@@ -15,7 +15,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+ import {RouterModule} from '@angular/router';
+ import {bootstrapApplication} from '@angular/platform-browser';
+ 
+-import {MAT_RIPPLE_GLOBAL_OPTIONS} from '@angular/material/core';
++import {MAT_RIPPLE_GLOBAL_OPTIONS, provideNativeDateAdapter} from '@angular/material/core';
+ import {Directionality} from '@angular/cdk/bidi';
+ import {OverlayContainer, FullscreenOverlayContainer} from '@angular/cdk/overlay';
+ 
+@@ -43,6 +43,7 @@ bootstrapApplication(DevApp, {
+       RouterModule.forRoot(DEV_APP_ROUTES),
+       HttpClientModule,
+     ),
++    provideNativeDateAdapter(),
+     {provide: OverlayContainer, useClass: FullscreenOverlayContainer},
+     {provide: MAT_RIPPLE_GLOBAL_OPTIONS, useExisting: DevAppRippleOptions},
+     {provide: Directionality, useClass: DevAppDirectionality},
+diff --git a/src/material-date-fns-adapter/adapter/index.ts b/src/material-date-fns-adapter/adapter/index.ts
+index 53705b2a1..d4f283611 100644
+--- a/src/material-date-fns-adapter/adapter/index.ts
++++ b/src/material-date-fns-adapter/adapter/index.ts
+@@ -6,8 +6,13 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {NgModule} from '@angular/core';
+-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
++import {NgModule, Provider} from '@angular/core';
++import {
++  DateAdapter,
++  MAT_DATE_FORMATS,
++  MAT_DATE_LOCALE,
++  MatDateFormats,
++} from '@angular/material/core';
+ import {DateFnsAdapter} from './date-fns-adapter';
+ import {MAT_DATE_FNS_FORMATS} from './date-fns-formats';
+ 
+@@ -30,3 +35,14 @@ export class DateFnsModule {}
+   providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_DATE_FNS_FORMATS}],
+ })
+ export class MatDateFnsModule {}
++
++export function provideDateFnsAdapter(formats: MatDateFormats = MAT_DATE_FNS_FORMATS): Provider[] {
++  return [
++    {
++      provide: DateAdapter,
++      useClass: DateFnsAdapter,
++      deps: [MAT_DATE_LOCALE],
++    },
++    {provide: MAT_DATE_FORMATS, useValue: formats},
++  ];
++}
+diff --git a/src/material-luxon-adapter/adapter/index.ts b/src/material-luxon-adapter/adapter/index.ts
+index b2dc8ffb8..ead77b968 100644
+--- a/src/material-luxon-adapter/adapter/index.ts
++++ b/src/material-luxon-adapter/adapter/index.ts
+@@ -6,8 +6,13 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {NgModule} from '@angular/core';
+-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
++import {NgModule, Provider} from '@angular/core';
++import {
++  DateAdapter,
++  MAT_DATE_FORMATS,
++  MAT_DATE_LOCALE,
++  MatDateFormats,
++} from '@angular/material/core';
+ import {MAT_LUXON_DATE_ADAPTER_OPTIONS, LuxonDateAdapter} from './luxon-date-adapter';
+ import {MAT_LUXON_DATE_FORMATS} from './luxon-date-formats';
+ 
+@@ -30,3 +35,16 @@ export class LuxonDateModule {}
+   providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_LUXON_DATE_FORMATS}],
+ })
+ export class MatLuxonDateModule {}
++
++export function provideLuxonDateAdapter(
++  formats: MatDateFormats = MAT_LUXON_DATE_FORMATS,
++): Provider[] {
++  return [
++    {
++      provide: DateAdapter,
++      useClass: LuxonDateAdapter,
++      deps: [MAT_DATE_LOCALE, MAT_LUXON_DATE_ADAPTER_OPTIONS],
++    },
++    {provide: MAT_DATE_FORMATS, useValue: formats},
++  ];
++}
+diff --git a/src/material-moment-adapter/adapter/index.ts b/src/material-moment-adapter/adapter/index.ts
+index a78d5b4fa..6f8d73a5b 100644
+--- a/src/material-moment-adapter/adapter/index.ts
++++ b/src/material-moment-adapter/adapter/index.ts
+@@ -6,9 +6,18 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {NgModule} from '@angular/core';
+-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+-import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter} from './moment-date-adapter';
++import {NgModule, Provider} from '@angular/core';
++import {
++  DateAdapter,
++  MAT_DATE_FORMATS,
++  MAT_DATE_LOCALE,
++  MatDateFormats,
++} from '@angular/material/core';
++import {
++  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
++  MatMomentDateAdapterOptions,
++  MomentDateAdapter,
++} from './moment-date-adapter';
+ import {MAT_MOMENT_DATE_FORMATS} from './moment-date-formats';
+ 
+ export * from './moment-date-adapter';
+@@ -30,3 +39,23 @@ export class MomentDateModule {}
+   providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS}],
+ })
+ export class MatMomentDateModule {}
++
++export function provideMomentDateAdapter(
++  formats: MatDateFormats = MAT_MOMENT_DATE_FORMATS,
++  options?: MatMomentDateAdapterOptions,
++): Provider[] {
++  const providers: Provider[] = [
++    {
++      provide: DateAdapter,
++      useClass: MomentDateAdapter,
++      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
++    },
++    {provide: MAT_DATE_FORMATS, useValue: formats},
++  ];
++
++  if (options) {
++    providers.push({provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: options});
++  }
++
++  return providers;
++}
+diff --git a/src/material-moment-adapter/adapter/moment-date-adapter.ts b/src/material-moment-adapter/adapter/moment-date-adapter.ts
+index e9f247d30..79c6e095c 100644
+--- a/src/material-moment-adapter/adapter/moment-date-adapter.ts
++++ b/src/material-moment-adapter/adapter/moment-date-adapter.ts
+@@ -19,7 +19,7 @@ import {default as _rollupMoment, Moment, MomentFormatSpecification, MomentInput
+ 
+ const moment = _rollupMoment || _moment;
+ 
+-/** Configurable options for {@see MomentDateAdapter}. */
++/** Configurable options for MomentDateAdapter. */
+ export interface MatMomentDateAdapterOptions {
+   /**
+    * When enabled, the dates have to match the format exactly.
+@@ -30,7 +30,7 @@ export interface MatMomentDateAdapterOptions {
+   /**
+    * Turns the use of utc dates on or off.
+    * Changing this will change how Angular Material components like DatePicker output dates.
+-   * {@default false}
++   * Defaults to `false`.
+    */
+   useUtc?: boolean;
+ }
+diff --git a/src/material/core/datetime/index.ts b/src/material/core/datetime/index.ts
+index 7a4196043..fab2a6b7a 100644
+--- a/src/material/core/datetime/index.ts
++++ b/src/material/core/datetime/index.ts
+@@ -6,9 +6,9 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {NgModule} from '@angular/core';
++import {NgModule, Provider} from '@angular/core';
+ import {DateAdapter} from './date-adapter';
+-import {MAT_DATE_FORMATS} from './date-formats';
++import {MAT_DATE_FORMATS, MatDateFormats} from './date-formats';
+ import {NativeDateAdapter} from './native-date-adapter';
+ import {MAT_NATIVE_DATE_FORMATS} from './native-date-formats';
+ 
+@@ -27,3 +27,12 @@ export class NativeDateModule {}
+   providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS}],
+ })
+ export class MatNativeDateModule {}
++
++export function provideNativeDateAdapter(
++  formats: MatDateFormats = MAT_NATIVE_DATE_FORMATS,
++): Provider[] {
++  return [
++    {provide: DateAdapter, useClass: NativeDateAdapter},
++    {provide: MAT_DATE_FORMATS, useValue: formats},
++  ];
++}
+diff --git a/src/material/datepicker/datepicker-errors.ts b/src/material/datepicker/datepicker-errors.ts
+index 0fdad5cf7..c4f842626 100644
+--- a/src/material/datepicker/datepicker-errors.ts
++++ b/src/material/datepicker/datepicker-errors.ts
+@@ -9,8 +9,8 @@
+ /** @docs-private */
+ export function createMissingDateImplError(provider: string) {
+   return Error(
+-    `MatDatepicker: No provider found for ${provider}. You must import one of the following ` +
+-      `modules at your application root: MatNativeDateModule, MatDateFnsModule, MatLuxonDateModule, MatMomentDateModule, or provide a ` +
+-      `custom implementation.`,
++    `MatDatepicker: No provider found for ${provider}. You must add one of the following ` +
++      `to your app config: provideNativeDateAdapter, provideDateFnsAdapter, ` +
++      `provideLuxonDateAdapter, provideMomentDateAdapter, or provide a custom implementation.`,
+   );
+ }
+diff --git a/src/material/datepicker/datepicker.md b/src/material/datepicker/datepicker.md
+index 8cec8afbb..f14b2f65b 100644
+--- a/src/material/datepicker/datepicker.md
++++ b/src/material/datepicker/datepicker.md
+@@ -1,5 +1,5 @@
+ The datepicker allows users to enter a date either through text input, or by choosing a date from
+-the calendar. It is made up of several components, directives and [the date implementation module](#choosing-a-date-implementation-and-date-format-settings) that work together.
++the calendar. It is made up of several components, directives and [the date implementation](#choosing-a-date-implementation-and-date-format-settings) that work together.
+ 
+ <!-- example(datepicker-overview) -->
+ 
+@@ -288,17 +288,14 @@ from `@angular/core`. If you want to override it, you can provide a new value fo
+ `MAT_DATE_LOCALE` token:
+ 
+ ```ts
+-@NgModule({
+-  providers: [
+-    {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},
+-  ],
+-})
+-export class MyApp {}
++bootstapApplication(MyApp, {
++  providers: [{provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
++});
+ ```
+ 
+ It's also possible to set the locale at runtime using the `setLocale` method of the `DateAdapter`.
+ 
+-**Note:** if you're using the `MatDateFnsModule`, you have to provide the data object for your
++**Note:** if you're using the `provideDateFnsAdapter`, you have to provide the data object for your
+ locale to `MAT_DATE_LOCALE` instead of the locale code, in addition to providing a configuration
+ compatible with `date-fns` to `MAT_DATE_FORMATS`. Locale data for `date-fns` can be imported
+ from `date-fns/locale`.
+@@ -311,9 +308,9 @@ The datepicker was built to be date implementation agnostic. This means that it
+ with a variety of different date implementations. However it also means that developers need to make
+ sure to provide the appropriate pieces for the datepicker to work with their chosen implementation.
+ 
+-The easiest way to ensure this is to import one of the provided date modules:
++The easiest way to ensure this is to import one of the provided date adapters:
+ 
+-`MatNativeDateModule`
++`provideNativeDateAdapter` or `MatNativeDateModule`
+ 
+ <table>
+   <tbody>
+@@ -336,7 +333,7 @@ The easiest way to ensure this is to import one of the provided date modules:
+   </tbody>
+ </table>
+ 
+-`MatDateFnsModule` (installed via `ng add @angular/material-date-fns-adapter`)
++`provideDateFnsAdapter` or `MatDateFnsModule` (installed via `ng add @angular/material-date-fns-adapter`)
+ 
+ <table>
+   <tbody>
+@@ -359,7 +356,7 @@ The easiest way to ensure this is to import one of the provided date modules:
+   </tbody>
+ </table>
+ 
+-`MatLuxonDateModule` (installed via `ng add @angular/material-luxon-adapter`)
++`provideLuxonDateAdapter` or `MatLuxonDateModule` (installed via `ng add @angular/material-luxon-adapter`)
+ 
+ <table>
+   <tbody>
+@@ -382,7 +379,7 @@ The easiest way to ensure this is to import one of the provided date modules:
+   </tbody>
+ </table>
+ 
+-`MatMomentDateModule` (installed via `ng add @angular/material-moment-adapter`)
++`provideMomentDateAdapter` or `MatMomentDateModule` (installed via `ng add @angular/material-moment-adapter`)
+ 
+ <table>
+   <tbody>
+@@ -405,20 +402,19 @@ The easiest way to ensure this is to import one of the provided date modules:
+   </tbody>
+ </table>
+ 
+-*Please note: `MatNativeDateModule` is based off the functionality available in JavaScript's
++*Please note: `provideNativeDateAdapter` is based off the functionality available in JavaScript's
+ native [`Date` object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date).
+ Thus it is not suitable for many locales. One of the biggest shortcomings of the native `Date`
+ object is the inability to set the parse format. We strongly recommend using an adapter based on
+-a more robust formatting and parsing library. You can use the `MomentDateAdapter`
++a more robust formatting and parsing library. You can use `provideMomentDateAdapter`
+ or a custom `DateAdapter` that works with the library of your choice.*
+ 
+-These modules include providers for `DateAdapter` and `MAT_DATE_FORMATS`.
++These APIs include providers for `DateAdapter` and `MAT_DATE_FORMATS`.
+ 
+ ```ts
+-@NgModule({
+-  imports: [MatDatepickerModule, MatNativeDateModule],
+-})
+-export class MyApp {}
++bootstrapApplication(MyApp, {
++  providers: [provideNativeDateAdapter()]
++});
+ ```
+ 
+ Because `DateAdapter` is a generic class, `MatDatepicker` and `MatDatepickerInput` also need to be
+@@ -435,30 +431,26 @@ export class MyComponent {
+ 
+ <!-- example(datepicker-moment) -->
+ 
+-By default the `MomentDateAdapter` creates dates in your time zone specific locale. You can change the default behaviour to parse dates as UTC by providing the `MAT_MOMENT_DATE_ADAPTER_OPTIONS` and setting it to `useUtc: true`.
++By default the `MomentDateAdapter` creates dates in your time zone specific locale. You can change
++the default behaviour to parse dates as UTC by passing `useUtc: true` into `provideMomentDateAdapter`
++or by providing the `MAT_MOMENT_DATE_ADAPTER_OPTIONS` injection token.
+ 
+ ```ts
+-@NgModule({
+-  imports: [MatDatepickerModule, MatMomentDateModule],
+-  providers: [
+-    {provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: {useUtc: true}}
+-  ]
+-})
++bootstrapApplication(MyApp, {
++  providers: [provideMomentDateAdapter(undefined, {useUtc: true})]
++});
+ ```
+ 
+ By default the `MomentDateAdapter` will parse dates in a
+ [forgiving way](https://momentjs.com/guides/#/parsing/forgiving-mode/). This may result in dates
+ being parsed incorrectly. You can change the default behaviour to
+-[parse dates strictly](https://momentjs.com/guides/#/parsing/strict-mode/) by providing
+-the `MAT_MOMENT_DATE_ADAPTER_OPTIONS` and setting it to `strict: true`.
++[parse dates strictly](https://momentjs.com/guides/#/parsing/strict-mode/) by `strict: true` to
++`provideMomentDateAdapter` or by providing the `MAT_MOMENT_DATE_ADAPTER_OPTIONS` injection token.
+ 
+ ```ts
+-@NgModule({
+-  imports: [MatDatepickerModule, MatMomentDateModule],
+-  providers: [
+-    {provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: {strict: true}}
+-  ]
+-})
++bootstrapApplication(MyApp, {
++  providers: [provideMomentDateAdapter(undefined, {strict: true})]
++});
+ ```
+ 
+ It is also possible to create your own `DateAdapter` that works with any date format your app
+@@ -469,14 +461,12 @@ in your app are formats that can be understood by your date implementation. See
+ information about `MAT_DATE_FORMATS`.
+ 
+ ```ts
+-@NgModule({
+-  imports: [MatDatepickerModule],
++bootstrapApplication(MyApp, {
+   providers: [
+     {provide: DateAdapter, useClass: MyDateAdapter},
+     {provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS},
+-  ],
+-})
+-export class MyApp {}
++  ]
++});
+ ```
+ 
+ If you need to work with native `Date` objects, but need custom behavior (for example custom date
+@@ -489,51 +479,39 @@ and displaying dates. These formats are passed through to the `DateAdapter` so y
+ sure that the format objects you're using are compatible with the `DateAdapter` used in your app.
+ 
+ If you want use one of the `DateAdapters` that ships with Angular Material, but use your own
+-`MAT_DATE_FORMATS`, you can import the `NativeDateModule` or `MomentDateModule`. These modules are
+-identical to the "Mat"-prefixed versions (`MatNativeDateModule` and `MatMomentDateModule`) except
+-they do not include the default formats. For example:
++`MAT_DATE_FORMATS`, you can either pass the formats into the providers function, or provide the
++`MAT_DATE_FORMATS` token yourself. For example:
+ 
+ ```ts
+-@NgModule({
+-  imports: [MatDatepickerModule, NativeDateModule],
+-  providers: [
+-    {provide: MAT_DATE_FORMATS, useValue: MY_NATIVE_DATE_FORMATS},
+-  ],
+-})
+-export class MyApp {}
++bootstrapApplication(MyApp, {
++  providers: [provideNativeDateAdapter(MY_NATIVE_DATE_FORMATS)],
++});
+ ```
+ 
+ <!-- example(datepicker-formats) -->
+ 
+-##### MomentDateModule formats
++##### Moment.js formats
+ 
+-To use custom formats with the `MomentDateModule` you can pick from the parse formats documented
+-[here](https://momentjs.com/docs/#/parsing/string-format/) and the display formats documented
+-[here](https://momentjs.com/docs/#/displaying/format/).
++To use custom formats with the `provideMomentDateAdapter` you can pick from the parse formats
++documented [here](https://momentjs.com/docs/#/parsing/string-format/) and the display formats
++documented [here](https://momentjs.com/docs/#/displaying/format/).
+ 
+ It is also possible to support multiple parse formats. For example:
+ 
+ ```ts
+-@NgModule({
+-  imports: [MatDatepickerModule, MomentDateModule],
+-  providers: [
+-    {
+-      provide: MAT_DATE_FORMATS,
+-      useValue: {
+-        parse: {
+-          dateInput: ['l', 'LL'],
+-        },
+-        display: {
+-          dateInput: 'L',
+-          monthYearLabel: 'MMM YYYY',
+-          dateA11yLabel: 'LL',
+-          monthYearA11yLabel: 'MMMM YYYY',
+-        },
+-      },
++bootstraApplication(MyApp, {
++  providers: [provideMomentDateAdapter({
++    parse: {
++      dateInput: ['l', 'LL'],
+     },
+-  ],
+-})
+-export class MyApp {}
++    display: {
++      dateInput: 'L',
++      monthYearLabel: 'MMM YYYY',
++      dateA11yLabel: 'LL',
++      monthYearA11yLabel: 'MMMM YYYY',
++    },
++  })]
++});
+ ```
+ 
+ #### Customizing the calendar header
+@@ -554,16 +532,15 @@ detection.
+ 
+ The various text strings used by the datepicker are provided through `MatDatepickerIntl`.
+ Localization of these messages can be done by providing a subclass with translated values in your
+-application root module.
++app config.
+ 
+ ```ts
+-@NgModule({
+-  imports: [MatDatepickerModule, MatNativeDateModule],
++bootstrapApplication(MyApp, {
+   providers: [
+     {provide: MatDatepickerIntl, useClass: MyIntl},
++    provideNativeDateAdapter(),
+   ],
+-})
+-export class MyApp {}
++});
+ ```
+ 
+ #### Highlighting specific dates
+@@ -662,8 +639,8 @@ In multi-year view:
+ #### Error: MatDatepicker: No provider found for DateAdapter/MAT_DATE_FORMATS
+ 
+ This error is thrown if you have not provided all of the injectables the datepicker needs to work.
+-The easiest way to resolve this is to import the `MatNativeDateModule` or `MatMomentDateModule` in
+-your application's root module. See
++The easiest way to resolve this is to add `provideNativeDateAdapter` or `provideMomentDateAdapter`
++to your app config. See
+ [_Choosing a date implementation_](#choosing-a-date-implementation-and-date-format-settings)) for
+ more information.
+ 
+diff --git a/src/universal-app/kitchen-sink/kitchen-sink.ts b/src/universal-app/kitchen-sink/kitchen-sink.ts
+index b41e1d8d3..8a9d575ae 100644
+--- a/src/universal-app/kitchen-sink/kitchen-sink.ts
++++ b/src/universal-app/kitchen-sink/kitchen-sink.ts
+@@ -3,7 +3,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
+ import {ScrollingModule, ViewportRuler} from '@angular/cdk/scrolling';
+ import {CdkTableModule, DataSource} from '@angular/cdk/table';
+ import {Component, ElementRef, InjectionToken, inject} from '@angular/core';
+-import {MatNativeDateModule, MatRippleModule} from '@angular/material/core';
++import {MatRippleModule, provideNativeDateAdapter} from '@angular/material/core';
+ import {MatAutocompleteModule} from '@angular/material/autocomplete';
+ import {MatButtonModule} from '@angular/material/button';
+ import {MatButtonToggleModule} from '@angular/material/button-toggle';
+@@ -77,6 +77,7 @@ export class TestEntryComponent {}
+   selector: 'kitchen-sink',
+   templateUrl: './kitchen-sink.html',
+   standalone: true,
++  providers: [provideNativeDateAdapter()],
+   styles: `
+     .universal-viewport {
+       height: 100px;
+@@ -100,7 +101,6 @@ export class TestEntryComponent {}
+     MatInputModule,
+     MatListModule,
+     MatMenuModule,
+-    MatNativeDateModule,
+     MatPaginatorModule,
+     MatProgressBarModule,
+     MatProgressSpinnerModule,
+diff --git a/tools/public_api_guard/material/core.md b/tools/public_api_guard/material/core.md
+index 5e7041f62..1e84c7bb8 100644
+--- a/tools/public_api_guard/material/core.md
++++ b/tools/public_api_guard/material/core.md
+@@ -23,6 +23,7 @@ import { Observable } from 'rxjs';
+ import { OnDestroy } from '@angular/core';
+ import { OnInit } from '@angular/core';
+ import { Platform } from '@angular/cdk/platform';
++import { Provider } from '@angular/core';
+ import { QueryList } from '@angular/core';
+ import { Subject } from 'rxjs';
+ import { Version } from '@angular/core';
+@@ -515,6 +516,9 @@ export class NativeDateModule {
+     static ɵmod: i0.ɵɵNgModuleDeclaration<NativeDateModule, never, never, never>;
+ }
+ 
++// @public (undocumented)
++export function provideNativeDateAdapter(formats?: MatDateFormats): Provider[];
++
+ // @public
+ export interface RippleAnimationConfig {
+     enterDuration?: number;

@@ -1,0 +1,154 @@
+diff --git a/goldens/cdk/table/index.api.md b/goldens/cdk/table/index.api.md
+index e24a0fc59..e78862330 100644
+--- a/goldens/cdk/table/index.api.md
++++ b/goldens/cdk/table/index.api.md
+@@ -291,7 +291,7 @@ export class CdkRowDef<T> extends BaseRowDef {
+ }
+ 
+ // @public
+-export class CdkTable<T> implements AfterContentInit, AfterContentChecked, CollectionViewer, OnDestroy, OnInit {
++export class CdkTable<T> implements AfterContentInit, AfterContentChecked, CollectionViewer, OnDestroy, OnInit, StickyPositioningListener {
+     constructor(...args: unknown[]);
+     addColumnDef(columnDef: CdkColumnDef): void;
+     addFooterRowDef(footerRowDef: CdkFooterRowDef): void;
+@@ -307,6 +307,8 @@ export class CdkTable<T> implements AfterContentInit, AfterContentChecked, Colle
+     protected _data: readonly T[] | undefined;
+     get dataSource(): CdkTableDataSourceInput<T>;
+     set dataSource(dataSource: CdkTableDataSourceInput<T>);
++    readonly _dataSourceChanges: Subject<CdkTableDataSourceInput<T>>;
++    readonly _dataStream: Subject<readonly T[]>;
+     // (undocumented)
+     protected readonly _differs: IterableDiffers;
+     // (undocumented)
+@@ -352,22 +354,22 @@ export class CdkTable<T> implements AfterContentInit, AfterContentChecked, Colle
+     removeFooterRowDef(footerRowDef: CdkFooterRowDef): void;
+     removeHeaderRowDef(headerRowDef: CdkHeaderRowDef): void;
+     removeRowDef(rowDef: CdkRowDef<T>): void;
++    protected _renderedRange?: ListRange;
+     renderRows(): void;
+     // (undocumented)
+     _rowOutlet: DataRowOutlet;
+     setNoDataRow(noDataRow: CdkNoDataRow | null): void;
++    stickyColumnsUpdated(update: StickyUpdate): void;
+     protected stickyCssClass: string;
+-    // (undocumented)
+-    protected readonly _stickyPositioningListener: StickyPositioningListener;
++    stickyEndColumnsUpdated(update: StickyUpdate): void;
++    stickyFooterRowsUpdated(update: StickyUpdate): void;
++    stickyHeaderRowsUpdated(update: StickyUpdate): void;
+     get trackBy(): TrackByFunction<T>;
+     set trackBy(fn: TrackByFunction<T>);
+     updateStickyColumnStyles(): void;
+     updateStickyFooterRowStyles(): void;
+     updateStickyHeaderRowStyles(): void;
+-    readonly viewChange: BehaviorSubject<{
+-        start: number;
+-        end: number;
+-    }>;
++    readonly viewChange: BehaviorSubject<ListRange>;
+     // (undocumented)
+     protected _viewRepeater: _ViewRepeater<T, RenderRow<T>, RowContext<T>>;
+     // (undocumented)
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index b97cf5c57..142e3e2cb 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -67,7 +67,7 @@ import {
+   Subject,
+   Subscription,
+ } from 'rxjs';
+-import {auditTime, filter, map, takeUntil} from 'rxjs/operators';
++import {auditTime, takeUntil} from 'rxjs/operators';
+ import {CdkColumnDef} from './cell';
+ import {
+   BaseRowDef,
+@@ -1489,26 +1489,15 @@ export class CdkTable<T>
+ 
+     viewport.attach({
+       dataStream: this._dataStream,
+-      measureRangeSize: () => {
+-        // TODO(crisbeto): implement this method so autosizing works.
+-        if (typeof ngDevMode === 'undefined' || ngDevMode) {
+-          throw new Error('autoSize is not supported for tables with virtual scroll enabled.');
+-        }
+-        return 0;
+-      },
++      measureRangeSize: (range, orientation) => this._measureRangeSize(range, orientation),
+     });
+ 
+-    const offsetFromTopStream = this.viewChange.pipe(
+-      map(() => viewport.getOffsetToRenderedContentStart()),
+-      filter(offset => offset !== null),
+-    );
+-
+     // The `StyickyStyler` sticks elements by applying a `top` or `bottom` position offset to
+     // them. However, the virtual scroll viewport applies a `translateY` offset to a container
+     // div that encapsulates the table. The translation causes the rows to also be offset by the
+     // distance from the top of the scroll viewport in addition to their `top` offset. This logic
+     // negates the translation to move the rows to their correct positions.
+-    combineLatest([offsetFromTopStream, this._headerRowStickyUpdates])
++    combineLatest([viewport.renderedContentOffset, this._headerRowStickyUpdates])
+       .pipe(takeUntil(this._onDestroy))
+       .subscribe(([offsetFromTop, update]) => {
+         if (!update.sizes || !update.offsets || !update.elements) {
+@@ -1530,7 +1519,7 @@ export class CdkTable<T>
+         }
+       });
+ 
+-    combineLatest([offsetFromTopStream, this._footerRowStickyUpdates])
++    combineLatest([viewport.renderedContentOffset, this._footerRowStickyUpdates])
+       .pipe(takeUntil(this._onDestroy))
+       .subscribe(([offsetFromTop, update]) => {
+         if (!update.sizes || !update.offsets || !update.elements) {
+@@ -1594,6 +1583,51 @@ export class CdkTable<T>
+ 
+     this._changeDetectorRef.markForCheck();
+   }
++
++  /**
++   * Measures the size of the rendered range in the table.
++   * This is used for virtual scrolling when auto-sizing is enabled.
++   */
++  private _measureRangeSize(range: ListRange, orientation: 'horizontal' | 'vertical'): number {
++    if (range.start >= range.end || orientation !== 'vertical') {
++      return 0;
++    }
++
++    const renderedRange = this.viewChange.value;
++    const viewContainerRef = this._rowOutlet.viewContainer;
++
++    if (
++      (range.start < renderedRange.start || range.end > renderedRange.end) &&
++      (typeof ngDevMode === 'undefined' || ngDevMode)
++    ) {
++      throw Error(`Error: attempted to measure an item that isn't rendered.`);
++    }
++
++    const renderedStartIndex = range.start - renderedRange.start;
++    const rangeLen = range.end - range.start;
++    let firstNode: HTMLElement | undefined;
++    let lastNode: HTMLElement | undefined;
++
++    for (let i = 0; i < rangeLen; i++) {
++      const view = viewContainerRef.get(i + renderedStartIndex) as EmbeddedViewRef<unknown> | null;
++      if (view && view.rootNodes.length) {
++        firstNode = lastNode = view.rootNodes[0];
++        break;
++      }
++    }
++
++    for (let i = rangeLen - 1; i > -1; i--) {
++      const view = viewContainerRef.get(i + renderedStartIndex) as EmbeddedViewRef<unknown> | null;
++      if (view && view.rootNodes.length) {
++        lastNode = view.rootNodes[view.rootNodes.length - 1];
++        break;
++      }
++    }
++
++    const startRect = firstNode?.getBoundingClientRect?.();
++    const endRect = lastNode?.getBoundingClientRect?.();
++    return startRect && endRect ? endRect.bottom - startRect.top : 0;
++  }
+ }
+ 
+ /** Utility function that gets a merged list of the entries in an array and values of a Set. */

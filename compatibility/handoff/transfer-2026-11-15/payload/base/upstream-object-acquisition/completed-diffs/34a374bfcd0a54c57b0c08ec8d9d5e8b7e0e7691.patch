@@ -1,0 +1,66 @@
+diff --git a/src/cdk/layout/breakpoints-observer.spec.ts b/src/cdk/layout/breakpoints-observer.spec.ts
+index 89374f8bf..04d33a71d 100644
+--- a/src/cdk/layout/breakpoints-observer.spec.ts
++++ b/src/cdk/layout/breakpoints-observer.spec.ts
+@@ -9,7 +9,7 @@
+ import {BreakpointObserver, BreakpointState} from './breakpoints-observer';
+ import {MediaMatcher} from './media-matcher';
+ import {fakeAsync, TestBed, flush, tick} from '@angular/core/testing';
+-import {Injectable} from '@angular/core';
++import {Service} from '@angular/core';
+ import {Subscription} from 'rxjs';
+ import {skip, take} from 'rxjs/operators';
+ 
+@@ -205,7 +205,7 @@ export class FakeMediaQueryList {
+   }
+ }
+ 
+-@Injectable()
++@Service({autoProvided: false})
+ export class FakeMediaMatcher {
+   /** A map of match media queries. */
+   private _queries = new Map<string, FakeMediaQueryList>();
+diff --git a/src/cdk/layout/breakpoints-observer.ts b/src/cdk/layout/breakpoints-observer.ts
+index e329e2848..b18abfbd0 100644
+--- a/src/cdk/layout/breakpoints-observer.ts
++++ b/src/cdk/layout/breakpoints-observer.ts
+@@ -7,7 +7,7 @@
+  */
+ 
+ import {coerceArray} from '../coercion';
+-import {Injectable, NgZone, OnDestroy, inject} from '@angular/core';
++import {Service, NgZone, OnDestroy, inject} from '@angular/core';
+ import {combineLatest, concat, Observable, Observer, Subject} from 'rxjs';
+ import {debounceTime, map, skip, startWith, take, takeUntil} from 'rxjs/operators';
+ import {MediaMatcher} from './media-matcher';
+@@ -39,7 +39,7 @@ interface Query {
+ }
+ 
+ /** Utility for checking the matching state of `@media` queries. */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class BreakpointObserver implements OnDestroy {
+   private _mediaMatcher = inject(MediaMatcher);
+   private _zone = inject(NgZone);
+diff --git a/src/cdk/layout/media-matcher.ts b/src/cdk/layout/media-matcher.ts
+index cf6c7fe83..8459b9002 100644
+--- a/src/cdk/layout/media-matcher.ts
++++ b/src/cdk/layout/media-matcher.ts
+@@ -5,7 +5,7 @@
+  * Use of this source code is governed by an MIT-style license that can be
+  * found in the LICENSE file at https://angular.dev/license
+  */
+-import {Injectable, CSP_NONCE, inject} from '@angular/core';
++import {Service, CSP_NONCE, inject} from '@angular/core';
+ import {Platform} from '../platform';
+ 
+ /** Global registry for all dynamically-created, injected media queries. */
+@@ -15,7 +15,7 @@ const mediaQueriesForWebkitCompatibility: Set<string> = new Set<string>();
+ let mediaQueryStyleNode: HTMLStyleElement | undefined;
+ 
+ /** A utility for calling matchMedia queries. */
+-@Injectable({providedIn: 'root'})
++@Service()
+ export class MediaMatcher {
+   private _platform = inject(Platform);
+   private _nonce = inject(CSP_NONCE, {optional: true});

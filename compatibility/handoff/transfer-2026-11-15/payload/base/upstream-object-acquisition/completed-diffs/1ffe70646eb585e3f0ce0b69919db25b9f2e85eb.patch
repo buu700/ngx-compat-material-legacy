@@ -1,0 +1,309 @@
+diff --git a/goldens/cdk/dialog/index.api.md b/goldens/cdk/dialog/index.api.md
+index 156b68e79..cbcca84d6 100644
+--- a/goldens/cdk/dialog/index.api.md
++++ b/goldens/cdk/dialog/index.api.md
+@@ -127,6 +127,7 @@ export class DialogConfig<D = unknown, R = unknown, C extends BasePortalOutlet =
+     };
+     data?: D | null;
+     direction?: Direction;
++    disableAnimations?: boolean;
+     disableClose?: boolean;
+     hasBackdrop?: boolean;
+     height?: string;
+diff --git a/goldens/cdk/overlay/index.api.md b/goldens/cdk/overlay/index.api.md
+index f5b8cf0bc..b43323a18 100644
+--- a/goldens/cdk/overlay/index.api.md
++++ b/goldens/cdk/overlay/index.api.md
+@@ -299,6 +299,7 @@ export class OverlayConfig {
+     constructor(config?: OverlayConfig);
+     backdropClass?: string | string[];
+     direction?: Direction | Directionality;
++    disableAnimations?: boolean;
+     disposeOnNavigation?: boolean;
+     hasBackdrop?: boolean;
+     height?: number | string;
+diff --git a/src/cdk/dialog/dialog-config.ts b/src/cdk/dialog/dialog-config.ts
+index b78b427b9..b115a20ae 100644
+--- a/src/cdk/dialog/dialog-config.ts
++++ b/src/cdk/dialog/dialog-config.ts
+@@ -138,6 +138,11 @@ export class DialogConfig<D = unknown, R = unknown, C extends BasePortalOutlet =
+    */
+   closeOnOverlayDetachments?: boolean = true;
+ 
++  /**
++   * Whether the built-in overlay animations should be disabled.
++   */
++  disableAnimations?: boolean = false;
++
+   /**
+    * Providers that will be exposed to the contents of the dialog. Can also
+    * be provided as a function in order to generate the providers lazily.
+diff --git a/src/cdk/dialog/dialog.ts b/src/cdk/dialog/dialog.ts
+index 1804a4184..d07c24388 100644
+--- a/src/cdk/dialog/dialog.ts
++++ b/src/cdk/dialog/dialog.ts
+@@ -190,6 +190,7 @@ export class Dialog implements OnDestroy {
+       width: config.width,
+       height: config.height,
+       disposeOnNavigation: config.closeOnNavigation,
++      disableAnimations: config.disableAnimations,
+     });
+ 
+     if (config.backdropClass) {
+diff --git a/src/cdk/overlay/overlay-config.ts b/src/cdk/overlay/overlay-config.ts
+index e8107805c..fa1d96551 100644
+--- a/src/cdk/overlay/overlay-config.ts
++++ b/src/cdk/overlay/overlay-config.ts
+@@ -27,6 +27,9 @@ export class OverlayConfig {
+   /** Custom class to add to the backdrop */
+   backdropClass?: string | string[] = 'cdk-overlay-dark-backdrop';
+ 
++  /** Whether to disable any built-in animations. */
++  disableAnimations?: boolean;
++
+   /** The width of the overlay panel. If a number is provided, pixel units are assumed. */
+   width?: number | string;
+ 
+diff --git a/src/cdk/overlay/overlay.ts b/src/cdk/overlay/overlay.ts
+index 1896d6b8b..fbb13b25d 100644
+--- a/src/cdk/overlay/overlay.ts
++++ b/src/cdk/overlay/overlay.ts
+@@ -86,7 +86,7 @@ export class Overlay {
+       this._document,
+       this._location,
+       this._outsideClickDispatcher,
+-      this._animationsModuleType === 'NoopAnimations',
++      config?.disableAnimations ?? this._animationsModuleType === 'NoopAnimations',
+       this._injector.get(EnvironmentInjector),
+       this._renderer,
+     );
+diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts
+index 426953017..c7e4fd457 100644
+--- a/src/material/autocomplete/autocomplete-trigger.ts
++++ b/src/material/autocomplete/autocomplete-trigger.ts
+@@ -45,6 +45,7 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+ import {
+   MatOption,
+   MatOptionSelectionChange,
++  _animationsDisabled,
+   _countGroupLabelsBeforeOption,
+   _getOptionScrollPosition,
+ } from '../core';
+@@ -149,6 +150,7 @@ export class MatAutocompleteTrigger
+   private _viewportRuler = inject(ViewportRuler);
+   private _scrollStrategy = inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY);
+   private _renderer = inject(Renderer2);
++  private _animationsDisabled = _animationsDisabled();
+   private _defaults = inject<MatAutocompleteDefaultOptions | null>(
+     MAT_AUTOCOMPLETE_DEFAULT_OPTIONS,
+     {optional: true},
+@@ -903,6 +905,7 @@ export class MatAutocompleteTrigger
+       hasBackdrop: this._defaults?.hasBackdrop,
+       backdropClass: this._defaults?.backdropClass,
+       panelClass: this._defaults?.overlayPanelClass,
++      disableAnimations: this._animationsDisabled,
+     });
+   }
+ 
+diff --git a/src/material/bottom-sheet/bottom-sheet.ts b/src/material/bottom-sheet/bottom-sheet.ts
+index e46edf55d..ce8e459e5 100644
+--- a/src/material/bottom-sheet/bottom-sheet.ts
++++ b/src/material/bottom-sheet/bottom-sheet.ts
+@@ -13,6 +13,7 @@ import {Injectable, TemplateRef, InjectionToken, OnDestroy, inject} from '@angul
+ import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetConfig} from './bottom-sheet-config';
+ import {MatBottomSheetContainer} from './bottom-sheet-container';
+ import {MatBottomSheetRef} from './bottom-sheet-ref';
++import {_animationsDisabled} from '../core';
+ 
+ /** Injection token that can be used to specify default bottom sheet options. */
+ export const MAT_BOTTOM_SHEET_DEFAULT_OPTIONS = new InjectionToken<MatBottomSheetConfig>(
+@@ -26,6 +27,7 @@ export const MAT_BOTTOM_SHEET_DEFAULT_OPTIONS = new InjectionToken<MatBottomShee
+ export class MatBottomSheet implements OnDestroy {
+   private _overlay = inject(Overlay);
+   private _parentBottomSheet = inject(MatBottomSheet, {optional: true, skipSelf: true});
++  private _animationsDisabled = _animationsDisabled();
+   private _defaultOptions = inject<MatBottomSheetConfig>(MAT_BOTTOM_SHEET_DEFAULT_OPTIONS, {
+     optional: true,
+   });
+@@ -89,6 +91,7 @@ export class MatBottomSheet implements OnDestroy {
+       container: MatBottomSheetContainer,
+       scrollStrategy: _config.scrollStrategy || this._overlay.scrollStrategies.block(),
+       positionStrategy: this._overlay.position().global().centerHorizontally().bottom('0'),
++      disableAnimations: this._animationsDisabled,
+       templateContext: () => ({bottomSheetRef: ref}),
+       providers: (cdkRef, _cdkConfig, container) => {
+         ref = new MatBottomSheetRef(cdkRef, _config, container as MatBottomSheetContainer);
+diff --git a/src/material/core/private/ripple-loader.ts b/src/material/core/private/ripple-loader.ts
+index 6cddbd8c3..c098a7e52 100644
+--- a/src/material/core/private/ripple-loader.ts
++++ b/src/material/core/private/ripple-loader.ts
+@@ -175,10 +175,10 @@ export class MatRippleLoader implements OnDestroy {
+     const globalOptions = this._globalRippleOptions;
+     const enterDuration = this._animationsDisabled
+       ? 0
+-      : globalOptions?.animation?.enterDuration ?? defaultRippleAnimationConfig.enterDuration;
++      : (globalOptions?.animation?.enterDuration ?? defaultRippleAnimationConfig.enterDuration);
+     const exitDuration = this._animationsDisabled
+       ? 0
+-      : globalOptions?.animation?.exitDuration ?? defaultRippleAnimationConfig.exitDuration;
++      : (globalOptions?.animation?.exitDuration ?? defaultRippleAnimationConfig.exitDuration);
+     const target: RippleTarget = {
+       rippleDisabled:
+         this._animationsDisabled || globalOptions?.disabled || host.hasAttribute(matRippleDisabled),
+diff --git a/src/material/datepicker/datepicker-base.ts b/src/material/datepicker/datepicker-base.ts
+index 8b98d13d5..2fea31ae0 100644
+--- a/src/material/datepicker/datepicker-base.ts
++++ b/src/material/datepicker/datepicker-base.ts
+@@ -394,6 +394,7 @@ export abstract class MatDatepickerBase<
+   private _dateAdapter = inject<DateAdapter<D>>(DateAdapter, {optional: true})!;
+   private _dir = inject(Directionality, {optional: true});
+   private _model = inject<MatDateSelectionModel<S, D>>(MatDateSelectionModel);
++  private _animationsDisabled = _animationsDisabled();
+ 
+   private _scrollStrategy = inject(MAT_DATEPICKER_SCROLL_STRATEGY);
+   private _inputStateChanges = Subscription.EMPTY;
+@@ -769,6 +770,7 @@ export abstract class MatDatepickerBase<
+         direction: this._dir || 'ltr',
+         scrollStrategy: isDialog ? this._overlay.scrollStrategies.block() : this._scrollStrategy(),
+         panelClass: `mat-datepicker-${isDialog ? 'dialog' : 'popup'}`,
++        disableAnimations: this._animationsDisabled,
+       }),
+     ));
+ 
+diff --git a/src/material/dialog/dialog-container.ts b/src/material/dialog/dialog-container.ts
+index 625d148db..c217c6aca 100644
+--- a/src/material/dialog/dialog-container.ts
++++ b/src/material/dialog/dialog-container.ts
+@@ -77,11 +77,11 @@ export class MatDialogContainer extends CdkDialogContainer<MatDialogConfig> impl
+   private _hostElement: HTMLElement = this._elementRef.nativeElement;
+   /** Duration of the dialog open animation. */
+   private _enterAnimationDuration = this._animationsEnabled
+-    ? parseCssTime(this._config.enterAnimationDuration) ?? OPEN_ANIMATION_DURATION
++    ? (parseCssTime(this._config.enterAnimationDuration) ?? OPEN_ANIMATION_DURATION)
+     : 0;
+   /** Duration of the dialog close animation. */
+   private _exitAnimationDuration = this._animationsEnabled
+-    ? parseCssTime(this._config.exitAnimationDuration) ?? CLOSE_ANIMATION_DURATION
++    ? (parseCssTime(this._config.exitAnimationDuration) ?? CLOSE_ANIMATION_DURATION)
+     : 0;
+   /** Current timer for dialog animations. */
+   private _animationTimer: ReturnType<typeof setTimeout> | null = null;
+diff --git a/src/material/dialog/dialog.ts b/src/material/dialog/dialog.ts
+index fa75e3f50..d4083b695 100644
+--- a/src/material/dialog/dialog.ts
++++ b/src/material/dialog/dialog.ts
+@@ -23,6 +23,7 @@ import {defer, Observable, Subject} from 'rxjs';
+ import {Dialog, DialogConfig} from '@angular/cdk/dialog';
+ import {startWith} from 'rxjs/operators';
+ import {_IdGenerator} from '@angular/cdk/a11y';
++import {_animationsDisabled} from '../core';
+ 
+ /** Injection token that can be used to access the data that was passed in to a dialog. */
+ export const MAT_DIALOG_DATA = new InjectionToken<any>('MatMdcDialogData');
+@@ -55,6 +56,7 @@ export class MatDialog implements OnDestroy {
+   private _parentDialog = inject(MatDialog, {optional: true, skipSelf: true});
+   private _idGenerator = inject(_IdGenerator);
+   protected _dialog = inject(Dialog);
++  private _animationsDisabled = _animationsDisabled();
+ 
+   private readonly _openDialogsAtThisLevel: MatDialogRef<any>[] = [];
+   private readonly _afterAllClosedAtThisLevel = new Subject<void>();
+@@ -146,6 +148,10 @@ export class MatDialog implements OnDestroy {
+       // Disable closing on detachments so that we can sync up the animation.
+       // The Material dialog ref handles this manually.
+       closeOnOverlayDetachments: false,
++      disableAnimations:
++        this._animationsDisabled ||
++        config.enterAnimationDuration?.toLocaleString() === '0' ||
++        config.exitAnimationDuration?.toString() === '0',
+       container: {
+         type: this._dialogContainerType,
+         providers: () => [
+diff --git a/src/material/menu/menu-trigger.ts b/src/material/menu/menu-trigger.ts
+index a19f1bf79..6dcf5aefe 100644
+--- a/src/material/menu/menu-trigger.ts
++++ b/src/material/menu/menu-trigger.ts
+@@ -47,6 +47,7 @@ import {throwMatMenuRecursiveError} from './menu-errors';
+ import {MatMenuItem} from './menu-item';
+ import {MAT_MENU_PANEL, MatMenuPanel} from './menu-panel';
+ import {MenuPositionX, MenuPositionY} from './menu-positions';
++import {_animationsDisabled} from '../core';
+ 
+ /** Injection token that determines the scroll handling while the menu is open. */
+ export const MAT_MENU_SCROLL_STRATEGY = new InjectionToken<() => ScrollStrategy>(
+@@ -117,6 +118,7 @@ export class MatMenuTrigger implements AfterContentInit, OnDestroy {
+   private _ngZone = inject(NgZone);
+   private _scrollStrategy = inject(MAT_MENU_SCROLL_STRATEGY);
+   private _changeDetectorRef = inject(ChangeDetectorRef);
++  private _animationsDisabled = _animationsDisabled();
+   private _cleanupTouchstart: () => void;
+ 
+   private _portal: TemplatePortal;
+@@ -447,6 +449,7 @@ export class MatMenuTrigger implements AfterContentInit, OnDestroy {
+       panelClass: menu.overlayPanelClass,
+       scrollStrategy: this._scrollStrategy(),
+       direction: this._dir || 'ltr',
++      disableAnimations: this._animationsDisabled,
+     });
+   }
+ 
+diff --git a/src/material/snack-bar/snack-bar.ts b/src/material/snack-bar/snack-bar.ts
+index b7c2dd348..c7e65e3e2 100644
+--- a/src/material/snack-bar/snack-bar.ts
++++ b/src/material/snack-bar/snack-bar.ts
+@@ -25,6 +25,7 @@ import {MAT_SNACK_BAR_DATA, MatSnackBarConfig} from './snack-bar-config';
+ import {MatSnackBarRef} from './snack-bar-ref';
+ import {ComponentPortal, TemplatePortal} from '@angular/cdk/portal';
+ import {takeUntil} from 'rxjs/operators';
++import {_animationsDisabled} from '../core';
+ 
+ /**
+  * @docs-private
+@@ -55,6 +56,7 @@ export class MatSnackBar implements OnDestroy {
+   private _breakpointObserver = inject(BreakpointObserver);
+   private _parentSnackBar = inject(MatSnackBar, {optional: true, skipSelf: true});
+   private _defaultConfig = inject<MatSnackBarConfig>(MAT_SNACK_BAR_DEFAULT_OPTIONS);
++  private _animationsDisabled = _animationsDisabled();
+ 
+   /**
+    * Reference to the current snack bar in the view *at this level* (in the Angular injector tree).
+@@ -295,6 +297,7 @@ export class MatSnackBar implements OnDestroy {
+     }
+ 
+     overlayConfig.positionStrategy = positionStrategy;
++    overlayConfig.disableAnimations = this._animationsDisabled;
+     return this._overlay.create(overlayConfig);
+   }
+ 
+diff --git a/src/material/timepicker/timepicker.ts b/src/material/timepicker/timepicker.ts
+index 483b48e1b..7fc235261 100644
+--- a/src/material/timepicker/timepicker.ts
++++ b/src/material/timepicker/timepicker.ts
+@@ -343,6 +343,7 @@ export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
+       scrollStrategy: this._scrollStrategyFactory(),
+       direction: this._dir || 'ltr',
+       hasBackdrop: false,
++      disableAnimations: this._animationsDisabled,
+     });
+ 
+     this._overlayRef.detachments().subscribe(() => this.close());
+diff --git a/src/material/tooltip/tooltip.ts b/src/material/tooltip/tooltip.ts
+index 82d577095..ccd75286a 100644
+--- a/src/material/tooltip/tooltip.ts
++++ b/src/material/tooltip/tooltip.ts
+@@ -207,6 +207,7 @@ export class MatTooltip implements OnDestroy, AfterViewInit {
+   protected _dir = inject(Directionality);
+   private _injector = inject(Injector);
+   private _viewContainerRef = inject(ViewContainerRef);
++  private _animationsDisabled = _animationsDisabled();
+   private _defaultOptions = inject<MatTooltipDefaultOptions>(MAT_TOOLTIP_DEFAULT_OPTIONS, {
+     optional: true,
+   });
+@@ -550,6 +551,7 @@ export class MatTooltip implements OnDestroy, AfterViewInit {
+       positionStrategy: strategy,
+       panelClass: `${this._cssClassPrefix}-${PANEL_CLASS}`,
+       scrollStrategy: this._injector.get(MAT_TOOLTIP_SCROLL_STRATEGY)(),
++      disableAnimations: this._animationsDisabled,
+     });
+ 
+     this._updatePosition(this._overlayRef);

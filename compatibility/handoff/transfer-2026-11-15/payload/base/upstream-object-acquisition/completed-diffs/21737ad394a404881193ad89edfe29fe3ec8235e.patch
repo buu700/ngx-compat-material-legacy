@@ -1,0 +1,56 @@
+diff --git a/src/material-date-fns-adapter/adapter/index.ts b/src/material-date-fns-adapter/adapter/index.ts
+index d4f283611..48870d41d 100644
+--- a/src/material-date-fns-adapter/adapter/index.ts
++++ b/src/material-date-fns-adapter/adapter/index.ts
+@@ -31,8 +31,7 @@ export * from './date-fns-formats';
+ export class DateFnsModule {}
+ 
+ @NgModule({
+-  imports: [DateFnsModule],
+-  providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_DATE_FNS_FORMATS}],
++  providers: [provideDateFnsAdapter()],
+ })
+ export class MatDateFnsModule {}
+ 
+diff --git a/src/material-luxon-adapter/adapter/index.ts b/src/material-luxon-adapter/adapter/index.ts
+index ead77b968..ecf73790b 100644
+--- a/src/material-luxon-adapter/adapter/index.ts
++++ b/src/material-luxon-adapter/adapter/index.ts
+@@ -31,8 +31,7 @@ export * from './luxon-date-formats';
+ export class LuxonDateModule {}
+ 
+ @NgModule({
+-  imports: [LuxonDateModule],
+-  providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_LUXON_DATE_FORMATS}],
++  providers: [provideLuxonDateAdapter()],
+ })
+ export class MatLuxonDateModule {}
+ 
+diff --git a/src/material-moment-adapter/adapter/index.ts b/src/material-moment-adapter/adapter/index.ts
+index 6f8d73a5b..04be3a49e 100644
+--- a/src/material-moment-adapter/adapter/index.ts
++++ b/src/material-moment-adapter/adapter/index.ts
+@@ -35,8 +35,7 @@ export * from './moment-date-formats';
+ export class MomentDateModule {}
+ 
+ @NgModule({
+-  imports: [MomentDateModule],
+-  providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS}],
++  providers: [provideMomentDateAdapter()],
+ })
+ export class MatMomentDateModule {}
+ 
+diff --git a/src/material/core/datetime/index.ts b/src/material/core/datetime/index.ts
+index fab2a6b7a..79cd028f5 100644
+--- a/src/material/core/datetime/index.ts
++++ b/src/material/core/datetime/index.ts
+@@ -23,8 +23,7 @@ export * from './native-date-formats';
+ export class NativeDateModule {}
+ 
+ @NgModule({
+-  imports: [NativeDateModule],
+-  providers: [{provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS}],
++  providers: [provideNativeDateAdapter()],
+ })
+ export class MatNativeDateModule {}
+ 

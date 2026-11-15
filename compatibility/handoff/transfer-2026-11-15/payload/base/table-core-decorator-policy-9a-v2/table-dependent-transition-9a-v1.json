@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "role": "table-source-and-producer-transition-review",
+  "line": "main",
+  "status": "reviewed",
+  "g11_claim": "not-passed",
+  "source_head": "9a5fac0b285f5663d1b8e00f9df3ef34b7c26a4c",
+  "transitions": [
+    {
+      "path": "tests/table_column_class_probe.mjs",
+      "before": "d705ef13767f65720ff10b098cc9c453621d3173",
+      "after": "c5d9a894db6a597f203eec323e16e4044ef06190",
+      "old": "3b904a1a7b4a6dba055e37a14c21e10bf1ebae5c5fe1105bdf86c90f412f9937",
+      "current": "022bbbe27e6abe00e3b4a311c3117dd0241f301161b229a398d42afcba2dee2f",
+      "before_bytes": 12614,
+      "after_bytes": 11977,
+      "diff_sha256": "e1b7344214aafed27e376ea50ca3532d32234ff838e6fc05f1688d118243244c",
+      "diff": "diff --git a/tests/table_column_class_probe.mjs b/tests/table_column_class_probe.mjs\nindex 2cc2dde40..a9f9b4f26 100644\n--- a/tests/table_column_class_probe.mjs\n+++ b/tests/table_column_class_probe.mjs\n@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';\n import {readFileSync, writeFileSync, mkdirSync, existsSync} from 'node:fs';\n import {createHash} from 'node:crypto';\n import {createRequire} from 'node:module';\n-import {execFileSync, spawn} from 'node:child_process';\n-import {createServer} from 'node:http';\n+import {execFileSync} from 'node:child_process';\n+import {withChromium} from '../scripts/check-companion-computed-styles.mjs';\n import {dirname, join, resolve} from 'node:path';\n import {fileURLToPath} from 'node:url';\n import {prepareMaterialPublicSubjects} from '../scripts/material-public-subjects.mjs';\n@@ -31,6 +31,8 @@ assert.equal(hash(read(originalPath)), provenance.sha256);\n const worker = read('tests/table_column_class_subject.mjs'), loaded = prepareMaterialPublicSubjects(root);\n const results = [], types = [], archiveProofs = [];\n const chrome = [process.env.CHROME_BIN, '/usr/bin/chromium-browser', '/snap/bin/chromium'].find(p => p && existsSync(p)); assert.ok(chrome);\n+// Keep the original executable selection when delegating launch and cleanup.\n+process.env.CHROME_BIN = chrome;\n try {\n   for (const model of loaded.models) {\n     const metadata = model.subject.packages.find(p => p.name === '@angular/cdk');\n@@ -97,17 +99,17 @@ try {\n       writeFileSync(join(model.root, 'subject.mjs'), worker);\n       await esbuild.build({entryPoints: [join(model.root, 'subject.mjs')], bundle: true, format: 'iife', platform: 'browser', outfile: join(model.root, 'bundle.js'), logLevel: 'silent'});\n       writeFileSync(join(model.root, 'index.html'), '<pre id=\"report\">pending</pre><script>window.addEventListener(\"error\",function(e){document.getElementById(\"report\").textContent=JSON.stringify({error:String(e.message)});});</script><script src=\"bundle.js\"></script>');\n-      const server = createServer((request, response) => {const name = request.url === '/bundle.js' ? 'bundle.js' : 'index.html'; response.setHeader('Content-Type', name.endsWith('.js') ? 'application/javascript' : 'text/html'); response.end(readFileSync(join(model.root, name)));});\n-      await new Promise(done => server.listen(0, '127.0.0.1', done));\n-      let html;\n-      try {html = await new Promise((done, reject) => {\n-        const child = spawn(chrome, ['--headless', '--no-sandbox', '--disable-gpu', '--no-first-run', '--user-data-dir=' + join(model.root, 'chrome-' + variant), '--virtual-time-budget=1000', '--dump-dom', 'http://127.0.0.1:' + server.address().port], {stdio: ['ignore', 'pipe', 'pipe']});\n-        let output = '', error = ''; child.stdout.on('data', b => output += b); child.stderr.on('data', b => error += b);\n-        const timer = setTimeout(() => {child.kill(); reject(Error('Chromium timeout'));}, 20000);\n-        child.on('error', reject); child.on('close', code => {clearTimeout(timer); code === 0 ? done(output) : reject(Error(error.slice(-1000)));});\n-      });} finally {server.close();}\n-      const text = html.match(/<pre id=\"report\">([\\s\\S]*?)<\\/pre>/)?.[1]; assert.ok(text && text !== 'pending', html.slice(-1500));\n-      const observation = JSON.parse(text.replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '\"'));\n+      const text = await withChromium(model.root, async ({evaluate}) => {\n+        const deadline = Date.now() + 20000;\n+        while (Date.now() < deadline) {\n+          const value = await evaluate(\"document.querySelector('#report')?.textContent ?? ''\");\n+          if (value && value !== 'pending') return value;\n+          await new Promise(resolve => setTimeout(resolve, 50));\n+        }\n+        throw Error('Chromium report timeout');\n+      }, {debugPort: 0, requireAnnouncedEndpoint: true});\n+      assert.ok(text && text !== 'pending', 'Chromium did not produce a report');\n+      const observation = JSON.parse(text);\n       assert.ok(!observation.error, observation.error); results.push({line: model.line, variant, ...observation});\n     }\n   }\n"
+    },
+    {
+      "path": "tests/table_no_data_cell_probe.mjs",
+      "before": "400ae49e112ae71f60287fc1a9400f5b8183acef",
+      "after": "87d381f56b545081bfb87b1d5f1a1e1e9941d2eb",
+      "old": "c074fe2a91d19d22633f7cabbacd092beaa7947b165cae2e677917f0cbc17c7d",
+      "current": "ddeceabd18cbe49af0730eb08448c4cf2bf823ac0bb2034300455561425a75bb",
+      "before_bytes": 13140,
+      "after_bytes": 12503,
+      "diff_sha256": "d750658458a7997869a50df4484e1e80eb49b9ffe124d60c0186bf9243b37d2f",
+      "diff": "diff --git a/tests/table_no_data_cell_probe.mjs b/tests/table_no_data_cell_probe.mjs\nindex 8d9536e26..0f379b295 100644\n--- a/tests/table_no_data_cell_probe.mjs\n+++ b/tests/table_no_data_cell_probe.mjs\n@@ -9,8 +9,8 @@ import assert from 'node:assert/strict';\n import {readFileSync, writeFileSync, mkdirSync, existsSync} from 'node:fs';\n import {createHash} from 'node:crypto';\n import {createRequire} from 'node:module';\n-import {execFileSync, spawn} from 'node:child_process';\n-import {createServer} from 'node:http';\n+import {execFileSync} from 'node:child_process';\n+import {withChromium} from '../scripts/check-companion-computed-styles.mjs';\n import {dirname, join, resolve} from 'node:path';\n import {fileURLToPath} from 'node:url';\n import {prepareMaterialPublicSubjects} from '../scripts/material-public-subjects.mjs';\n@@ -38,6 +38,8 @@ const originalRenderer = renderer(rendererPath, read(rendererPath));\n assert.doesNotMatch(originalRenderer.source, /_cellClassNames|querySelectorAll/);\n const worker = read('tests/table_no_data_cell_subject.mjs'), loaded = prepareMaterialPublicSubjects(root), results = [], types = [], archiveProofs = [];\n const chrome = [process.env.CHROME_BIN, '/usr/bin/chromium-browser', '/snap/bin/chromium'].find(p => p && existsSync(p)); assert.ok(chrome);\n+// Keep the original executable selection when delegating launch and cleanup.\n+process.env.CHROME_BIN = chrome;\n try {\n   for (const model of loaded.models) {\n     const metadata = model.subject.packages.find(p => p.name === '@angular/cdk');\n@@ -86,17 +88,17 @@ try {\n       writeFileSync(join(model.root, 'subject.mjs'), worker);\n       await esbuild.build({entryPoints: [join(model.root, 'subject.mjs')], bundle: true, format: 'iife', platform: 'browser', outfile: join(model.root, 'bundle.js'), logLevel: 'silent'});\n       writeFileSync(join(model.root, 'index.html'), '<pre id=\"report\">pending</pre><script>window.addEventListener(\"error\",function(e){document.getElementById(\"report\").textContent=JSON.stringify({error:String(e.message)});});</script><script src=\"bundle.js\"></script>');\n-      const server = createServer((request, response) => {const name = request.url === '/bundle.js' ? 'bundle.js' : 'index.html'; response.setHeader('Content-Type', name.endsWith('.js') ? 'application/javascript' : 'text/html'); response.end(readFileSync(join(model.root, name)));});\n-      await new Promise(done => server.listen(0, '127.0.0.1', done));\n-      let html;\n-      try {html = await new Promise((done, reject) => {\n-        const child = spawn(chrome, ['--headless', '--no-sandbox', '--disable-gpu', '--no-first-run', '--user-data-dir=' + join(model.root, 'chrome-' + variant), '--virtual-time-budget=1000', '--dump-dom', 'http://127.0.0.1:' + server.address().port], {stdio: ['ignore', 'pipe', 'pipe']});\n-        let output = '', error = ''; child.stdout.on('data', b => output += b); child.stderr.on('data', b => error += b);\n-        const timer = setTimeout(() => {child.kill(); reject(Error('Chromium timeout'));}, 20000);\n-        child.on('error', reject); child.on('close', code => {clearTimeout(timer); code === 0 ? done(output) : reject(Error(error.slice(-1000)));});\n-      });} finally {server.close();}\n-      const text = html.match(/<pre id=\"report\">([\\s\\S]*?)<\\/pre>/)?.[1]; assert.ok(text && text !== 'pending', html.slice(-1500));\n-      const observation = JSON.parse(text.replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '\"'));\n+      const text = await withChromium(model.root, async ({evaluate}) => {\n+        const deadline = Date.now() + 20000;\n+        while (Date.now() < deadline) {\n+          const value = await evaluate(\"document.querySelector('#report')?.textContent ?? ''\");\n+          if (value && value !== 'pending') return value;\n+          await new Promise(resolve => setTimeout(resolve, 50));\n+        }\n+        throw Error('Chromium report timeout');\n+      }, {debugPort: 0, requireAnnouncedEndpoint: true});\n+      assert.ok(text && text !== 'pending', 'Chromium did not produce a report');\n+      const observation = JSON.parse(text);\n       assert.ok(!observation.error, observation.error); results.push({line: model.line, variant, ...observation});\n     }\n   }\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "before": "7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad",
+      "after": "ceb5ab6ff0b910436768384a622299f4b01d2da3",
+      "old": "e645f8b92ccb57518eb9fac6ab3a20c35db6bd9f19a301fcb659ffe58911cfb6",
+      "current": "e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931",
+      "before_bytes": 28628,
+      "after_bytes": 28656,
+      "diff_sha256": "332b17cdfed9610889061dd34c36df979d6e98ed0a382f1412e31771a05962b5",
+      "diff": "diff --git a/projects/ngx-material-legacy/legacy-form-field/form-field.ts b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\nindex aff83b932..ed01890da 100644\n--- a/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n+++ b/projects/ngx-material-legacy/legacy-form-field/form-field.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n type BooleanInput = string | boolean | null | undefined;\n@@ -47,7 +49,7 @@ import {Platform} from '@angular/cdk/platform';\n import {afterFormFieldRender} from './internal/after-form-field-render';\n import {nextLegacyHintId} from './internal/hint-id';\n import {AbstractControlDirective, ValidatorFn} from '@angular/forms';\n-import {ANIMATION_MODULE_TYPE} from '@angular/core';\n+\n import {MatFormFieldControl} from '@angular/material/form-field';\n import {\n   MAT_LEGACY_ERROR as MAT_ERROR,\n@@ -317,7 +319,7 @@ export class MatLegacyFormField\n     private _defaults: MatLegacyFormFieldDefaultOptions,\n     private _platform: Platform,\n     private _ngZone: NgZone,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) _animationMode: string,\n     private _injector?: Injector,\n   ) {\n     super(elementRef);\n"
+    }
+  ],
+  "policy": {
+    "commit": "072f4c859af66724ee26621ad0f97d41043f3af2",
+    "before_sha256": "e74fdf4aee4d66bf4c2db62ee6e71e89bb0ad9fd8ed845e6b34ca3c238b5e8ef",
+    "before_bytes": 5364,
+    "after_sha256": "e25053ac5acd14808dc72884fcc396ae9c2eab5f809d30f1d2bcf0f10581016b",
+    "after_bytes": 6477
+  },
+  "form_field_scope": "The sole prior-to-current form-field source diff replaces the animation injection token and adds its import. This file is common contextual evidence in a shared table/form review; neither form-field animation behavior nor its motion changes are qualified by the four table outlet decisions.",
+  "probe_scope": "The two probe transitions change browser launch, communication and cleanup; prior reports keep their original producer identities. Fresh independent diagnostics were executed with the approved Nix Chromium profile and process supervisor; they are not packed, current 21.x, compiler-floor or coordinator admission.",
+  "receipts": [
+    {
+      "path": "compatibility/rc/table-column-class-policy-9a-diagnostic.json",
+      "sha256": "3574bf2bc6f81f6e5a3e6f1b2341d864ea2c0b44d1b155286dd7f86cdfa2ba67",
+      "bytes": 192144
+    },
+    {
+      "path": "compatibility/rc/table-no-data-policy-9a-diagnostic.json",
+      "sha256": "4017219e035402f3cdb4d56e589e8d16334cb8ea02b6cd43f1d3201e41035136",
+      "bytes": 33076
+    }
+  ],
+  "artifact_source": "isolated source checkout 3cf626fd4dd66f231fb64e36d6fa63cbcb2ae14e; relevant table/producer sources byte-identical to 9a5fac0",
+  "browser": {
+    "path": "/nix/store/qhdnfx3ipfqcpjs1sywfc3iv7m2p5l62-playwright-browsers/chromium-1228/chrome-linux/chrome",
+    "sha256": "3a0b4b909e867cbd845162be0b67343c0d6bb03dbac8f2d410eec8fcc8913fe9",
+    "hash_observation": "Recorded earlier in this session; executable was unavailable at post-run check, so no fresh pre/post binary identity qualification is claimed.",
+    "node": "24.21.0",
+    "supervisor": {
+      "path": "tests/browser_reference_owned_process.py",
+      "sha256": "02c1aec73680f02c0f25e7fb2237f883197a171dbbd0dcfaf0e0e4c443ba3f0f",
+      "bytes": 3884
+    },
+    "transport": {
+      "path": "scripts/check-companion-computed-styles.mjs",
+      "sha256": "bcc2808b58064868e366c8cdcb7cbb4d80724e178579b924a1062b7e688b561c",
+      "bytes": 61815
+    }
+  },
+  "historical_programs_replayed": false,
+  "private_hook_or_runtime_admission": false
+}
