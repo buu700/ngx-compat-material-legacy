@@ -108,7 +108,7 @@ export class MatLegacyProgressBar
     // the same thing.
     const path = location ? location.getPathname().split('#')[0] : '';
     this._rectangleFillValue = `url('${path}#${this.progressbarId}')`;
-    this._isNoopAnimation = _animationMode === 'NoopAnimations';
+    this._isNoopAnimation = this._animationMode === 'NoopAnimations';
 
     if (defaults) {
       if (defaults.color) {
