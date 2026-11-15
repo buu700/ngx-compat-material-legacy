@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {isDeepStrictEqual} from 'node:util';
-import {readFileSync,writeFileSync,mkdirSync,renameSync,symlinkSync,unlinkSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,renameSync,symlinkSync,unlinkSync,existsSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -120,6 +120,7 @@ try{
  try{assert.match(check().detail,/symlink/);sourceCases++;}finally{unlinkSync(owned);renameSync(owned+'.saved',owned);}
  const out=join(f.runDir,'evidence/upstream-audit-disposition/synthetic-upstream');mkdirSync(out,{recursive:true});
  const environment=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('RC_')));
+ environment.NODE_PATH=dirname(dirname(dirname(createRequire(import.meta.url).resolve('typescript'))));
  const cliResults=[];
  function cli(name,mutate,expected){
   reset();mutate?.();f.save();f.runPut('seed.json',{commits:[{sha:NATIVE_DATE_SHA}],fixture_only:true});f.runPut('ledger.json',{entries:[f.entry],g11_claim:'not-passed',fixture_only:true});
@@ -135,6 +136,21 @@ try{
   else assert.ok(result.insufficient_review_sha_ids.sensitive.includes(NATIVE_DATE_SHA),name);
   cliResults.push({name,admitted:expected});cliCases++;
  }
+ let currentSyntheticLedgerRejected=false;
+ if(f.line==='main'){
+  reset();f.save();f.runPut('seed.json',{commits:[{sha:NATIVE_DATE_SHA}],fixture_only:true});
+  f.runPut('ledger.json',{entries:[f.entry],g11_claim:'not-passed',fixture_only:true});
+  const reportPath=join(f.runDir,'synthetic-ledger-rejection.json'),env={...environment,RC_CHECK_ID:'upstream-audit-disposition',RC_RUN_ID:f.request.runId,
+   RC_INVOCATION_ID:'synthetic-upstream',RC_EVIDENCE_BINDING:JSON.stringify(f.request.binding),RC_ASSERTION_OUTPUT_DIR:out,
+   RC_UPSTREAM_PACKED_CONSUMER:JSON.stringify(f.request.packedConsumerExecution)};
+  assert.deepEqual(readFileSync(join(f.root,'scripts/check-upstream-audit-disposition.mjs')),read('scripts/check-upstream-audit-disposition.mjs'));
+  const child=spawnSync(process.execPath,[join(f.root,'scripts/check-upstream-audit-disposition.mjs'),'--admission','--line',f.line,
+   '--seed',join(f.runDir,'seed.json'),'--ledger',join(f.runDir,'ledger.json'),'--symbols',join(f.root,'symbols.json'),
+   '--current-symbols',join(f.root,'current.json'),'--report',reportPath],{cwd:f.root,env,encoding:'utf8',timeout:30000});
+  assert.equal(child.status,2,child.stderr+String(child.error||''));assert.match(child.stderr,/coordinated main requires the live ledger/);
+  assert.equal(existsSync(reportPath),false);currentSyntheticLedgerRejected=true;cliCases++;
+  cliResults.push({name:'synthetic-ledger-rejected',admitted:false,fixture_only:true});
+ }else{
  cli('complete',null,true);
  cli('failed-child',()=>{f.request.packedConsumerExecution.exit_code=8;},false);
  cli('missing-child',()=>{delete f.request.packedConsumerExecution;},false);
@@ -151,8 +167,10 @@ try{
  cli('foreign-library',()=>{f.report.artifacts.library.sha256='0'.repeat(64);},false);
  cli('missing-source',()=>{f.entry.individual_proof.native_date_behavior.source_members.pop();},false);
  cli('foreign-branch',()=>{f.entry.individual_proof.affected_branches=[f.line==='main'?'21.x':'main'];},false);
+ }
  const report={schema_version:1,line:f.line,subjects:1,full_packed_roster:106,helper_controls:helpers,cached_actual_reader_semantic_controls:semantics,
   current_original_source_or_path_corruptions_rejected:sourceCases,actual_CLI_controls:cliCases,CLI_cases:cliResults,
+  current_synthetic_ledger_rejected:currentSyntheticLedgerRejected,
   registered_SHA_cannot_be_relabelled_away:true,source_or_runtime_dispositions_changed:false,prerequisite_and_runtime_results_synthetic:true,
   actual_Angular_DI_or_artifact_factory_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
  if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});

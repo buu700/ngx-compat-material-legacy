@@ -9,8 +9,8 @@
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
-import {readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync} from 'node:fs';
-import {dirname, join, resolve} from 'node:path';
+import {readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, lstatSync, realpathSync} from 'node:fs';
+import {dirname, join, resolve, relative, isAbsolute, sep} from 'node:path';
 import {tmpdir} from 'node:os';
 import {scanCurrentAuthoredUses} from '../../scripts/authored-current-use-inventory.mjs';
 import {ARTIFACT_BEHAVIOR_KIND, SELECT_FOCUS_SHA, SELECT_FOCUS_PATCH, SELECT_FOCUS_MEMBERS} from '../../scripts/upstream-artifact-behavior-evidence.mjs';
@@ -41,6 +41,64 @@ export function focusSample() {
     }))};
 }
 
+// The checker has a finite owned static closure. Keep non-script inputs explicit.
+const ownedCheckerModules = new Set([
+  'testing/datepicker-inherited/contracts-fixture.mjs',
+  'testing/overlay-inherited/contracts-fixture.mjs',
+  'testing/table-inherited/contracts.mjs',
+  'compatibility/rc/ordinary-card-c04-successor-model-v1.mjs',
+  'compatibility/rc/ordinary-card-public-bridge-model-v1.mjs',
+  'compatibility/rc/ordinary-card-public-bridge-model-v2.mjs',
+  'compatibility/rc/ordinary-checkbox-button-expectation-model-v1.mjs',
+  'compatibility/rc/ordinary-checkbox-button-legacy-composition-model-v1.mjs',
+  'compatibility/rc/parallel-spinner-snack-public-bridge-integration-source-subject.mjs',
+]);
+
+// Files read during checker module initialization, rather than imported.
+const eagerCheckerData = [
+  'scripts/browser-reference-proposal.mjs',
+  'scripts/revalidate-typeahead.mjs',
+  'compatibility/rc/matrices/library-exports.json',
+  'scripts/measure-sass-inspection-scope.mjs',
+  'compatibility/rc/parallel-spinner-snack-css-contract-inputs-v1.json',
+  'compatibility/rc/ordinary-checkbox-button-legacy-composition-cases-v1.json',
+  'compatibility/rc/ordinary-checkbox-button-legacy-composition-known-before-v1.json',
+  'compatibility/rc/ordinary-card-c04-successor-inputs-v1.json',
+  'compatibility/rc/ordinary-card-public-bridge-original-cases-v1.json',
+  'compatibility/rc/current-sass-legacy-retention-reference-v1.json',
+];
+
+export function copyCheckerModules(sourceRoot, destination) {
+  const root = realpathSync(sourceRoot), ts = createRequire(import.meta.url)('typescript'), copied = new Set();
+  const copy = (path, parseImports = true) => {
+    const absolute = resolve(root, path), member = relative(root, absolute);
+    if (!member || isAbsolute(member) || member === '..' || member.startsWith('..' + sep) ||
+        !(member.startsWith('scripts' + sep) || ownedCheckerModules.has(member) || (!parseImports && eagerCheckerData.includes(member)))) {
+      throw Error('Unexpected checker import: ' + path);
+    }
+    // Reject symlinks even when they resolve back inside the repository. This also
+    // prevents an allowed name from being replaced with an external module.
+    let component = root;
+    for (const part of member.split(sep)) {
+      component = join(component, part);
+      if (lstatSync(component).isSymbolicLink()) throw Error('Symlink in checker import: ' + member);
+    }
+    if (copied.has(member)) return;
+    const bytes = readFileSync(absolute);
+    copied.add(member);
+    const target = join(destination, member); mkdirSync(dirname(target), {recursive: true}); writeFileSync(target, bytes);
+    if (!parseImports) return;
+    const sf = ts.createSourceFile(member, bytes.toString(), ts.ScriptTarget.Latest, true);
+    for (const node of sf.statements) {
+      if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) && node.moduleSpecifier?.text.startsWith('.')) {
+        copy(resolve(dirname(absolute), node.moduleSpecifier.text));
+      }
+    }
+  };
+  copy('scripts/check-upstream-audit-disposition.mjs');
+  for (const path of eagerCheckerData) copy(path, false);
+}
+
 export function createFixture(sourceRoot, individualReview = null) {
   const temp = mkdtempSync(join(tmpdir(), 'artifact-behavior-validator-'));
   const root = join(temp, 'repo'), runDir = join(temp, 'run');
@@ -50,18 +108,7 @@ export function createFixture(sourceRoot, individualReview = null) {
     writeFileSync(target, typeof value === 'string' || Buffer.isBuffer(value) ? value : JSON.stringify(value, null, 2) + '\n');
   };
   const repoPut = (path, value) => put(root, path, value), runPut = (path, value) => put(runDir, path, value);
-  const ts = createRequire(import.meta.url)('typescript'), copied = new Set();
-  const copyModule = path => {
-    if (copied.has(path)) return; copied.add(path);
-    const bytes = read(path); repoPut(path, bytes);
-    const sf = ts.createSourceFile(path, bytes.toString(), ts.ScriptTarget.Latest, true);
-    for (const node of sf.statements) if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) && node.moduleSpecifier?.text.startsWith('.')) {
-      const next = resolve(sourceRoot, dirname(path), node.moduleSpecifier.text);
-      if (!next.startsWith(sourceRoot + '/scripts/')) throw Error('Unexpected checker import');
-      copyModule(next.slice(sourceRoot.length + 1));
-    }
-  };
-  copyModule('scripts/check-upstream-audit-disposition.mjs');
+  copyCheckerModules(sourceRoot, root);
   const manifest = JSON.parse(read('projects/ngx-material-legacy/package.json'));
   const line = manifest.version.startsWith('21.') ? '21.x' : 'main';
   repoPut('projects/ngx-material-legacy/package.json', manifest);

@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {spawnSync} from 'node:child_process';
-import {readFileSync, writeFileSync, mkdirSync, renameSync, symlinkSync, unlinkSync} from 'node:fs';
+import {readFileSync, writeFileSync, mkdirSync, renameSync, symlinkSync, unlinkSync, existsSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {requiresArtifactBehavior, validateArtifactBehavior} from '../../scripts/upstream-artifact-behavior-evidence.mjs';
@@ -152,6 +152,28 @@ try {
     }
     observations.push({name, actual_cli: true, exit_code: child.status, fixture_only: true});
   };
+  let currentSyntheticLedgerRejected = false;
+  if (f.line === 'main') {
+    // Current coordinated MAIN admits only its authenticated live ledger. A
+    // synthetic fixture cannot exercise a positive CLI admission through it.
+    reset(); f.save();
+    f.runPut('seed.json', {commits: [{sha: f.entry.sha}], fixture_only: true});
+    f.runPut('ledger.json', {g11_claim: 'not-passed', entries: [f.entry], fixture_only: true});
+    const reportPath = join(f.runDir, 'synthetic-ledger-rejection.json');
+    const env = {...environment, RC_CHECK_ID: 'upstream-audit-disposition', RC_RUN_ID: f.request.runId,
+      RC_INVOCATION_ID: invocation, RC_EVIDENCE_BINDING: JSON.stringify(f.request.binding), RC_ASSERTION_OUTPUT_DIR: outputDir,
+      RC_UPSTREAM_PACKED_CONSUMER: JSON.stringify(f.request.packedConsumerExecution)};
+    assert.deepEqual(readFileSync(join(f.root, 'scripts/check-upstream-audit-disposition.mjs')),
+      readFileSync(join(sourceRoot, 'scripts/check-upstream-audit-disposition.mjs')));
+    const child = spawnSync(process.execPath, [join(f.root, 'scripts/check-upstream-audit-disposition.mjs'), '--admission', '--line', f.line,
+      '--seed', join(f.runDir, 'seed.json'), '--ledger', join(f.runDir, 'ledger.json'), '--symbols', join(f.root, 'symbols.json'),
+      '--current-symbols', join(f.root, 'current.json'), '--report', reportPath], {cwd: f.root, env, encoding: 'utf8', timeout: 30000});
+    assert.equal(child.status, 2, child.stderr + String(child.error || ''));
+    assert.match(child.stderr, /coordinated main requires the live ledger/);
+    assert.equal(existsSync(reportPath), false);
+    currentSyntheticLedgerRejected = true; cliCases++;
+    observations.push({name: 'synthetic-ledger-rejected', actual_cli: true, exit_code: child.status, fixture_only: true});
+  } else {
   runCli('complete-current-artifact-fixture', null, true);
   runCli('source-only-without-run', null, false, {noCoordinator: true});
   runCli('failed-prerequisite', () => f.request.packedConsumerExecution.exit_code = 7, false);
@@ -169,9 +191,10 @@ try {
   f.repoPut('scripts/artifact-mutant.mjs', mutant);
   runCli('mutant-removes-runtime-guard', null, true, {noCoordinator: true, checker: 'artifact-mutant.mjs'}); mutants++;
   unlinkSync(join(f.root, 'scripts/artifact-mutant.mjs'));
+  }
   reset(); assert.equal(check().ok, true);
   const output = {schema_version: 1, line: f.line, node: process.version, helper_cases: helperCases, actual_cli_cases: cliCases,
-    checker_mutants_detected: mutants, packed_roster_cases: f.ids.length, frozen_fixture_uses: f.frozenUses,
+    checker_mutants_detected: mutants, current_synthetic_ledger_rejected: currentSyntheticLedgerRejected, packed_roster_cases: f.ids.length, frozen_fixture_uses: f.frozenUses,
     current_fixture_additional_uses: f.additionalUses, actual_product_or_packed_or_native_qualified: false, g11_claim: 'not-passed', observations,
     helper_sha256: hash(readFileSync(join(sourceRoot, 'scripts/upstream-artifact-behavior-evidence.mjs'))),
     checker_sha256: hash(readFileSync(join(sourceRoot, 'scripts/check-upstream-audit-disposition.mjs'))),

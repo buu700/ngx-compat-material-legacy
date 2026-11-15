@@ -27,8 +27,9 @@ class ArtifactBehaviorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(observed['helper_cases'], 87)
-        self.assertEqual(observed['actual_cli_cases'], 11)
-        self.assertEqual(observed['checker_mutants_detected'], 1)
+        self.assertEqual(observed['actual_cli_cases'], 1 if observed['line'] == 'main' else 11)
+        self.assertEqual(observed['checker_mutants_detected'], 0 if observed['line'] == 'main' else 1)
+        self.assertEqual(observed['current_synthetic_ledger_rejected'], observed['line'] == 'main')
         self.assertEqual(observed['packed_roster_cases'], 106)
         self.assertEqual(observed['frozen_fixture_uses'], 1736)
         self.assertFalse(observed['actual_product_or_packed_or_native_qualified'])
@@ -42,7 +43,7 @@ class ArtifactBehaviorTests(unittest.TestCase):
             for prerequisite in [None, 0, 7]:
                 with self.subTest(prerequisite=prerequisite):
                     active = SimpleNamespace(run_dir=Path(temp), manifest={'run_id': 'fixture-run'},
-                        binding={'fixture_only': True},
+                        binding={'fixture_only': True}, outputs={},
                         invocations={} if prerequisite is None else {'packed-consumer': 'captured-invocation'},
                         exit_codes={} if prerequisite is None else {'packed-consumer': prerequisite},
                         invocation=lambda check_id: 'captured-upstream', record_exit=lambda check_id, code: None)
