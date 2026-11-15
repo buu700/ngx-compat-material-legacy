@@ -11,6 +11,7 @@ import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 const SELF='scripts/retained-validator-program-source.mjs',image=readFileSync(fileURLToPath(import.meta.url));
 const PACKET={path:'compatibility/rc/main-retained-validator-programs-v1.json',sha256:'e26a11ac20146aa41e5b2a540606cf659c627b5235ae09687a0bb3cea4b2780d',bytes:6968};
 const CONTEXT_SUCCESSOR={path:'compatibility/rc/retained-validator-context-successor-4015.json',sha256:'55543fe7a1c7621e516b0ddde32711445b463ba47dcdeda0f2fa51bd33d0e1eb',bytes:2286};
+const CONTEXT_CONTINUATION={path:'compatibility/rc/retained-validator-context-successor-149de.json',sha256:'ed55cab51218c54b292a1f33adef1d84edd68941e59b6fdfecd977546a8b9575',bytes:2591};
 const AUTHORITY='1c4ace0fa7a0e7cc4d3e919f415e05ca5e46f3c0',INTERMEDIATE='4e6f608402e99da9fb550bb46040aa68a648440a',CURRENT='1b81670bc1390da94e7928c0fb24f361e1af08e8';
 const PATHS=['scripts/upstream-build-scope-evidence.mjs','scripts/upstream-test-consolidation-evidence.mjs','scripts/upstream-bazel-build-scope.mjs'];
 const sha=raw=>createHash('sha256').update(raw).digest('hex'),clean=ref=>({path:ref.path,sha256:ref.sha256,bytes:ref.bytes});
@@ -50,6 +51,21 @@ export function retainedValidatorProgramSource({root=process.cwd(),read}={}){
  for(const row of successor.transitions)for(const side of ['before','after'])assert.equal(row[side].path,row.path);
  assert.deepEqual(packet.support.find(row=>row.path===successorPaths[0]),successor.transitions[0].before);
  verifyGit(parent,successor.transitions.map(row=>row.before));verifyGit(commit,successor.transitions.map(row=>row.after));
+ // Authenticate the complete committed follow-on, including the Python test
+ // harness, as Git data. Neither historical body is a current reader.
+ const continuationRaw=physical(CONTEXT_CONTINUATION.path);exact(continuationRaw,CONTEXT_CONTINUATION);
+ const continuation=JSON.parse(continuationRaw),continuationParent='d443a7671cb7c5bbbd20211e5806a5de61b4af9e',continuationCommit='149de9c37bdf99050e4b5e8b9096ce7892c22ef1';
+ const continuationPaths=[...successorPaths,'tests/test_current_reader_source_successors.py'];
+ assert.equal(continuation.schema_version,1);assert.equal(continuation.role,'retained-validator-current-context-source-continuation');
+ assert.equal(continuation.source_parent,continuationParent);assert.equal(continuation.source_commit,continuationCommit);
+ for(const [key,value]of Object.entries({source_only:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(continuation[key],value,key);
+ assert.equal(git(['rev-parse',continuationCommit+'^']).toString().trim(),continuationParent);
+ git(['merge-base','--is-ancestor',commit,continuationParent]);git(['merge-base','--is-ancestor',continuationCommit,'HEAD']);
+ assert.deepEqual(continuation.transitions.map(row=>row.path),continuationPaths);
+ assert.deepEqual(git(['diff','--name-status','--no-renames',continuationParent,continuationCommit]).toString().trim().split('\n'),continuationPaths.map(path=>'M\t'+path));
+ for(const row of continuation.transitions)for(const side of ['before','after'])assert.equal(row[side].path,row.path);
+ for(let i=0;i<successorPaths.length;i++)assert.deepEqual(continuation.transitions[i].before,successor.transitions[i].after);
+ verifyGit(continuationParent,continuation.transitions.map(row=>row.before));verifyGit(continuationCommit,continuation.transitions.map(row=>row.after));
  const bound=new Map(),identities=new Map();
  const add=ref=>{const normalized=clean(ref),prior=bound.get(ref.path);if(prior)assert.deepEqual(prior,normalized);else bound.set(ref.path,normalized);};
  add({path:SELF,sha256:sha(image),bytes:image.length});add(PACKET);add(packet.source_input);
@@ -60,8 +76,8 @@ export function retainedValidatorProgramSource({root=process.cwd(),read}={}){
   const known=new Map();for(const ref of [row.before,row.intermediate,row.current]){const prior=known.get(ref.sha256);if(prior)assert.deepEqual(prior,clean(ref));else known.set(ref.sha256,clean(ref));}
   identities.set(row.path,{known,current:clean(row.current)});add(row.current);
  }
- for(const ref of packet.support)add(ref.path===successorPaths[0]?successor.transitions[0].after:ref);
- add(CONTEXT_SUCCESSOR);add(successor.transitions[1].after);
+ for(const ref of packet.support)add(ref.path===successorPaths[0]?continuation.transitions[0].after:ref);
+ add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);for(const row of continuation.transitions.slice(1))add(row.after);
  let checking=false,reentered=false;
  const assertCurrent=()=>{
   if(checking){reentered=true;throw new Error('retained validator program reentry');}
