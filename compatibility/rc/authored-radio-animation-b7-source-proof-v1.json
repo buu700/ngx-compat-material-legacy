@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "role": "finite-radio-animation-authored-source-transition",
+  "line": "main",
+  "source_only": true,
+  "head": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+  "transitions": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-radio/radio.ts",
+      "predecessor": "6157a1468b457c0553112258f84e9da7eb482f1b",
+      "before_sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+      "after_sha256": "0b749baf2f25dcacad39803d51f809f2cca02ed4add03c3199513cdf60b9fb15",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-radio/radio.ts b/projects/ngx-material-legacy/legacy-radio/radio.ts\nindex 26e4f3e0c..48ee777dd 100644\n--- a/projects/ngx-material-legacy/legacy-radio/radio.ts\n+++ b/projects/ngx-material-legacy/legacy-radio/radio.ts\n@@ -7,10 +7,11 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor} from '@angular/cdk/a11y';\n import {UniqueSelectionDispatcher} from '@angular/cdk/collections';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -103,7 +104,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n     changeDetector: ChangeDetectorRef,\n     focusMonitor: FocusMonitor,\n     radioDispatcher: UniqueSelectionDispatcher,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_RADIO_DEFAULT_OPTIONS)\n     providerOverride?: MatRadioDefaultOptions,\n@@ -115,7 +116,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {\n       changeDetector,\n       focusMonitor,\n       radioDispatcher,\n-      animationMode,\n+      resolveLegacyAnimationMode(animationMode),\n       providerOverride,\n       tabIndex,\n     );\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "predecessor": "68b6d30f8a89456031a8c8115d5b8f3e25cf111d",
+      "before_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "after_sha256": "97a730e6ecbc37b34e526cd202162049b4c2639a8f7c0dc4f3250d028f7e7b8b",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\nindex 6bbea620d..474024a0c 100644\n--- a/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n+++ b/projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts\n@@ -7,24 +7,29 @@\n  * found in the LICENSE file at https://angular.io/license\n  *\n  * Owned legacy motion helper. Reads the public MATERIAL_ANIMATIONS token and\n- * public ANIMATION_MODULE_TYPE. Does not call private Material helpers\n+ * an owned legacy mode token. Does not call private Material helpers\n  * (_getAnimationsState / _animationsDisabled).\n  */\n \n import {MediaMatcher} from '@angular/cdk/layout';\n-import {ANIMATION_MODULE_TYPE, InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n+import {InjectionToken, assertInInjectionContext, inject} from '@angular/core';\n import {MATERIAL_ANIMATIONS} from '@angular/material/core';\n \n /** Public re-export for consumers/docs that prefer the legacy-core entry. */\n export {MATERIAL_ANIMATIONS};\n \n+/** Legacy-only animation policy. It is distinct from Material's token. */\n+export const LEGACY_ANIMATION_MODE = new InjectionToken<'NoopAnimations' | 'BrowserAnimations'>(\n+  'LEGACY_ANIMATION_MODE',\n+);\n+\n /** Owned state labels for lifecycle/tests (mirrors Material public semantics). */\n export type LegacyAnimationsState = 'enabled' | 'di-disabled' | 'reduced-motion';\n \n /**\n  * Optional override token for unit tests that cannot construct Material's\n  * MATERIAL_ANIMATIONS provider graph. Production code should prefer\n- * MATERIAL_ANIMATIONS / ANIMATION_MODULE_TYPE.\n+ * MATERIAL_ANIMATIONS / LEGACY_ANIMATION_MODE.\n  */\n export const LEGACY_ANIMATIONS_TEST_OVERRIDE = new InjectionToken<LegacyAnimationsState | null>(\n   'LEGACY_ANIMATIONS_TEST_OVERRIDE',\n@@ -45,7 +50,7 @@ export function getLegacyAnimationsState(): LegacyAnimationsState {\n     return 'di-disabled';\n   }\n \n-  if (inject(ANIMATION_MODULE_TYPE, {optional: true}) === 'NoopAnimations') {\n+  if (inject(LEGACY_ANIMATION_MODE, {optional: true}) === 'NoopAnimations') {\n     return 'di-disabled';\n   }\n \n@@ -72,6 +77,11 @@ export function legacyAnimationsDisabled(): boolean {\n   return getLegacyAnimationsState() !== 'enabled';\n }\n \n+/** Preserve explicit historical constructor modes while applying ambient policy. */\n+export function resolveLegacyAnimationMode<T extends string | null | undefined>(mode: T): T | 'NoopAnimations' {\n+  return mode === 'NoopAnimations' || legacyAnimationsDisabled() ? 'NoopAnimations' : mode;\n+}\n+\n /** Zero-duration params used when dialog (and similar) should noop motion. */\n export const LEGACY_ZERO_ANIMATION_PARAMS = {\n   enterAnimationDuration: '0ms',\n"
+    }
+  ],
+  "material_animations_identifier_contexts": [
+    {
+      "parent": "ImportSpecifier",
+      "text": "MATERIAL_ANIMATIONS"
+    },
+    {
+      "parent": "ExportSpecifier",
+      "text": "MATERIAL_ANIMATIONS"
+    },
+    {
+      "parent": "CallExpression",
+      "text": "inject(MATERIAL_ANIMATIONS, {optional: true})"
+    }
+  ],
+  "peer_files": [
+    {
+      "path": "node_modules/@angular/material/package.json",
+      "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+      "bytes": 11420
+    },
+    {
+      "path": "node_modules/@angular/material/types/core.d.ts",
+      "sha256": "06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880",
+      "bytes": 8741
+    },
+    {
+      "path": "node_modules/@angular/material/types/_ripple-chunk.d.ts",
+      "sha256": "d492d47f9af7fd5e78c645d64618d712b3ebd265c8b8d7f7ea5609996001609e",
+      "bytes": 11072
+    },
+    {
+      "path": "node_modules/@angular/material/types/_palette-chunk.d.ts",
+      "sha256": "9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9",
+      "bytes": 132
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+      "bytes": 1391
+    }
+  ],
+  "observations": "The radio-base source bytes are unchanged; the separately bound radio wrapper now substitutes and resolves a legacy animation mode. MATERIAL_ANIMATIONS import, re-export, and optional injection parent contexts remain unchanged; the subsequent fallback now reads the owned LEGACY_ANIMATION_MODE rather than ANIMATION_MODULE_TYPE and a new resolver uses the ambient policy. Those policy and radio lifecycle effects require independent runtime evidence.",
+  "runtime_or_floor_execution": false,
+  "g11_claim": "not-passed"
+}

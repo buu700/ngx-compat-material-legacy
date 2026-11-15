@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "role": "finite-select-form-field-authored-source-transition",
+  "line": "main",
+  "source_only": true,
+  "head": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+  "source": {
+    "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+    "predecessor": "4e605d28d6cbb0a321bc42e97a326f0d8b745649",
+    "before_sha256": "120ab123d79e58ea256211cafa50268dba3ce26524426e88b0347a8624aee68d",
+    "after_sha256": "66e8e28ad78a5bf18cb2563f95fe8df48be821dddc9e124d13fe821ef0734c00",
+    "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-select/internal/select-base.ts b/projects/ngx-material-legacy/legacy-select/internal/select-base.ts\nindex 9b0918811..dfa3c4f10 100644\n--- a/projects/ngx-material-legacy/legacy-select/internal/select-base.ts\n+++ b/projects/ngx-material-legacy/legacy-select/internal/select-base.ts\n@@ -22,6 +22,7 @@ import {\n   A,\n   DOWN_ARROW,\n   ENTER,\n+  ESCAPE,\n   hasModifierKey,\n   LEFT_ARROW,\n   RIGHT_ARROW,\n@@ -39,6 +40,7 @@ import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/lega\n import {MAT_SELECT_CONFIG} from '@angular/material/select';\n import {\n   AfterContentInit,\n+  AfterViewInit,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -219,6 +221,7 @@ export abstract class _MatSelectBase<C>\n   extends _MatSelectReactiveMixinBase\n   implements\n     AfterContentInit,\n+    AfterViewInit,\n     OnChanges,\n     OnDestroy,\n     OnInit,\n@@ -347,6 +350,7 @@ export abstract class _MatSelectBase<C>\n   /** Overlay pane containing the options. */\n   @ViewChild(CdkConnectedOverlay)\n   protected _overlayDir: CdkConnectedOverlay;\n+  private _overlayKeydownBound = false;\n \n   /** Classes to be passed to the select panel. Supports the same syntax as `ngClass`. */\n   @Input() panelClass: string | string[] | Set<string> | {[key: string]: any};\n@@ -584,6 +588,23 @@ export abstract class _MatSelectBase<C>\n     this._initialized.complete();\n   }\n \n+  ngAfterViewInit() {\n+    if (this._motionDestroyed || this._overlayKeydownBound || !this._overlayDir) {\n+      return;\n+    }\n+    this._overlayKeydownBound = true;\n+    // Let the select own Escape so the CDK does not detach the panel before\n+    // the select's exit lifecycle has finished. This also keeps an interrupted\n+    // exit attached when the user immediately reopens the panel.\n+    this._overlayDir.disableClose = true;\n+    this._overlayDir.overlayKeydown.pipe(takeUntil(this._destroy)).subscribe(event => {\n+      if (event.keyCode === ESCAPE && !hasModifierKey(event)) {\n+        event.preventDefault();\n+        this.close();\n+      }\n+    });\n+  }\n+\n   ngDoCheck() {\n     const newAriaLabelledby = this._getTriggerAriaLabelledby();\n     const ngControl = this.ngControl;\n",
+    "identifier_parent_contexts": {
+      "ErrorStateMatcher": [
+        {
+          "parent": "ImportSpecifier",
+          "text": "ErrorStateMatcher"
+        },
+        {
+          "parent": "TypeReference",
+          "text": "ErrorStateMatcher"
+        },
+        {
+          "parent": "TypeReference",
+          "text": "ErrorStateMatcher"
+        },
+        {
+          "parent": "TypeReference",
+          "text": "ErrorStateMatcher"
+        }
+      ],
+      "MatFormField": [
+        {
+          "parent": "ImportSpecifier",
+          "text": "MatLegacyFormField as MatFormField"
+        },
+        {
+          "parent": "TypeReference",
+          "text": "MatFormField"
+        }
+      ],
+      "MatFormFieldControl": [
+        {
+          "parent": "ImportSpecifier",
+          "text": "MatFormFieldControl"
+        },
+        {
+          "parent": "ExpressionWithTypeArguments",
+          "text": "MatFormFieldControl<any>"
+        }
+      ],
+      "MAT_FORM_FIELD": [
+        {
+          "parent": "ImportSpecifier",
+          "text": "MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD"
+        },
+        {
+          "parent": "CallExpression",
+          "text": "Inject(MAT_FORM_FIELD)"
+        }
+      ]
+    }
+  },
+  "peer_files": [
+    {
+      "path": "node_modules/@angular/material/package.json",
+      "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+      "bytes": 11420
+    },
+    {
+      "path": "node_modules/@angular/material/types/core.d.ts",
+      "sha256": "06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880",
+      "bytes": 8741
+    },
+    {
+      "path": "node_modules/@angular/material/types/form-field.d.ts",
+      "sha256": "9e043a5eaf125805f291d49fe9dc3e22bb30633ed8282b3149b68b968c1bc068",
+      "bytes": 992
+    },
+    {
+      "path": "node_modules/@angular/material/types/_form-field-control-chunk.d.ts",
+      "sha256": "2be93d05a1ab4c451e32b558313a34f85b75924bac07ad77bf6858ee251c9a60",
+      "bytes": 2855
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+      "bytes": 1391
+    }
+  ],
+  "source_observation": "The full change adds AfterViewInit and an overlay Escape keydown subscription using takeUntil, plus its guards and imports. Target peer strategy/control imports and local form-field aliases have identical target identifier parent contexts. This is not a proof of Escape, overlay teardown, DI or any packed behavior.",
+  "runtime_or_floor_execution": false,
+  "g11_claim": "not-passed"
+}

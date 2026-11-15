@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "role": "finite-tabnav-core-authored-source-transition",
+  "line": "main",
+  "source_only": true,
+  "head": "cdee8672eb721a4e9c9b72caabb3ddcc6b41bab2",
+  "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+  "transitions": [
+    {
+      "predecessor": "35807fe63d87c22bd18d04ac406cb457d9058645",
+      "before_sha256": "daf7d6f4c83292e7d3bf24eaf675b5cfc6c3fe341b779c5e801c23ef49d30f7f",
+      "after_sha256": "008255ffdda75f44728754803a78fb032f8491acb1c7976f64d7a15f97d65295",
+      "complete_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\nindex d8a470384..a8ee32efb 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n@@ -8,8 +8,9 @@\n  *\n  * Owned Material-16 tab-nav bases.\n  */\n+\n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterContentChecked,\n   AfterContentInit,\n   AfterViewInit,\n@@ -123,7 +124,7 @@ export abstract class _MatTabNavBase\n     changeDetectorRef: ChangeDetectorRef,\n     viewportRuler: ViewportRuler,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n@@ -246,15 +247,15 @@ export class _MatTabLinkBase\n     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n     @Attribute('tabindex') tabIndex: string,\n     private _focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super();\n \n     this.rippleConfig = globalRippleOptions || {};\n     this.tabIndex = parseInt(tabIndex) || 0;\n \n-    if (animationMode === 'NoopAnimations') {\n-      this.rippleConfig.animation = {enterDuration: 0, exitDuration: 0};\n+    if (resolveLegacyAnimationMode(animationMode) === 'NoopAnimations') {\n+      this.rippleConfig = {...this.rippleConfig, animation: {enterDuration: 0, exitDuration: 0}};\n     }\n   }\n \n@@ -282,12 +283,6 @@ export class _MatTabLinkBase\n       if (this.disabled) {\n         event.preventDefault();\n       } else if (this._tabNavBar.tabPanel) {\n-        // Only prevent the default action on space since it can scroll the page.\n-        // Don't prevent enter since it can break link navigation.\n-        if (event.keyCode === SPACE) {\n-          event.preventDefault();\n-        }\n-\n         this.elementRef.nativeElement.click();\n       }\n     }\n"
+    },
+    {
+      "predecessor": "a4cf004d315099dedae7d11f3bf9bb8af2e43409",
+      "before_sha256": "9205bb2a5b3573e8f21161b03baa04e4b3e868e72d70e06c5dcdf96d2439af36",
+      "after_sha256": "008255ffdda75f44728754803a78fb032f8491acb1c7976f64d7a15f97d65295",
+      "complete_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\nindex 985eab29a..a8ee32efb 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts\n@@ -8,8 +8,9 @@\n  *\n  * Owned Material-16 tab-nav bases.\n  */\n+\n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterContentChecked,\n   AfterContentInit,\n   AfterViewInit,\n@@ -25,6 +26,8 @@ import {\n   OnDestroy,\n   Optional,\n   QueryList,\n+  signal,\n+  WritableSignal,\n   ViewChild,\n } from '@angular/core';\n import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, ThemePalette} from '@angular/material/core';\n@@ -47,6 +50,17 @@ import {ENTER, SPACE} from '@angular/cdk/keycodes';\n import {MAT_TABS_CONFIG, MatTabsConfig} from '@angular/material/tabs';\n import {MatPaginatedTabHeader, MatPaginatedTabHeaderItem} from './paginated-tab-header';\n \n+// Focus state stays local to the owned implementation and does not add a public API.\n+const focusedItems = new WeakMap<_MatTabNavBase, WritableSignal<MatPaginatedTabHeaderItem | null>>();\n+function focusedItemFor(nav: _MatTabNavBase): WritableSignal<MatPaginatedTabHeaderItem | null> {\n+  let value = focusedItems.get(nav);\n+  if (!value) {\n+    value = signal<MatPaginatedTabHeaderItem | null>(null);\n+    focusedItems.set(nav, value);\n+  }\n+  return value;\n+}\n+\n // Increasing integer for generating unique ids for tab nav components.\n let nextUniqueId = 0;\n \n@@ -110,7 +124,7 @@ export abstract class _MatTabNavBase\n     changeDetectorRef: ChangeDetectorRef,\n     viewportRuler: ViewportRuler,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n@@ -127,6 +141,9 @@ export abstract class _MatTabNavBase\n     });\n \n     super.ngAfterContentInit();\n+    this.indexFocused.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {\n+      focusedItemFor(this).set(this._items?.get(this.focusIndex) || null);\n+    });\n   }\n \n   /** Notifies the component that the active link has been changed. */\n@@ -140,6 +157,7 @@ export abstract class _MatTabNavBase\n     for (let i = 0; i < items.length; i++) {\n       if (items[i].active) {\n         this.selectedIndex = i;\n+        focusedItemFor(this).set(items[i]);\n         this._changeDetectorRef.markForCheck();\n \n         if (this.tabPanel) {\n@@ -151,6 +169,12 @@ export abstract class _MatTabNavBase\n     }\n \n     this.selectedIndex = -1;\n+    if (this.tabPanel) {\n+      // Provide an entry point only when an enabled link is available.\n+      const firstEnabled = items.find(item => !item.disabled);\n+      focusedItemFor(this).set(firstEnabled || null);\n+      this._changeDetectorRef.markForCheck();\n+    }\n     this._inkBar.hide();\n   }\n \n@@ -223,15 +247,15 @@ export class _MatTabLinkBase\n     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,\n     @Attribute('tabindex') tabIndex: string,\n     private _focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super();\n \n     this.rippleConfig = globalRippleOptions || {};\n     this.tabIndex = parseInt(tabIndex) || 0;\n \n-    if (animationMode === 'NoopAnimations') {\n-      this.rippleConfig.animation = {enterDuration: 0, exitDuration: 0};\n+    if (resolveLegacyAnimationMode(animationMode) === 'NoopAnimations') {\n+      this.rippleConfig = {...this.rippleConfig, animation: {enterDuration: 0, exitDuration: 0}};\n     }\n   }\n \n@@ -259,12 +283,6 @@ export class _MatTabLinkBase\n       if (this.disabled) {\n         event.preventDefault();\n       } else if (this._tabNavBar.tabPanel) {\n-        // Only prevent the default action on space since it can scroll the page.\n-        // Don't prevent enter since it can break link navigation.\n-        if (event.keyCode === SPACE) {\n-          event.preventDefault();\n-        }\n-\n         this.elementRef.nativeElement.click();\n       }\n     }\n@@ -294,7 +312,14 @@ export class _MatTabLinkBase\n \n   _getTabIndex(): number {\n     if (this._tabNavBar.tabPanel) {\n-      return this._isActive && !this.disabled ? 0 : -1;\n+      if (this.disabled) {\n+        return -1;\n+      }\n+      const focused = focusedItemFor(this._tabNavBar)();\n+      const target = focused && !focused.disabled\n+        ? focused\n+        : this._tabNavBar._items?.find(item => !item.disabled);\n+      return target === this ? 0 : -1;\n     } else {\n       return this.tabIndex;\n     }\n"
+    }
+  ],
+  "identifier_parent_contexts": {
+    "MAT_RIPPLE_GLOBAL_OPTIONS": [
+      {
+        "parent": "ImportSpecifier",
+        "text": "MAT_RIPPLE_GLOBAL_OPTIONS"
+      },
+      {
+        "parent": "CallExpression",
+        "text": "Inject(MAT_RIPPLE_GLOBAL_OPTIONS)"
+      }
+    ],
+    "RippleGlobalOptions": [
+      {
+        "parent": "ImportSpecifier",
+        "text": "RippleGlobalOptions"
+      },
+      {
+        "parent": "TypeReference",
+        "text": "RippleGlobalOptions"
+      },
+      {
+        "parent": "TypeReference",
+        "text": "RippleGlobalOptions"
+      }
+    ],
+    "ThemePalette": [
+      {
+        "parent": "ImportSpecifier",
+        "text": "ThemePalette"
+      },
+      {
+        "parent": "TypeReference",
+        "text": "ThemePalette"
+      },
+      {
+        "parent": "TypeReference",
+        "text": "ThemePalette"
+      },
+      {
+        "parent": "TypeReference",
+        "text": "ThemePalette"
+      },
+      {
+        "parent": "TypeReference",
+        "text": "ThemePalette"
+      }
+    ]
+  },
+  "peer_files": [
+    {
+      "path": "node_modules/@angular/material/package.json",
+      "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+      "bytes": 11420
+    },
+    {
+      "path": "node_modules/@angular/material/types/core.d.ts",
+      "sha256": "06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880",
+      "bytes": 8741
+    },
+    {
+      "path": "node_modules/@angular/material/types/_ripple-chunk.d.ts",
+      "sha256": "d492d47f9af7fd5e78c645d64618d712b3ebd265c8b8d7f7ea5609996001609e",
+      "bytes": 11072
+    },
+    {
+      "path": "node_modules/@angular/material/types/_palette-chunk.d.ts",
+      "sha256": "9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9",
+      "bytes": 132
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c",
+      "bytes": 1391
+    }
+  ],
+  "observations": "Target public token, interface and color type identifier parent contexts remain unchanged. Full changes include owned focus tracking, keyboard behavior and animation mode changes. In noop mode the constructor now replaces the ripple config with a shallow copy instead of mutating its animation field. No prior options-object identity, focus, DI or motion behavior is requalified.",
+  "runtime_or_floor_execution": false,
+  "g11_claim": "not-passed",
+  "independent_evidence_transition": {
+    "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+    "predecessor": "938fec1a55e66a6dc9f5689c6f533d466ad6c4de",
+    "before_sha256": "cfe4a91ab31cb5c3db1db81648ccd5b57623cba736745ea4abb25a8b85b59794",
+    "after_sha256": "78c95f9fa130adc675e1400462ea429562031edc1f57ddb5b04f6c19965f13d1",
+    "full_diff": "diff --git a/scripts/bidi-isolated-packed-evidence-requalification.mjs b/scripts/bidi-isolated-packed-evidence-requalification.mjs\nindex 03c90789e..b4103128d 100644\n--- a/scripts/bidi-isolated-packed-evidence-requalification.mjs\n+++ b/scripts/bidi-isolated-packed-evidence-requalification.mjs\n@@ -186,7 +186,7 @@ export function inspectBidiIsolatedRequalification({root = rootDefault, readMemb\n   const frozen = JSON.parse(writes.get(roles.stores[0].path)), current = JSON.parse(writes.get(roles.stores[1].path));\n   const frozenEvidence = authoredUseReviewEvidence(frozen, line, afterRead, hash);\n   assert.equal(frozenEvidence.reviewed, 1446); assert.equal(frozenEvidence.insufficient, 0);\n-  const currentAdmission = currentAuthoredUseAdmission({current: scanCurrentAuthoredUses({root, readSource: read}),\n+  const currentAdmission = currentAuthoredUseAdmission({root,current: scanCurrentAuthoredUses({root, readSource: read}),\n     frozen: frozen.symbol_uses, candidate: current, line, readMember: afterRead});\n   assert.equal(currentAdmission.source_snapshot_valid, true); assert.equal(currentAdmission.review_evidence.reviewed, 178);\n   assert.equal(currentAdmission.review_evidence.insufficient, 0); assert.equal(currentAdmission.inventory.open, 130);\n",
+    "historical_execution_requalified": false
+  }
+}
