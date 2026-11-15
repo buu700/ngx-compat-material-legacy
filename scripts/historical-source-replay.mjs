@@ -155,10 +155,9 @@ function consumerWrapperSuccessors(root,data,members,read){
 // The checker literal remains npm's trust anchor; this HEAD-owned descriptor
 // authenticates one complete afterimage without returning before bytes as source.
 const checkerSealPath='scripts/check-dependency-eligibility.py';
-const checkerSealProfile='compatibility/rc/parent-private-npm-current-profile-inputs-v2.json';
+const checkerSealProfiles={v2:'compatibility/rc/parent-private-npm-current-profile-inputs-v2.json',v3:'compatibility/rc/parent-private-npm-current-profile-inputs-v3.json'};
 const checkerSealDocument='compatibility/rc/historical-source-replay.md';
-const checkerSealBegin='<!-- npm-current-profile-checker-self-pin-v1 -->';
-const checkerSealEnd='<!-- /npm-current-profile-checker-self-pin-v1 -->';
+const checkerSealMarkers={v2:['<!-- npm-current-profile-checker-self-pin-v1 -->','<!-- /npm-current-profile-checker-self-pin-v1 -->'],v3:['<!-- npm-current-profile-checker-self-pin-v2 -->','<!-- /npm-current-profile-checker-self-pin-v2 -->']};
 const checkerSealEquals=Buffer.prototype.equals,checkerSealIsBuffer=Buffer.isBuffer,checkerSealApply=Reflect.apply;
 const checkerSealEqual=(actual,supplied)=>checkerSealIsBuffer(supplied)&&checkerSealApply(checkerSealEquals,actual,[supplied]);
 function checkerSealPhysical(root,path){
@@ -177,6 +176,12 @@ function checkerSelfPinTransport({root,data,member,supplied,read,toolingCommit})
   assert.ok(checkerSealEqual(checkerSealPhysical(root,path),actual),'checker seal member changed during callback '+path);
   retained.set(path,Buffer.from(actual));return actual;
  };
+ const before=git(root,['show',data.current_frame.commit+':'+checkerSealPath]);assert.equal(blobHash(before),member.blob,'checker before program is not frame Gitblob');
+ const beforeText=before.toString('utf8');assert.ok(checkerSealEqual(before,Buffer.from(beforeText)));
+ const paths=[...beforeText.matchAll(/^NPM_CURRENT_PRIVATE_PROFILE_PATH = "([^"]+)"$/gm)];assert.equal(paths.length,1);
+ const version=Object.keys(checkerSealProfiles).find(v=>checkerSealProfiles[v]===paths[0][1]);assert.ok(version,'unregistered checker profile handoff');
+ const checkerSealProfile=checkerSealProfiles[version],[checkerSealBegin,checkerSealEnd]=checkerSealMarkers[version];
+ if(version==='v3')assert.equal(git(root,['ls-tree','-z',data.current_frame.commit,'--',checkerSealProfile]).length,0,'v3 profile must be absent from source frame');
  const document=current(checkerSealDocument),headDocument=git(root,['show',toolingCommit+':'+checkerSealDocument]);
  assert.ok(checkerSealEqual(document,headDocument),'checker seal document differs from HEAD');
  const text=document.toString('utf8');assert.ok(checkerSealEqual(document,Buffer.from(text)));
@@ -188,26 +193,24 @@ function checkerSelfPinTransport({root,data,member,supplied,read,toolingCommit})
  assert.equal(descriptor.schema_version,1);assert.equal(descriptor.line,data.line,'foreign checker seal line');
  const ref=descriptor.profile;checkerSealObject(ref,['path','sha256','bytes','commit']);assert.equal(ref.path,checkerSealProfile);
  assert.match(ref.sha256,/^[0-9a-f]{64}$/);assert.ok(Number.isSafeInteger(ref.bytes)&&ref.bytes>0&&ref.bytes<=3000000);assert.match(ref.commit,/^[0-9a-f]{40}$/);
- const before=git(root,['show',data.current_frame.commit+':'+checkerSealPath]);assert.equal(blobHash(before),member.blob,'checker before program is not frame Gitblob');
- const beforeText=before.toString('utf8');assert.ok(checkerSealEqual(before,Buffer.from(beforeText)));
- const paths=[...beforeText.matchAll(/^NPM_CURRENT_PRIVATE_PROFILE_PATH = "([^"]+)"$/gm)];assert.equal(paths.length,1);assert.equal(paths[0][1],checkerSealProfile,'checker profile filename handoff must precede source frame');
  const assignments=[...beforeText.matchAll(/^NPM_CURRENT_PRIVATE_PROFILE_SHA256\s*=/gm)];
  const pins=[...beforeText.matchAll(/^NPM_CURRENT_PRIVATE_PROFILE_SHA256 = "([a-f0-9]{64})"$/gm)];assert.equal(assignments.length,1);assert.equal(pins.length,1,'checker seal field is not exactly one literal');
  const profile=current(checkerSealProfile);assert.equal(profile.length,ref.bytes);assert.equal(hash(profile),ref.sha256,'checker seal profile SHA changed');
  const entry=git(root,['ls-tree','-z',ref.commit,'--',checkerSealProfile]).toString().split('\0').filter(Boolean);assert.equal(entry.length,1);const[meta,path]=entry[0].split('\t');assert.equal(path,checkerSealProfile);assert.match(meta,/^100(?:644|755) blob [0-9a-f]{40}$/);
  const stored=git(root,['show',ref.commit+':'+checkerSealProfile]);assert.ok(checkerSealEqual(profile,stored),'checker seal profile differs from immutable Git DATA');
- const packet=JSON.parse(profile);assert.equal(packet.schema_version,1);assert.equal(packet.scope,'maintained-tool-owned-npm-invocations');
+ const packet=JSON.parse(profile);assert.equal(packet.schema_version,version==='v3'?2:1);assert.equal(packet.scope,'maintained-tool-owned-npm-invocations');
  assert.deepEqual(packet.historical_artifacts,{'private-profile-source-manifests.json':'08f1feb3a2186f6bb0bd9e36af7462e2c752c7a344632b37c44e8bb194b0b3a4','private-profile-remaining-evidence.json':'f944d76dfb5ea39bf4f7743ea377c5112218efcef4c42af465eb59437bcb82fb','private-profile-remaining-result.json':'54bd6cf921745b848f05fb1d2eaea6339b870bf53ce431e9e5eaad606a390dc0'});
  assert.deepEqual(Object.keys(packet.lines).sort(),['21.x','main']);
- const suffixes=['.cjs','.js','.mjs','.py','.sh','.ts'],roots=['compatibility/handoff/codex-closeout/tools','tests'];
- for(const branch of Object.values(packet.lines)){
+ const suffixes=['.cjs','.js','.mjs','.py','.sh','.ts'];
+ for(const[line,branch]of Object.entries(packet.lines)){
+  const roots=['compatibility/handoff/codex-closeout/tools','tests'];if(version==='v3'&&line==='main')roots.push('compatibility/rc/typeahead-fixture','compatibility/rc/typeahead-runner');
   assert.match(branch.source_parent,/^[0-9a-f]{40}$/);const seen=new Set();
   for(const key of ['source_files','support_files','input_files']){assert.ok(Array.isArray(branch[key]));for(const row of branch[key]){
    assert.equal(typeof row.path,'string');relativePath(row.path);assert.equal(seen.has(row.path),false);seen.add(row.path);
    assert.notEqual(row.path,checkerSealDocument,'checker seal document cannot be bound by npm profile');
   }}
-  assert.ok(Array.isArray(branch.support_discovery));assert.equal(branch.support_discovery.length,2);
-  assert.deepEqual(branch.support_discovery.map(group=>group.root).sort(),roots);
+  assert.ok(Array.isArray(branch.support_discovery));assert.equal(branch.support_discovery.length,roots.length);
+  assert.deepEqual(branch.support_discovery.map(group=>group.root).sort(),roots.sort());
   for(const group of branch.support_discovery){assert.deepEqual(group.suffixes,suffixes);assert.ok(Array.isArray(group.paths));for(const path of group.paths){
    assert.equal(typeof path,'string');relativePath(path);assert.notEqual(path,checkerSealDocument);assert.ok(path.startsWith(group.root+'/'),'foreign npm discovery member');
   }assert.equal(checkerSealDocument.startsWith(group.root+'/')&&suffixes.some(s=>checkerSealDocument.endsWith(s)),false);}
@@ -225,7 +228,7 @@ function checkerSelfPinTransport({root,data,member,supplied,read,toolingCommit})
  assertCurrent();return {assertCurrent};
 }
 
-export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,readMember,productPaths}={}){
+function verifyHistoricalCurrentSubjectsCore({root=rootDefault,data,members,readMember,productPaths}={}){
  const read=readMember||((path)=>{let cursor=root;assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());for(const part of path.split('/')){cursor=join(cursor,part);assert.ok(!lstatSync(cursor).isSymbolicLink(),'symlink in current source route '+path);}assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);}),mutable=new Set(data.mutable_progress_paths),wrappers=new Map(data.wrapper_edits.map(row=>[row.path,row]));
  const currentByPath=new Map(members.map(row=>[row.path,row])),tooling=new Set(toolingPaths),successors=currentWrapperSuccessors(root,data,members,read),consumerSuccessors=consumerWrapperSuccessors(root,data,members,read);let guarded=0;
  const toolingCommit=git(root,['rev-parse','HEAD']).toString().trim(),toolingTree=git(root,['rev-parse',toolingCommit+'^{tree}']).toString().trim();let checkerTransport;
@@ -259,9 +262,40 @@ export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,r
   current_tooling_members:toolingPaths.length,tooling_reference:{commit:toolingCommit,tree:toolingTree},
   exact_wrapper_edits_only:true,authenticated_current_wrapper_successors:successors.size,authenticated_consumer_wrapper_transitions:consumerSuccessors.size,mutable_progress_paths:[...mutable],current_source_qualification:false,current_native_or_packed_qualification:false};
 }
+// Inspection reads real current bytes even when a caller supplies an observing
+// callback. Preserve verifyHistoricalCurrentSubjects' historical wrapper-form
+// comparison API; this transaction is the stricter current-owner entry point.
+let inspectionTransaction;
+export function verifyHistoricalCurrentSubjects(options={}){
+ if(inspectionTransaction){inspectionTransaction.poisoned=true;throw new Error('historical replay inspection reentry');}
+ const transaction={poisoned:false};inspectionTransaction=transaction;
+ try{const result=verifyHistoricalCurrentSubjectsCore(options);assert.equal(transaction.poisoned,false,'historical replay inspection reentry');return result;}
+ finally{inspectionTransaction=undefined;}
+}
 export function inspectHistoricalReplayCurrent({root=rootDefault,readMember,productPaths}={}){
- const data=historicalReplayInputs({root,readMember}),members=historicalFrameMembers(root,data.current_frame);
- return {data,members,guard:verifyHistoricalCurrentSubjects({root,data,members,readMember,productPaths})};
+ if(inspectionTransaction){inspectionTransaction.poisoned=true;throw new Error('historical replay inspection reentry');}
+ const transaction={poisoned:false},retained=new Map();inspectionTransaction=transaction;
+ try{
+  const head=git(root,['rev-parse','HEAD']).toString().trim();
+  const read=path=>{
+   const before=checkerSealPhysical(root,path),supplied=readMember?readMember(path):before;
+   assert.ok(checkerSealEqual(before,supplied),'current replay callback differs from physical '+path);
+   assert.ok(checkerSealEqual(before,checkerSealPhysical(root,path)),'current replay callback changed physical '+path);
+   const prior=retained.get(path);if(prior)assert.ok(checkerSealEqual(prior,before),'current replay member changed '+path);
+   else retained.set(path,Buffer.from(before));
+   assert.equal(transaction.poisoned,false,'historical replay inspection reentry');
+   return Buffer.from(before);
+  };
+  const data=historicalReplayInputs({root,readMember:read}),members=historicalFrameMembers(root,data.current_frame);
+  if(productPaths!==undefined)assert.deepEqual(productPaths,sourceFiles(root,'projects/ngx-material-legacy'),'current replay product paths differ from physical');
+  const guard=verifyHistoricalCurrentSubjectsCore({root,data,members,readMember:read,productPaths});
+  const expectedProduct=members.filter(row=>row.path.startsWith('projects/ngx-material-legacy/')).map(row=>row.path).sort();
+  assert.deepEqual(sourceFiles(root,'projects/ngx-material-legacy'),expectedProduct,'late physical replay product membership changed');
+  assert.equal(git(root,['rev-parse','HEAD']).toString().trim(),head,'historical replay HEAD changed');
+  for(const[path,bytes]of retained)assert.ok(checkerSealEqual(bytes,checkerSealPhysical(root,path)),'late physical replay change '+path);
+  assert.equal(transaction.poisoned,false,'historical replay inspection reentry');
+  return {data,members,guard};
+ }finally{inspectionTransaction=undefined;}
 }
 function regularTree(root,members){
  const files=[];

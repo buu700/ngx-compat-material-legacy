@@ -749,7 +749,7 @@ def private_npm_source_paths(root: Path) -> set[str]:
     return names
 
 
-NPM_CURRENT_PRIVATE_PROFILE_PATH = "compatibility/rc/parent-private-npm-current-profile-inputs-v2.json"
+NPM_CURRENT_PRIVATE_PROFILE_PATH = "compatibility/rc/parent-private-npm-current-profile-inputs-v3.json"
 # Sealed only after complete current source and command preconditions are reviewed.
 # An absent or unsealed profile fails closed during development.
 NPM_CURRENT_PRIVATE_PROFILE_SHA256 = "f16b82348f90185cd5acd79d8367adb4d4dd55554e5aa9198dab955b70138045"

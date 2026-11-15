@@ -21,6 +21,11 @@ class HistoricalSourceReplayTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(report['controls'], 97)
-        self.assertEqual(report['current_product_members'], 1142)
+        # The immutable source frame, rather than a historical population size,
+        # supplies the exact expected product membership for this epoch.
+        frame = json.loads((ROOT / 'compatibility/rc/historical-source-replay-inputs.json').read_bytes())['current_frame']['commit']
+        members = subprocess.check_output(['git', '--no-replace-objects', 'ls-tree', '-rz', frame,
+                                           '--', 'projects/ngx-material-legacy'], cwd=ROOT)
+        self.assertEqual(report['current_product_members'], len(members.split(b'\0')) - 1)
         self.assertEqual(report['historical_probes_executed'], 0)
         self.assertFalse(report['actual_current_native_or_packed_qualified'])
