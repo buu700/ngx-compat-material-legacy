@@ -37,6 +37,8 @@ import {requiresTestingApi21xProof} from './upstream-testing-api-21x-admission.m
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';
+import {datepickerOutputRecords} from './datepicker-inherited-live-evidence.mjs';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {requiresRulesJsBuild,rulesJsBuildEntryEvidenceOk,rulesJsBuildOriginalPatch} from './upstream-rules-js-build-admission.mjs';
 import {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';
 import {requiresHistoricalBehavior,validateHistoricalBehavior,historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';
@@ -743,6 +745,11 @@ function writeAcceptance(request) {
     sha256: createHash('sha256').update(assertionBytes).digest('hex'),
     bytes: assertionBytes.length,
   };
+  const liveOutputs = datepickerOutputRecords(report.inherited_execution_evidence, request.runId, request.invocation);
+  for (const item of liveOutputs) {
+    const bytes = readEvidenceMember(request.runDir, item.path);
+    if (bytes.length !== item.bytes || createHash('sha256').update(bytes).digest('hex') !== item.sha256) throw Error('datepicker live evidence changed');
+  }
   const passedIds = cases.filter(item => item.result === 'pass').map(item => item.case_id);
   const admitted = failed.length === 0 && summary.disposition_admission === 'pass';
   const rcReport = {
@@ -771,7 +778,7 @@ function writeAcceptance(request) {
     passed: passedIds.length,
     failed: failed.length,
     skipped: 0,
-    outputs: [output],
+    outputs: [output, ...liveOutputs],
     case_results: cases.map(item => ({
       case_id: item.case_id,
       result: item.result,

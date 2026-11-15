@@ -1,0 +1,171 @@
+diff --git a/src/material/datepicker/calendar-header.html b/src/material/datepicker/calendar-header.html
+index 2ffe6c6d1..ee72dd311 100644
+--- a/src/material/datepicker/calendar-header.html
++++ b/src/material/datepicker/calendar-header.html
+@@ -20,7 +20,7 @@
+ 
+     <button matIconButton type="button" class="mat-calendar-previous-button"
+             [disabled]="!previousEnabled()" (click)="previousClicked()"
+-            [attr.aria-label]="prevButtonLabel">
++            [attr.aria-label]="prevButtonLabel" disabledInteractive>
+       <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+@@ -28,7 +28,7 @@
+ 
+     <button matIconButton type="button" class="mat-calendar-next-button"
+             [disabled]="!nextEnabled()" (click)="nextClicked()"
+-            [attr.aria-label]="nextButtonLabel">
++            [attr.aria-label]="nextButtonLabel" disabledInteractive>
+       <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+         <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+       </svg>
+diff --git a/src/material/datepicker/calendar-header.spec.ts b/src/material/datepicker/calendar-header.spec.ts
+index 8b67d0d07..baf561d3c 100644
+--- a/src/material/datepicker/calendar-header.spec.ts
++++ b/src/material/datepicker/calendar-header.spec.ts
+@@ -246,7 +246,7 @@ describe('MatCalendarHeader', () => {
+       fixture.detectChanges();
+ 
+       expect(calendarInstance.currentView).toBe('multi-year');
+-      expect(prevButton.disabled).toBe(true);
++      expect(prevButton.getAttribute('aria-disabled')).toBe('true');
+     });
+ 
+     it('should enable the page after the one showing minDate', () => {
+@@ -255,7 +255,7 @@ describe('MatCalendarHeader', () => {
+       fixture.detectChanges();
+ 
+       expect(calendarInstance.currentView).toBe('multi-year');
+-      expect(nextButton.disabled).toBe(false);
++      expect(nextButton.hasAttribute('aria-disabled')).toBe(false);
+     });
+   });
+ 
+@@ -300,7 +300,7 @@ describe('MatCalendarHeader', () => {
+       fixture.detectChanges();
+ 
+       expect(calendarInstance.currentView).toBe('multi-year');
+-      expect(nextButton.disabled).toBe(true);
++      expect(nextButton.getAttribute('aria-disabled')).toBe('true');
+     });
+ 
+     it('should enable the page before the one showing maxDate', () => {
+@@ -309,7 +309,7 @@ describe('MatCalendarHeader', () => {
+       fixture.detectChanges();
+ 
+       expect(calendarInstance.currentView).toBe('multi-year');
+-      expect(prevButton.disabled).toBe(false);
++      expect(prevButton.hasAttribute('aria-disabled')).toBe(false);
+     });
+   });
+ 
+@@ -356,7 +356,7 @@ describe('MatCalendarHeader', () => {
+       fixture.detectChanges();
+ 
+       expect(calendarInstance.currentView).toBe('multi-year');
+-      expect(nextButton.disabled).toBe(true);
++      expect(nextButton.getAttribute('aria-disabled')).toBe('true');
+     });
+ 
+     it('should disable the page before the one showing minDate', () => {
+@@ -371,7 +371,7 @@ describe('MatCalendarHeader', () => {
+       fixture.detectChanges();
+ 
+       expect(calendarInstance.activeDate).toEqual(new Date(2018 - yearsPerPage, JAN, 1));
+-      expect(prevButton.disabled).toBe(true);
++      expect(prevButton.getAttribute('aria-disabled')).toBe('true');
+     });
+   });
+ });
+diff --git a/src/material/datepicker/calendar.spec.ts b/src/material/datepicker/calendar.spec.ts
+index 76149d06b..ba2920b89 100644
+--- a/src/material/datepicker/calendar.spec.ts
++++ b/src/material/datepicker/calendar.spec.ts
+@@ -354,13 +354,17 @@ describe('MatCalendar', () => {
+         '.mat-calendar-previous-button',
+       ) as HTMLButtonElement;
+ 
+-      expect(prevButton.disabled).withContext('previous button should not be disabled').toBe(false);
++      expect(prevButton.hasAttribute('aria-disabled'))
++        .withContext('previous button should not be disabled')
++        .toBe(false);
+       expect(calendarInstance.activeDate).toEqual(new Date(2016, FEB, 1));
+ 
+       prevButton.click();
+       fixture.detectChanges();
+ 
+-      expect(prevButton.disabled).withContext('previous button should be disabled').toBe(true);
++      expect(prevButton.getAttribute('aria-disabled'))
++        .withContext('previous button should be disabled')
++        .toBe('true');
+       expect(calendarInstance.activeDate).toEqual(new Date(2016, JAN, 1));
+ 
+       prevButton.click();
+@@ -378,13 +382,17 @@ describe('MatCalendar', () => {
+         '.mat-calendar-next-button',
+       ) as HTMLButtonElement;
+ 
+-      expect(nextButton.disabled).withContext('next button should not be disabled').toBe(false);
++      expect(nextButton.hasAttribute('aria-disabled'))
++        .withContext('next button should not be disabled')
++        .toBe(false);
+       expect(calendarInstance.activeDate).toEqual(new Date(2017, DEC, 1));
+ 
+       nextButton.click();
+       fixture.detectChanges();
+ 
+-      expect(nextButton.disabled).withContext('next button should be disabled').toBe(true);
++      expect(nextButton.getAttribute('aria-disabled'))
++        .withContext('next button should be disabled')
++        .toBe('true');
+       expect(calendarInstance.activeDate).toEqual(new Date(2018, JAN, 1));
+ 
+       nextButton.click();
+diff --git a/src/material/datepicker/calendar.ts b/src/material/datepicker/calendar.ts
+index f1d446f02..583601417 100644
+--- a/src/material/datepicker/calendar.ts
++++ b/src/material/datepicker/calendar.ts
+@@ -114,24 +114,28 @@ export class MatCalendarHeader<D> {
+ 
+   /** Handles user clicks on the previous button. */
+   previousClicked(): void {
+-    this.calendar.activeDate =
+-      this.calendar.currentView == 'month'
+-        ? this._dateAdapter.addCalendarMonths(this.calendar.activeDate, -1)
+-        : this._dateAdapter.addCalendarYears(
+-            this.calendar.activeDate,
+-            this.calendar.currentView == 'year' ? -1 : -yearsPerPage,
+-          );
++    if (this.previousEnabled()) {
++      this.calendar.activeDate =
++        this.calendar.currentView == 'month'
++          ? this._dateAdapter.addCalendarMonths(this.calendar.activeDate, -1)
++          : this._dateAdapter.addCalendarYears(
++              this.calendar.activeDate,
++              this.calendar.currentView == 'year' ? -1 : -yearsPerPage,
++            );
++    }
+   }
+ 
+   /** Handles user clicks on the next button. */
+   nextClicked(): void {
+-    this.calendar.activeDate =
+-      this.calendar.currentView == 'month'
+-        ? this._dateAdapter.addCalendarMonths(this.calendar.activeDate, 1)
+-        : this._dateAdapter.addCalendarYears(
+-            this.calendar.activeDate,
+-            this.calendar.currentView == 'year' ? 1 : yearsPerPage,
+-          );
++    if (this.nextEnabled()) {
++      this.calendar.activeDate =
++        this.calendar.currentView == 'month'
++          ? this._dateAdapter.addCalendarMonths(this.calendar.activeDate, 1)
++          : this._dateAdapter.addCalendarYears(
++              this.calendar.activeDate,
++              this.calendar.currentView == 'year' ? 1 : yearsPerPage,
++            );
++    }
+   }
+ 
+   /** Whether the previous period button is enabled. */

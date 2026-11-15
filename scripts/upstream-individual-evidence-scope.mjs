@@ -78,6 +78,7 @@ const KNOWN_INDIVIDUAL_PROOF_KINDS = new Set([
   "individual-private-fixture-data-repair",
   "individual-retained-historical-test-scope",
   "individual-source-scope",
+  "main-datepicker-inherited-native",
   "main-overlay-inherited-native",
   "main-table-inherited-native",
   "main-window-table-ssr-inherited",

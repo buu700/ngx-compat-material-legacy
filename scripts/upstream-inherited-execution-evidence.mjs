@@ -20,6 +20,7 @@ import {inheritedHelperRequirements, validateInheritedHelperExecution} from './u
 import {overlayInheritedRequirements, validateOverlayInherited} from './upstream-overlay-inherited-evidence.mjs';
 import {tableInheritedRequirements, validateTableInherited} from './upstream-table-inherited-evidence.mjs';
 import {windowSsrRequirements, validateWindowSsr} from './upstream-window-ssr-evidence.mjs';
+import {datepickerInheritedRequirements, validateDatepickerInherited} from './upstream-datepicker-inherited-evidence.mjs';
 
 // Independently authenticated minimum-peer bytes, rather than a ledger-selected
 // digest. Other registered native validators already pin and rehash their peers.
@@ -44,6 +45,7 @@ export function validateInheritedExecution({root, entry, proof, request, line}) 
       demand(readEvidenceMember(root,'scripts/upstream-inherited-execution-evidence.mjs').equals(WINDOW_DISPATCH_IMAGE),'loaded window dispatch changed');
       return result;
     }
+    if (datepickerInheritedRequirements(entry?.sha, line)) return validateDatepickerInherited({root, entry, proof, request, line});
     if (overlayInheritedRequirements(entry?.sha, line)) return validateOverlayInherited({root, entry, proof, request, line});
     if (tableInheritedRequirements(entry?.sha, line)) return validateTableInherited({root, entry, proof, request, line});
     if (typeaheadBehaviorRequirements(entry?.sha, line)) return validateTypeaheadBehavior({root, entry, proof, request, line});

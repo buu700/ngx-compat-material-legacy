@@ -1,0 +1,207 @@
+diff --git a/goldens/material/datepicker/index.api.md b/goldens/material/datepicker/index.api.md
+index 8f109cabd..f7d1db2fb 100644
+--- a/goldens/material/datepicker/index.api.md
++++ b/goldens/material/datepicker/index.api.md
+@@ -109,7 +109,7 @@ export class MatCalendar<D> implements AfterContentInit, AfterViewChecked, OnDes
+     get currentView(): MatCalendarView;
+     set currentView(value: MatCalendarView);
+     dateClass: MatCalendarCellClassFunction<D>;
+-    dateFilter: (date: D) => boolean;
++    dateFilter?: ((date: D) => boolean) | null;
+     _dateSelected(event: MatCalendarUserEvent<D | null>): void;
+     _dragEnded(event: MatCalendarUserEvent<DateRange<D> | null>): void;
+     _dragStarted(event: MatCalendarUserEvent<D>): void;
+@@ -373,7 +373,7 @@ export class MatDatepickerContent<S, D = ExtractDateTypeFromSelection<S>> implem
+ // @public
+ export interface MatDatepickerControl<D> {
+     // (undocumented)
+-    dateFilter: DateFilterFn<D>;
++    dateFilter: DateFilterFn<D> | null | undefined;
+     // (undocumented)
+     disabled: boolean;
+     // (undocumented)
+@@ -398,12 +398,12 @@ export class MatDatepickerInput<D> extends MatDatepickerInputBase<D | null, D> i
+     protected _ariaOwns: i0.WritableSignal<string | null>;
+     // (undocumented)
+     protected _assignValueToModel(value: D | null): void;
+-    get dateFilter(): DateFilterFn<D | null>;
+-    set dateFilter(value: DateFilterFn<D | null>);
++    get dateFilter(): DateFilterFn<D | null> | null | undefined;
++    set dateFilter(value: DateFilterFn<D | null> | null | undefined);
+     // (undocumented)
+     _datepicker: MatDatepickerPanel<MatDatepickerControl<D>, D | null, D>;
+     getConnectedOverlayOrigin(): ElementRef;
+-    protected _getDateFilter(): DateFilterFn<D | null>;
++    protected _getDateFilter(): DateFilterFn<D | null> | null | undefined;
+     _getMaxDate(): D | null;
+     _getMinDate(): D | null;
+     getOverlayLabelId(): string | null;
+@@ -534,8 +534,8 @@ export class MatDateRangeInput<D> implements MatFormFieldControl<DateRange<D>>,
+     comparisonEnd: D | null;
+     comparisonStart: D | null;
+     controlType: string;
+-    get dateFilter(): DateFilterFn<D>;
+-    set dateFilter(value: DateFilterFn<D>);
++    get dateFilter(): DateFilterFn<D> | null | undefined;
++    set dateFilter(value: DateFilterFn<D> | null | undefined);
+     get describedByIds(): string[];
+     readonly disableAutomaticLabeling = true;
+     get disabled(): boolean;
+@@ -673,7 +673,7 @@ export class MatMonthView<D> implements AfterContentInit, OnChanges, OnDestroy {
+     // (undocumented)
+     _dateAdapter: DateAdapter<D, any>;
+     dateClass: MatCalendarCellClassFunction<D>;
+-    dateFilter: (date: D) => boolean;
++    dateFilter: ((date: D) => boolean) | null | undefined;
+     _dateSelected(event: MatCalendarUserEvent<number>): void;
+     readonly dragEnded: EventEmitter<MatCalendarUserEvent<DateRange<D> | null>>;
+     protected _dragEnded(event: MatCalendarUserEvent<D | null>): void;
+@@ -731,7 +731,7 @@ export class MatMultiYearView<D> implements AfterContentInit, OnDestroy {
+     // (undocumented)
+     _dateAdapter: DateAdapter<D, any>;
+     dateClass: MatCalendarCellClassFunction<D>;
+-    dateFilter: (date: D) => boolean;
++    dateFilter: ((date: D) => boolean) | null | undefined;
+     _focusActiveCell(): void;
+     _focusActiveCellAfterViewChecked(): void;
+     // (undocumented)
+@@ -820,7 +820,7 @@ export class MatYearView<D> implements AfterContentInit, OnDestroy {
+     // (undocumented)
+     _dateAdapter: DateAdapter<D, any>;
+     dateClass: MatCalendarCellClassFunction<D>;
+-    dateFilter: (date: D) => boolean;
++    dateFilter: ((date: D) => boolean) | null | undefined;
+     _focusActiveCell(): void;
+     _focusActiveCellAfterViewChecked(): void;
+     _handleCalendarBodyKeydown(event: KeyboardEvent): void;
+diff --git a/src/material/datepicker/calendar.ts b/src/material/datepicker/calendar.ts
+index 9f54fb28a..436070604 100644
+--- a/src/material/datepicker/calendar.ts
++++ b/src/material/datepicker/calendar.ts
+@@ -327,7 +327,7 @@ export class MatCalendar<D> implements AfterContentInit, AfterViewChecked, OnDes
+   private _maxDate: D | null;
+ 
+   /** Function used to filter which dates are selectable. */
+-  @Input() dateFilter: (date: D) => boolean;
++  @Input() dateFilter?: ((date: D) => boolean) | null;
+ 
+   /** Function that can be used to add custom CSS classes to dates. */
+   @Input() dateClass: MatCalendarCellClassFunction<D>;
+diff --git a/src/material/datepicker/date-range-input.ts b/src/material/datepicker/date-range-input.ts
+index 0d507fd3c..86992cb61 100644
+--- a/src/material/datepicker/date-range-input.ts
++++ b/src/material/datepicker/date-range-input.ts
+@@ -154,7 +154,7 @@ export class MatDateRangeInput<D>
+   get dateFilter() {
+     return this._dateFilter;
+   }
+-  set dateFilter(value: DateFilterFn<D>) {
++  set dateFilter(value: DateFilterFn<D> | null | undefined) {
+     const start = this._startInput;
+     const end = this._endInput;
+     const wasMatchingStart = start && start._matchesFilter(start.value);
+@@ -169,7 +169,7 @@ export class MatDateRangeInput<D>
+       end._validatorOnChange();
+     }
+   }
+-  private _dateFilter: DateFilterFn<D>;
++  private _dateFilter?: DateFilterFn<D> | null;
+ 
+   /** The minimum valid date. */
+   @Input()
+diff --git a/src/material/datepicker/datepicker-base.ts b/src/material/datepicker/datepicker-base.ts
+index e8cef6970..657923acc 100644
+--- a/src/material/datepicker/datepicker-base.ts
++++ b/src/material/datepicker/datepicker-base.ts
+@@ -325,7 +325,7 @@ export interface MatDatepickerControl<D> {
+   min: D | null;
+   max: D | null;
+   disabled: boolean;
+-  dateFilter: DateFilterFn<D>;
++  dateFilter: DateFilterFn<D> | null | undefined;
+   getConnectedOverlayOrigin(): ElementRef;
+   getOverlayLabelId(): string | null;
+   stateChanges: Observable<void>;
+@@ -524,7 +524,7 @@ export abstract class MatDatepickerBase<
+     return this.datepickerInput && this.datepickerInput.max;
+   }
+ 
+-  _getDateFilter(): DateFilterFn<D> {
++  _getDateFilter(): DateFilterFn<D> | null | undefined {
+     return this.datepickerInput && this.datepickerInput.dateFilter;
+   }
+ 
+diff --git a/src/material/datepicker/datepicker-input-base.ts b/src/material/datepicker/datepicker-input-base.ts
+index 632cec9d4..01de0feb7 100644
+--- a/src/material/datepicker/datepicker-input-base.ts
++++ b/src/material/datepicker/datepicker-input-base.ts
+@@ -203,7 +203,7 @@ export abstract class MatDatepickerInputBase<S, D = ExtractDateTypeFromSelection
+   abstract _getMaxDate(): D | null;
+ 
+   /** Gets the date filter function. Used for validation. */
+-  protected abstract _getDateFilter(): DateFilterFn<D> | undefined;
++  protected abstract _getDateFilter(): DateFilterFn<D> | null | undefined;
+ 
+   /** Registers a date selection model with the input. */
+   _registerModel(model: MatDateSelectionModel<S, D>): void {
+diff --git a/src/material/datepicker/datepicker-input.ts b/src/material/datepicker/datepicker-input.ts
+index d555a1b58..dea01bd24 100644
+--- a/src/material/datepicker/datepicker-input.ts
++++ b/src/material/datepicker/datepicker-input.ts
+@@ -119,7 +119,7 @@ export class MatDatepickerInput<D>
+   get dateFilter() {
+     return this._dateFilter;
+   }
+-  set dateFilter(value: DateFilterFn<D | null>) {
++  set dateFilter(value: DateFilterFn<D | null> | null | undefined) {
+     const wasMatchingValue = this._matchesFilter(this.value);
+     this._dateFilter = value;
+ 
+@@ -127,7 +127,7 @@ export class MatDatepickerInput<D>
+       this._validatorOnChange();
+     }
+   }
+-  private _dateFilter: DateFilterFn<D | null>;
++  private _dateFilter: DateFilterFn<D | null> | null | undefined;
+ 
+   /** The combined form control validator for this input. */
+   protected _validator: ValidatorFn | null;
+diff --git a/src/material/datepicker/month-view.ts b/src/material/datepicker/month-view.ts
+index ff8a43696..6631c3b33 100644
+--- a/src/material/datepicker/month-view.ts
++++ b/src/material/datepicker/month-view.ts
+@@ -141,7 +141,7 @@ export class MatMonthView<D> implements AfterContentInit, OnChanges, OnDestroy {
+   private _maxDate: D | null;
+ 
+   /** Function used to filter which dates are selectable. */
+-  @Input() dateFilter: (date: D) => boolean;
++  @Input() dateFilter: ((date: D) => boolean) | null | undefined;
+ 
+   /** Function that can be used to add custom CSS classes to dates. */
+   @Input() dateClass: MatCalendarCellClassFunction<D>;
+diff --git a/src/material/datepicker/multi-year-view.ts b/src/material/datepicker/multi-year-view.ts
+index dc832f9e4..6fd4c88b8 100644
+--- a/src/material/datepicker/multi-year-view.ts
++++ b/src/material/datepicker/multi-year-view.ts
+@@ -133,7 +133,7 @@ export class MatMultiYearView<D> implements AfterContentInit, OnDestroy {
+   private _maxDate: D | null;
+ 
+   /** A function used to filter which dates are selectable. */
+-  @Input() dateFilter: (date: D) => boolean;
++  @Input() dateFilter: ((date: D) => boolean) | null | undefined;
+ 
+   /** Function that can be used to add custom CSS classes to date cells. */
+   @Input() dateClass: MatCalendarCellClassFunction<D>;
+diff --git a/src/material/datepicker/year-view.ts b/src/material/datepicker/year-view.ts
+index 97af5be58..89482b0b6 100644
+--- a/src/material/datepicker/year-view.ts
++++ b/src/material/datepicker/year-view.ts
+@@ -122,7 +122,7 @@ export class MatYearView<D> implements AfterContentInit, OnDestroy {
+   private _maxDate: D | null;
+ 
+   /** A function used to filter which dates are selectable. */
+-  @Input() dateFilter: (date: D) => boolean;
++  @Input() dateFilter: ((date: D) => boolean) | null | undefined;
+ 
+   /** Function that can be used to add custom CSS classes to date cells. */
+   @Input() dateClass: MatCalendarCellClassFunction<D>;

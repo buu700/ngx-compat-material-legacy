@@ -185,6 +185,97 @@ def assertion_directory(check_id: str, invocation_id: str) -> str:
     return f"evidence/{check_id}/{invocation_id}"
 
 
+DATEPICKER_LOADED_FILES = frozenset({
+    "scripts/revalidate-datepicker-inherited.mjs", "scripts/datepicker-inherited-live-evidence.mjs",
+    "scripts/datepicker-inherited-identities.mjs", "scripts/datepicker-inherited-fixture-pins.mjs",
+    "scripts/datepicker-inherited-native-run.mjs", "scripts/upstream-datepicker-inherited-evidence.mjs",
+    "scripts/datepicker-inherited-peers.mjs", "scripts/datepicker-inherited-sass-toolchain.mjs",
+    "scripts/inherited-native-profiles.mjs", "scripts/overlay-inherited-toolchain.mjs",
+    "scripts/overlay-inherited-archive.mjs", "scripts/upstream-packed-run-evidence.mjs",
+    "scripts/upstream-inherited-execution-evidence.mjs", "scripts/upstream-individual-evidence-scope.mjs",
+    "scripts/check-upstream-audit-disposition.mjs", "scripts/check-companion-computed-styles.mjs",
+    "tests/browser_reference_owned_process.py", "scripts/rc_acceptance.py",
+    "testing/datepicker-inherited/contracts-fixture.mjs", "compatibility/rc/inherited-native-profiles.json",
+    "compatibility/rc/overlay-inherited-toolchain-main.json", "compatibility/rc/overlay-inherited-toolchain-main-x64-provisional.json",
+    "compatibility/rc/datepicker-inherited-sass-toolchain-main.json", "compatibility/rc/datepicker-inherited-source-proposals-original.json",
+    *["compatibility/rc/datepicker-inherited-original-patches/" + n + ".diff" for n in (
+        "0d36e863ba6752596b6cee5810b5d953d536a9a9", "2d5942cb0fe86f9c3d26b1925b1d4390cfc6613b",
+        "5db8dca18b5967c203a5898dfa713ff03d9e7134", "e8b28fa6ba15f536e72d13c0b22765924efaf1f6")],
+    *["tests/datepicker-inherited/" + n for n in ("run.mjs", "supervised.py", "main.ts", "index.html", "theme.scss", "tsconfig.json", "typecheck.ts")],
+})
+
+DATEPICKER_SHAS = frozenset({
+    "0d36e863ba6752596b6cee5810b5d953d536a9a9", "2d5942cb0fe86f9c3d26b1925b1d4390cfc6613b",
+    "5db8dca18b5967c203a5898dfa713ff03d9e7134", "e8b28fa6ba15f536e72d13c0b22765924efaf1f6",
+})
+
+
+def validate_datepicker_live_outputs(snapshot, root, run_path, run, report, binding, invocation, library):
+    """Capture and replay live outputs even if the upstream child reported failure."""
+    cid = "upstream-audit-disposition"
+    prefix = assertion_directory(cid, invocation) + "/"
+    outputs = report.get("outputs")
+    require(isinstance(outputs, list), "datepicker: missing output roster")
+    ledger_path = root / "compatibility/f10/disposition-ledger/ledger.json"
+    live_present = any(isinstance(r, dict) and isinstance(r.get("path"), str)
+                       and r["path"].startswith(prefix + "datepicker-live-") for r in outputs)
+    if not ledger_path.is_file() and not live_present:
+        return []
+    ledger = snapshot.json("repository", "compatibility/f10/disposition-ledger/ledger.json", "datepicker-ledger")
+    required = {e.get("sha") for e in ledger.get("entries", []) if isinstance(e, dict)
+                and e.get("sha") in DATEPICKER_SHAS and isinstance(e.get("individual_proof"), dict)
+                and e["individual_proof"].get("proof_kind") == "main-datepicker-inherited-native"}
+    if not required and not live_present:
+        return []
+    assertion_path = prefix + "disposition-observations.json"
+    assertions = [r for r in outputs if isinstance(r, dict) and r.get("path") == assertion_path]
+    require(len(assertions) == 1, "datepicker: missing or duplicate audit assertion")
+    assertion = snapshot.json("run", assertion_path, "assertion-output", assertions[0])
+    require(assertion.get("run_id") == run["run_id"] and assertion.get("invocation_id") == invocation
+            and assertion.get("binding") == binding, "datepicker: stale audit assertion")
+    entries = assertion.get("inherited_execution_evidence")
+    require(isinstance(entries, list), "datepicker: missing inherited evidence")
+    rows = [r for r in entries if isinstance(r, dict) and r.get("execution") == "live-packed-native-datepicker"]
+    require({r.get("sha") for r in rows} == required and len(rows) == len(required), "datepicker: missing or duplicate subject result")
+    expected = {}
+    for row in rows:
+        nonce, filename = row.get("nonce"), row.get("output")
+        require(isinstance(nonce, str) and bool(_HEX64.fullmatch(nonce)) and filename == f"datepicker-live-{nonce}.json"
+                and row.get("run_id") == run["run_id"] and row.get("invocation_id") == invocation,
+                "datepicker: wrong subject output identity")
+        record = {"path": prefix + filename, "sha256": row.get("sha256"), "bytes": row.get("bytes")}
+        require(record["path"] not in expected or expected[record["path"]] == record, "datepicker: conflicting live output")
+        expected[record["path"]] = record
+    live_outputs = [r for r in outputs if isinstance(r, dict) and isinstance(r.get("path"), str)
+                    and r["path"].startswith(prefix + "datepicker-live-")]
+    require(len(live_outputs) == len(expected) and {r.get("path") for r in live_outputs} == set(expected), "datepicker: missing, duplicate or substituted live output")
+    # The source epoch is retained in the sealer snapshot alongside raw evidence.
+    for path in DATEPICKER_LOADED_FILES:
+        key = ("repository", path)
+        if key in snapshot.files:
+            checked_file(root, snapshot.files[key], "datepicker existing source identity")
+        else:
+            snapshot.capture("repository", path, "datepicker-checker")
+    replays = {}
+    for record in live_outputs:
+        require(record == expected[record["path"]], "datepicker: changed output identity")
+        snapshot.checked("run", record, "assertion-output")
+        args = {"root": str(root), "runDir": str(run_path.parent), "record": record, "binding": binding,
+                "runId": run["run_id"], "invocation": invocation, "library": library}
+        completed = subprocess.run(["node", str(root / "scripts/revalidate-datepicker-inherited.mjs")],
+                                   input=json.dumps(args), text=True, capture_output=True, cwd=root)
+        require(completed.returncode == 0, "datepicker: revalidation failed: " + completed.stderr.strip())
+        replay = parse_json_value(completed.stdout.encode(), "datepicker revalidation")
+        require(replay.get("ok") is True and replay.get("record") == record, "datepicker: wrong revalidation identity")
+        replays[record["path"]] = replay
+    for row in rows:
+        replay = replays[prefix + row["output"]]
+        observed = replay.get("cases", {}).get(row["sha"])
+        require(observed == row.get("cases") and row.get("ok") is all(x.get("baseline") is True and x.get("negative") is True for x in observed.values()),
+                "datepicker: reported subject differs from re-evaluated observations")
+    return [assertion_path, *expected]
+
+
 def prepack_binding_for(run_id: str, inputs: dict[str, Any], environment: dict[str, Any],
                         oracles: dict[str, Any], matrix_sha256: str) -> dict[str, Any]:
     """Input identity assigned before packing; deliberately has no output digest."""
@@ -458,11 +549,16 @@ def evaluate_run(
             require(row["implemented"] is True, f"{cid}: runner not implemented")
             expected = expected_cases(row, line)
             actual_exit = process_results.get(cid)
-            require(type(actual_exit) is int and actual_exit == 0, f"{cid}: child failed or was not invoked (exit={actual_exit})")
             invocation = invocation_ids.get(cid)
             require(isinstance(invocation, str) and bool(invocation), f"{cid}: missing invocation identity")
             report_rel = f"reports/{cid}.json"
             report = snapshot.json("run", report_rel, "report")
+            if cid == "upstream-audit-disposition":
+                require(report.get("run_id") == run_id and report.get("invocation_id") == invocation and report.get("binding") == binding,
+                        "datepicker: wrong report identity")
+                captured = validate_datepicker_live_outputs(snapshot, root, run_path, run, report, binding, invocation, artifacts["library"])
+                assertion_paths.extend((cid, path) for path in captured)
+            require(type(actual_exit) is int and actual_exit == 0, f"{cid}: child failed or was not invoked (exit={actual_exit})")
             report_path = run_path.parent / report_rel
             report_digest = snapshot.files[("run", report_rel)]["sha256"]
             require(report.get("schema_version") == 1 and type(report.get("schema_version")) is int and report.get("template") is False, f"{cid}: invalid report schema")

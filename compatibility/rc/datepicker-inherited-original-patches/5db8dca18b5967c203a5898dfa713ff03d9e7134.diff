@@ -1,0 +1,65 @@
+diff --git a/src/material/datepicker/calendar.spec.ts b/src/material/datepicker/calendar.spec.ts
+index d7db0679f..9fae25266 100644
+--- a/src/material/datepicker/calendar.spec.ts
++++ b/src/material/datepicker/calendar.spec.ts
+@@ -639,6 +639,28 @@ describe('MatCalendar', () => {
+       });
+     });
+   });
++
++  it("should not throw when updating today's date too early", () => {
++    const fixture = TestBed.createComponent(StandardCalendar);
++    const calendar = fixture.debugElement.query(By.directive(MatCalendar))
++      .componentInstance as MatCalendar<Date>;
++
++    expect(() => {
++      calendar.updateTodaysDate();
++      fixture.detectChanges();
++    }).not.toThrow();
++  });
++
++  it('should not throw when focusing the active cell too early', () => {
++    const fixture = TestBed.createComponent(StandardCalendar);
++    const calendar = fixture.debugElement.query(By.directive(MatCalendar))
++      .componentInstance as MatCalendar<Date>;
++
++    expect(() => {
++      calendar.focusActiveCell();
++      fixture.detectChanges();
++    }).not.toThrow();
++  });
+ });
+ 
+ @Component({
+diff --git a/src/material/datepicker/calendar.ts b/src/material/datepicker/calendar.ts
+index bfc071848..66f0b0760 100644
+--- a/src/material/datepicker/calendar.ts
++++ b/src/material/datepicker/calendar.ts
+@@ -499,12 +499,12 @@ export class MatCalendar<D> implements AfterContentInit, AfterViewChecked, OnDes
+ 
+   /** Focuses the active date. */
+   focusActiveCell() {
+-    this._getCurrentViewComponent()._focusActiveCell(false);
++    this._getCurrentViewComponent()?._focusActiveCell(false);
+   }
+ 
+   /** Updates today's date after an update of the active date */
+   updateTodaysDate() {
+-    this._getCurrentViewComponent()._init();
++    this._getCurrentViewComponent()?._init();
+   }
+ 
+   /** Handles date selection in the month view. */
+@@ -557,7 +557,11 @@ export class MatCalendar<D> implements AfterContentInit, AfterViewChecked, OnDes
+   }
+ 
+   /** Returns the component instance that corresponds to the current calendar view. */
+-  private _getCurrentViewComponent(): MatMonthView<D> | MatYearView<D> | MatMultiYearView<D> {
++  private _getCurrentViewComponent():
++    | MatMonthView<D>
++    | MatYearView<D>
++    | MatMultiYearView<D>
++    | undefined {
+     // The return type is explicitly written as a union to ensure that the Closure compiler does
+     // not optimize calls to _init(). Without the explicit return type, TypeScript narrows it to
+     // only the first component type. See https://github.com/angular/components/issues/22996.

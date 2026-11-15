@@ -1,0 +1,13 @@
+# Datepicker inherited observations
+
+This fixture is a source handoff, not an admission producer and not a pass/fail report. It runs strict Angular AOT plus the linker with a packed package and workspace dependencies supplied by a caller. The caller must independently authenticate the tarball, extracted input, toolchain, peer closure and browser profile. The runner inventories the input and its tested copy, records and rechecks the esbuild input hashes, requires a 64-hex nonce echoed by the browser, and uses the workspace's bounded Chromium helper and owned-process supervisor. It records raw observations in each mode's `result.json`; `summary.json` means observations collected only. An independent fixed verifier must interpret them. Browser faults are real case-tagged exercises (wrong class/filter callbacks, throwing guards, and boundary focus loss) and are not patched upstream implementations. `typeNegatives` contains actual compiler outputs/status for rejected invalid inputs and readonly assignment; `typecheck.ts` and the real template provide positive strict-AOT public declarations.
+
+Run from this directory, using an independently authenticated package and an unused output directory:
+
+```sh
+CHROME_BIN=/path/to/chromium TMPDIR=/path/to/tmp node run.mjs /path/to/package /path/to/workspace /path/to/new-output 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+```
+
+`theme.scss` is compiled against the tested extracted package; the runner loads the peer's installed `indigo-pink.css` and the compiled legacy theme, and records their digests. It waits for the opening animation to settle before closing, checks overlay removal, destroys the app, and captures error events and cleanup. Actual CDP Space presses exercise navigation at minimum and maximum. The baseline includes month/year/multi-year date classes and filters, a legacy form-field/input, and peer date-range inputs. Date-class changes use the public `updateTodaysDate()` refresh. Assertions and per-subject decisions belong to the independent verifier, including sensitivity checks against the fault observations.
+
+`assert-range-end.mjs RESULT_JSON` is an intentionally failing expected-behavior assertion. With start 15 and end 16 February 2024, switching from a filter excluding 15 to one excluding 16 should invalidate the end control. In both tested modes it remains valid until explicitly revalidated. Do not change that expected assertion to make this evidence pass. The root handoff documents a peer-native-adapter control and the identical source defect in untouched Material 16. The test of explicit `updateValueAndValidity()` is labeled `endAfterRevalidate`; it is a diagnostic workaround and does not change the captured pre-revalidation result.
