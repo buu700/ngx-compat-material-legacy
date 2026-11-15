@@ -1,0 +1,2211 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "scope": "Exactly four removed direct CDK outlet imports and two Angular Core table decorator metadata uses; no private outlet hook, constructor, DI, runtime, artifact or audit approval.",
+  "source_checkpoint": "38ee8359c688c039c6ae1db858f11282241d53ff",
+  "prior_review_preserved": true,
+  "reviews": [
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/cdk/table",
+      "symbol": "HeaderRowOutlet",
+      "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "conclusion": "removed-use",
+      "reviewer": "Codex bounded table source reviewer",
+      "decision": "The frozen direct HeaderRowOutlet import from @angular/cdk/table was the sole identifier occurrence in the pre-930 table source; commit 930b7a883ba2f0261a196e11b5101249981b56bc removes exactly the four unused bindings and current table source retains no HeaderRowOutlet identifier. This closes only that removed direct binding. The separate owned _LegacyTableOutlet currently assigns underscore-prefixed CdkTable outlet fields and calls _outletAssigned; their stability, behavior, constructor and runtime compatibility are not established by this decision.",
+      "prior_review": {
+        "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+        "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+      },
+      "prior_complete_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/cdk/table",
+        "symbol": "HeaderRowOutlet",
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "conclusion": "removed-use",
+        "reviewer": "Codex primary implementer",
+        "prior_source_review": {
+          "path": "compatibility/f10/authored-use-reviews/table-virtual-context-requalified-boundaries.json",
+          "sha256": "589ffee7e1b8b90858ff9db80d1f7a5a7a872575cf5dcf4fbc5fb23d021d3897"
+        },
+        "current_role": {
+          "absent_in_preimage_table_current_table_and_helper": true
+        },
+        "decision": "The previously removed direct outlet import remains absent in the entire preceding/current table and the new helper. Removing exactly the added local helper import and class decorator recovers the complete preceding table. Public module/outlet ownership and all prior evidence remain unchanged. The construction boundary is separately supported by genuine minimum node-injection and focused Angular22 full/partial AOT diagnostics; real legacy templates/native/packed/floors remain required. This requalifies only the removed frozen binding.",
+        "independent_evidence": [
+          {
+            "path": "compatibility/rc/table-public-module-import-source-proof.json",
+            "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+            "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+            "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+            "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+            "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+          },
+          {
+            "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+            "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+          },
+          {
+            "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+            "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-use-review.json",
+            "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+            "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+            "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+          },
+          {
+            "path": "scripts/table-virtual-context-requalification.mjs",
+            "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-source-proof.json",
+            "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+            "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+          },
+          {
+            "path": "tests/table_virtual_context_requalification_probe.mjs",
+            "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+          },
+          {
+            "path": "scripts/class-decorator-use-review.mjs",
+            "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+          },
+          {
+            "path": "scripts/framework-enum-use-review.mjs",
+            "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+          },
+          {
+            "path": "scripts/current-injection-context-review.mjs",
+            "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-inputs.json",
+            "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+            "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+            "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-changes.diff",
+            "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+            "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+          },
+          {
+            "path": "tests/metadata_current_profile_probe.mjs",
+            "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+          },
+          {
+            "path": "tests/class_decorator_use_probe.mjs",
+            "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+          },
+          {
+            "path": "tests/framework_enum_use_probe.mjs",
+            "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+          },
+          {
+            "path": "tests/test_class_decorator_uses.py",
+            "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+            "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+            "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+            "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+            "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+          }
+        ],
+        "source_checker_requalification": {
+          "source_parent": "6eae6ac87f20e85d78166be94fa49913d608cf86",
+          "scope": "Existing individual decision, subject bytes and receipt scope retained. The current class/enum populations are explicit; complete preceding semantic validators and public namespace/type/protocol machinery are preserved, with current-only enum type-import rejection added. Old source/protocol controls remain and new population/retirement controls pass. No product behavior, native/packed/AOT/floor or upstream qualification is added.",
+          "current_metadata_role": null,
+          "source_proof": {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          "historical_table_replay": {
+            "scope": "Replay only the historical table-review independent checker/producer receipts. Current table/helper/legacy API source and all15 corruption controls stay actual. Imported current domain implementations are justified by the independently checked complete preserved validator/helper bodies; current whole populations have separate genuine namespace diagnostics.",
+            "original_fifteen_control_bodies_recovered_exactly": true,
+            "all_fifteen_controls_reexecuted": true,
+            "current_table_helper_and_product_source_unchanged": true
+          }
+        }
+      },
+      "historical_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "commit": "e84b891955807c58da5c3eeae964a7cb0396df3a",
+        "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+      },
+      "current_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+      },
+      "current_class_case": null,
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+          "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+          "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+          "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+          "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+        },
+        {
+          "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+          "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+        },
+        {
+          "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+          "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+        },
+        {
+          "path": "compatibility/rc/framework-enum-use-review.json",
+          "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+          "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+          "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+        },
+        {
+          "path": "scripts/table-virtual-context-requalification.mjs",
+          "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+          "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+        },
+        {
+          "path": "tests/table_virtual_context_requalification_probe.mjs",
+          "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+        },
+        {
+          "path": "scripts/class-decorator-use-review.mjs",
+          "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+        },
+        {
+          "path": "scripts/framework-enum-use-review.mjs",
+          "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-inputs.json",
+          "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+          "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+          "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+          "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-changes.diff",
+          "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+          "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+        },
+        {
+          "path": "tests/metadata_current_profile_probe.mjs",
+          "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+        },
+        {
+          "path": "tests/class_decorator_use_probe.mjs",
+          "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+        },
+        {
+          "path": "tests/framework_enum_use_probe.mjs",
+          "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+          "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+          "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+          "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+          "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-routing-5628.json",
+          "sha256": "fc9a0f8b13a024be54b63b079f6ea889d038fc654c39d8879e1763d82906b919"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-old-failure-5628.json",
+          "sha256": "e996ea5a97eb46429078df2462c19e39e7ee165141a2cb602e7ee56620cffc2c"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-diagnostic-v4.json",
+          "sha256": "2a94b9d173ad402137c3d96cd90799f2cf54c3ed7a7b3dab8fde09a2abb1eb35"
+        },
+        {
+          "path": "scripts/class-decorator-current-5628.mjs",
+          "sha256": "04272b6aabb51450c2af622a3293e7aaa409639a9e863f0a894ea23e53cef890"
+        },
+        {
+          "path": "tests/class_decorator_current_5628_probe.mjs",
+          "sha256": "8960f44d7c3e718c061808c342a72c97f6d02f26cbd62128427b06083230cf0b"
+        },
+        {
+          "path": "tests/test_class_decorator_uses.py",
+          "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-expected-deltas.json",
+          "sha256": "e5d7425ee7efa629610b29c8acddc7184e26ae894947dc0a0c996d2595e12337"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/cdk/table",
+      "symbol": "DataRowOutlet",
+      "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "conclusion": "removed-use",
+      "reviewer": "Codex bounded table source reviewer",
+      "decision": "The frozen direct DataRowOutlet import from @angular/cdk/table was the sole identifier occurrence in the pre-930 table source; commit 930b7a883ba2f0261a196e11b5101249981b56bc removes exactly the four unused bindings and current table source retains no DataRowOutlet identifier. This closes only that removed direct binding. The separate owned _LegacyTableOutlet currently assigns underscore-prefixed CdkTable outlet fields and calls _outletAssigned; their stability, behavior, constructor and runtime compatibility are not established by this decision.",
+      "prior_review": {
+        "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+        "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+      },
+      "prior_complete_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/cdk/table",
+        "symbol": "DataRowOutlet",
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "conclusion": "removed-use",
+        "reviewer": "Codex primary implementer",
+        "prior_source_review": {
+          "path": "compatibility/f10/authored-use-reviews/table-virtual-context-requalified-boundaries.json",
+          "sha256": "589ffee7e1b8b90858ff9db80d1f7a5a7a872575cf5dcf4fbc5fb23d021d3897"
+        },
+        "current_role": {
+          "absent_in_preimage_table_current_table_and_helper": true
+        },
+        "decision": "The previously removed direct outlet import remains absent in the entire preceding/current table and the new helper. Removing exactly the added local helper import and class decorator recovers the complete preceding table. Public module/outlet ownership and all prior evidence remain unchanged. The construction boundary is separately supported by genuine minimum node-injection and focused Angular22 full/partial AOT diagnostics; real legacy templates/native/packed/floors remain required. This requalifies only the removed frozen binding.",
+        "independent_evidence": [
+          {
+            "path": "compatibility/rc/table-public-module-import-source-proof.json",
+            "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+            "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+            "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+            "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+            "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+          },
+          {
+            "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+            "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+          },
+          {
+            "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+            "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-use-review.json",
+            "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+            "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+            "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+          },
+          {
+            "path": "scripts/table-virtual-context-requalification.mjs",
+            "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-source-proof.json",
+            "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+            "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+          },
+          {
+            "path": "tests/table_virtual_context_requalification_probe.mjs",
+            "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+          },
+          {
+            "path": "scripts/class-decorator-use-review.mjs",
+            "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+          },
+          {
+            "path": "scripts/framework-enum-use-review.mjs",
+            "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+          },
+          {
+            "path": "scripts/current-injection-context-review.mjs",
+            "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-inputs.json",
+            "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+            "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+            "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-changes.diff",
+            "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+            "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+          },
+          {
+            "path": "tests/metadata_current_profile_probe.mjs",
+            "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+          },
+          {
+            "path": "tests/class_decorator_use_probe.mjs",
+            "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+          },
+          {
+            "path": "tests/framework_enum_use_probe.mjs",
+            "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+          },
+          {
+            "path": "tests/test_class_decorator_uses.py",
+            "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+            "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+            "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+            "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+            "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+          }
+        ],
+        "source_checker_requalification": {
+          "source_parent": "6eae6ac87f20e85d78166be94fa49913d608cf86",
+          "scope": "Existing individual decision, subject bytes and receipt scope retained. The current class/enum populations are explicit; complete preceding semantic validators and public namespace/type/protocol machinery are preserved, with current-only enum type-import rejection added. Old source/protocol controls remain and new population/retirement controls pass. No product behavior, native/packed/AOT/floor or upstream qualification is added.",
+          "current_metadata_role": null,
+          "source_proof": {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          "historical_table_replay": {
+            "scope": "Replay only the historical table-review independent checker/producer receipts. Current table/helper/legacy API source and all15 corruption controls stay actual. Imported current domain implementations are justified by the independently checked complete preserved validator/helper bodies; current whole populations have separate genuine namespace diagnostics.",
+            "original_fifteen_control_bodies_recovered_exactly": true,
+            "all_fifteen_controls_reexecuted": true,
+            "current_table_helper_and_product_source_unchanged": true
+          }
+        }
+      },
+      "historical_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "commit": "e84b891955807c58da5c3eeae964a7cb0396df3a",
+        "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+      },
+      "current_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+      },
+      "current_class_case": null,
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+          "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+          "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+          "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+          "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+        },
+        {
+          "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+          "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+        },
+        {
+          "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+          "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+        },
+        {
+          "path": "compatibility/rc/framework-enum-use-review.json",
+          "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+          "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+          "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+        },
+        {
+          "path": "scripts/table-virtual-context-requalification.mjs",
+          "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+          "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+        },
+        {
+          "path": "tests/table_virtual_context_requalification_probe.mjs",
+          "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+        },
+        {
+          "path": "scripts/class-decorator-use-review.mjs",
+          "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+        },
+        {
+          "path": "scripts/framework-enum-use-review.mjs",
+          "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-inputs.json",
+          "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+          "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+          "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+          "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-changes.diff",
+          "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+          "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+        },
+        {
+          "path": "tests/metadata_current_profile_probe.mjs",
+          "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+        },
+        {
+          "path": "tests/class_decorator_use_probe.mjs",
+          "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+        },
+        {
+          "path": "tests/framework_enum_use_probe.mjs",
+          "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+          "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+          "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+          "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+          "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-routing-5628.json",
+          "sha256": "fc9a0f8b13a024be54b63b079f6ea889d038fc654c39d8879e1763d82906b919"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-old-failure-5628.json",
+          "sha256": "e996ea5a97eb46429078df2462c19e39e7ee165141a2cb602e7ee56620cffc2c"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-diagnostic-v4.json",
+          "sha256": "2a94b9d173ad402137c3d96cd90799f2cf54c3ed7a7b3dab8fde09a2abb1eb35"
+        },
+        {
+          "path": "scripts/class-decorator-current-5628.mjs",
+          "sha256": "04272b6aabb51450c2af622a3293e7aaa409639a9e863f0a894ea23e53cef890"
+        },
+        {
+          "path": "tests/class_decorator_current_5628_probe.mjs",
+          "sha256": "8960f44d7c3e718c061808c342a72c97f6d02f26cbd62128427b06083230cf0b"
+        },
+        {
+          "path": "tests/test_class_decorator_uses.py",
+          "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-expected-deltas.json",
+          "sha256": "e5d7425ee7efa629610b29c8acddc7184e26ae894947dc0a0c996d2595e12337"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/cdk/table",
+      "symbol": "NoDataRowOutlet",
+      "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "conclusion": "removed-use",
+      "reviewer": "Codex bounded table source reviewer",
+      "decision": "The frozen direct NoDataRowOutlet import from @angular/cdk/table was the sole identifier occurrence in the pre-930 table source; commit 930b7a883ba2f0261a196e11b5101249981b56bc removes exactly the four unused bindings and current table source retains no NoDataRowOutlet identifier. This closes only that removed direct binding. The separate owned _LegacyTableOutlet currently assigns underscore-prefixed CdkTable outlet fields and calls _outletAssigned; their stability, behavior, constructor and runtime compatibility are not established by this decision.",
+      "prior_review": {
+        "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+        "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+      },
+      "prior_complete_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/cdk/table",
+        "symbol": "NoDataRowOutlet",
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "conclusion": "removed-use",
+        "reviewer": "Codex primary implementer",
+        "prior_source_review": {
+          "path": "compatibility/f10/authored-use-reviews/table-virtual-context-requalified-boundaries.json",
+          "sha256": "589ffee7e1b8b90858ff9db80d1f7a5a7a872575cf5dcf4fbc5fb23d021d3897"
+        },
+        "current_role": {
+          "absent_in_preimage_table_current_table_and_helper": true
+        },
+        "decision": "The previously removed direct outlet import remains absent in the entire preceding/current table and the new helper. Removing exactly the added local helper import and class decorator recovers the complete preceding table. Public module/outlet ownership and all prior evidence remain unchanged. The construction boundary is separately supported by genuine minimum node-injection and focused Angular22 full/partial AOT diagnostics; real legacy templates/native/packed/floors remain required. This requalifies only the removed frozen binding.",
+        "independent_evidence": [
+          {
+            "path": "compatibility/rc/table-public-module-import-source-proof.json",
+            "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+            "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+            "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+            "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+            "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+          },
+          {
+            "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+            "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+          },
+          {
+            "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+            "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-use-review.json",
+            "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+            "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+            "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+          },
+          {
+            "path": "scripts/table-virtual-context-requalification.mjs",
+            "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-source-proof.json",
+            "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+            "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+          },
+          {
+            "path": "tests/table_virtual_context_requalification_probe.mjs",
+            "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+          },
+          {
+            "path": "scripts/class-decorator-use-review.mjs",
+            "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+          },
+          {
+            "path": "scripts/framework-enum-use-review.mjs",
+            "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+          },
+          {
+            "path": "scripts/current-injection-context-review.mjs",
+            "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-inputs.json",
+            "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+            "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+            "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-changes.diff",
+            "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+            "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+          },
+          {
+            "path": "tests/metadata_current_profile_probe.mjs",
+            "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+          },
+          {
+            "path": "tests/class_decorator_use_probe.mjs",
+            "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+          },
+          {
+            "path": "tests/framework_enum_use_probe.mjs",
+            "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+          },
+          {
+            "path": "tests/test_class_decorator_uses.py",
+            "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+            "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+            "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+            "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+            "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+          }
+        ],
+        "source_checker_requalification": {
+          "source_parent": "6eae6ac87f20e85d78166be94fa49913d608cf86",
+          "scope": "Existing individual decision, subject bytes and receipt scope retained. The current class/enum populations are explicit; complete preceding semantic validators and public namespace/type/protocol machinery are preserved, with current-only enum type-import rejection added. Old source/protocol controls remain and new population/retirement controls pass. No product behavior, native/packed/AOT/floor or upstream qualification is added.",
+          "current_metadata_role": null,
+          "source_proof": {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          "historical_table_replay": {
+            "scope": "Replay only the historical table-review independent checker/producer receipts. Current table/helper/legacy API source and all15 corruption controls stay actual. Imported current domain implementations are justified by the independently checked complete preserved validator/helper bodies; current whole populations have separate genuine namespace diagnostics.",
+            "original_fifteen_control_bodies_recovered_exactly": true,
+            "all_fifteen_controls_reexecuted": true,
+            "current_table_helper_and_product_source_unchanged": true
+          }
+        }
+      },
+      "historical_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "commit": "e84b891955807c58da5c3eeae964a7cb0396df3a",
+        "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+      },
+      "current_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+      },
+      "current_class_case": null,
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+          "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+          "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+          "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+          "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+        },
+        {
+          "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+          "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+        },
+        {
+          "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+          "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+        },
+        {
+          "path": "compatibility/rc/framework-enum-use-review.json",
+          "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+          "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+          "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+        },
+        {
+          "path": "scripts/table-virtual-context-requalification.mjs",
+          "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+          "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+        },
+        {
+          "path": "tests/table_virtual_context_requalification_probe.mjs",
+          "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+        },
+        {
+          "path": "scripts/class-decorator-use-review.mjs",
+          "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+        },
+        {
+          "path": "scripts/framework-enum-use-review.mjs",
+          "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-inputs.json",
+          "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+          "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+          "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+          "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-changes.diff",
+          "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+          "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+        },
+        {
+          "path": "tests/metadata_current_profile_probe.mjs",
+          "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+        },
+        {
+          "path": "tests/class_decorator_use_probe.mjs",
+          "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+        },
+        {
+          "path": "tests/framework_enum_use_probe.mjs",
+          "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+          "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+          "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+          "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+          "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-routing-5628.json",
+          "sha256": "fc9a0f8b13a024be54b63b079f6ea889d038fc654c39d8879e1763d82906b919"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-old-failure-5628.json",
+          "sha256": "e996ea5a97eb46429078df2462c19e39e7ee165141a2cb602e7ee56620cffc2c"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-diagnostic-v4.json",
+          "sha256": "2a94b9d173ad402137c3d96cd90799f2cf54c3ed7a7b3dab8fde09a2abb1eb35"
+        },
+        {
+          "path": "scripts/class-decorator-current-5628.mjs",
+          "sha256": "04272b6aabb51450c2af622a3293e7aaa409639a9e863f0a894ea23e53cef890"
+        },
+        {
+          "path": "tests/class_decorator_current_5628_probe.mjs",
+          "sha256": "8960f44d7c3e718c061808c342a72c97f6d02f26cbd62128427b06083230cf0b"
+        },
+        {
+          "path": "tests/test_class_decorator_uses.py",
+          "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-expected-deltas.json",
+          "sha256": "e5d7425ee7efa629610b29c8acddc7184e26ae894947dc0a0c996d2595e12337"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/cdk/table",
+      "symbol": "FooterRowOutlet",
+      "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "conclusion": "removed-use",
+      "reviewer": "Codex bounded table source reviewer",
+      "decision": "The frozen direct FooterRowOutlet import from @angular/cdk/table was the sole identifier occurrence in the pre-930 table source; commit 930b7a883ba2f0261a196e11b5101249981b56bc removes exactly the four unused bindings and current table source retains no FooterRowOutlet identifier. This closes only that removed direct binding. The separate owned _LegacyTableOutlet currently assigns underscore-prefixed CdkTable outlet fields and calls _outletAssigned; their stability, behavior, constructor and runtime compatibility are not established by this decision.",
+      "prior_review": {
+        "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+        "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+      },
+      "prior_complete_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/cdk/table",
+        "symbol": "FooterRowOutlet",
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "conclusion": "removed-use",
+        "reviewer": "Codex primary implementer",
+        "prior_source_review": {
+          "path": "compatibility/f10/authored-use-reviews/table-virtual-context-requalified-boundaries.json",
+          "sha256": "589ffee7e1b8b90858ff9db80d1f7a5a7a872575cf5dcf4fbc5fb23d021d3897"
+        },
+        "current_role": {
+          "absent_in_preimage_table_current_table_and_helper": true
+        },
+        "decision": "The previously removed direct outlet import remains absent in the entire preceding/current table and the new helper. Removing exactly the added local helper import and class decorator recovers the complete preceding table. Public module/outlet ownership and all prior evidence remain unchanged. The construction boundary is separately supported by genuine minimum node-injection and focused Angular22 full/partial AOT diagnostics; real legacy templates/native/packed/floors remain required. This requalifies only the removed frozen binding.",
+        "independent_evidence": [
+          {
+            "path": "compatibility/rc/table-public-module-import-source-proof.json",
+            "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+            "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+            "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+            "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+          },
+          {
+            "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+            "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+          },
+          {
+            "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+            "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+          },
+          {
+            "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+            "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-use-review.json",
+            "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+            "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+            "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+          },
+          {
+            "path": "scripts/table-virtual-context-requalification.mjs",
+            "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-source-proof.json",
+            "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+            "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+          },
+          {
+            "path": "tests/table_virtual_context_requalification_probe.mjs",
+            "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+          },
+          {
+            "path": "scripts/class-decorator-use-review.mjs",
+            "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+          },
+          {
+            "path": "scripts/framework-enum-use-review.mjs",
+            "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+          },
+          {
+            "path": "scripts/current-injection-context-review.mjs",
+            "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-inputs.json",
+            "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+            "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+            "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-changes.diff",
+            "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+            "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+          },
+          {
+            "path": "tests/metadata_current_profile_probe.mjs",
+            "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+          },
+          {
+            "path": "tests/class_decorator_use_probe.mjs",
+            "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+          },
+          {
+            "path": "tests/framework_enum_use_probe.mjs",
+            "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+          },
+          {
+            "path": "tests/test_class_decorator_uses.py",
+            "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+            "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+            "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+            "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+            "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+          }
+        ],
+        "source_checker_requalification": {
+          "source_parent": "6eae6ac87f20e85d78166be94fa49913d608cf86",
+          "scope": "Existing individual decision, subject bytes and receipt scope retained. The current class/enum populations are explicit; complete preceding semantic validators and public namespace/type/protocol machinery are preserved, with current-only enum type-import rejection added. Old source/protocol controls remain and new population/retirement controls pass. No product behavior, native/packed/AOT/floor or upstream qualification is added.",
+          "current_metadata_role": null,
+          "source_proof": {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          "historical_table_replay": {
+            "scope": "Replay only the historical table-review independent checker/producer receipts. Current table/helper/legacy API source and all15 corruption controls stay actual. Imported current domain implementations are justified by the independently checked complete preserved validator/helper bodies; current whole populations have separate genuine namespace diagnostics.",
+            "original_fifteen_control_bodies_recovered_exactly": true,
+            "all_fifteen_controls_reexecuted": true,
+            "current_table_helper_and_product_source_unchanged": true
+          }
+        }
+      },
+      "historical_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "commit": "e84b891955807c58da5c3eeae964a7cb0396df3a",
+        "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+      },
+      "current_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+      },
+      "current_class_case": null,
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+          "sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+          "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+          "sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+          "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+        },
+        {
+          "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+          "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+        },
+        {
+          "path": "compatibility/rc/table-node-di-constructor-source-proof.json",
+          "sha256": "98aecd09c521af9abbfe74d3b8f52eaf30362517960170e12603bb487d2c0de6"
+        },
+        {
+          "path": "compatibility/rc/framework-enum-use-review.json",
+          "sha256": "5de904d23be34c4b349c03cd4d095104facf5ddcdfc57355a0a6bf53ac3ad108"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+          "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+          "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+        },
+        {
+          "path": "scripts/table-virtual-context-requalification.mjs",
+          "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+          "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+        },
+        {
+          "path": "tests/table_virtual_context_requalification_probe.mjs",
+          "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+        },
+        {
+          "path": "scripts/class-decorator-use-review.mjs",
+          "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+        },
+        {
+          "path": "scripts/framework-enum-use-review.mjs",
+          "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-inputs.json",
+          "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+          "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+          "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+          "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-changes.diff",
+          "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+          "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+        },
+        {
+          "path": "tests/metadata_current_profile_probe.mjs",
+          "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+        },
+        {
+          "path": "tests/class_decorator_use_probe.mjs",
+          "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+        },
+        {
+          "path": "tests/framework_enum_use_probe.mjs",
+          "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+          "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+          "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+          "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+          "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-routing-5628.json",
+          "sha256": "fc9a0f8b13a024be54b63b079f6ea889d038fc654c39d8879e1763d82906b919"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-old-failure-5628.json",
+          "sha256": "e996ea5a97eb46429078df2462c19e39e7ee165141a2cb602e7ee56620cffc2c"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-diagnostic-v4.json",
+          "sha256": "2a94b9d173ad402137c3d96cd90799f2cf54c3ed7a7b3dab8fde09a2abb1eb35"
+        },
+        {
+          "path": "scripts/class-decorator-current-5628.mjs",
+          "sha256": "04272b6aabb51450c2af622a3293e7aaa409639a9e863f0a894ea23e53cef890"
+        },
+        {
+          "path": "tests/class_decorator_current_5628_probe.mjs",
+          "sha256": "8960f44d7c3e718c061808c342a72c97f6d02f26cbd62128427b06083230cf0b"
+        },
+        {
+          "path": "tests/test_class_decorator_uses.py",
+          "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-expected-deltas.json",
+          "sha256": "e5d7425ee7efa629610b29c8acddc7184e26ae894947dc0a0c996d2595e12337"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/core",
+      "symbol": "Component",
+      "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex bounded table source reviewer",
+      "decision": "The genuine @angular/core Component import in the unchanged current table source binds its single MatLegacyTable decorator with the exact metadata in the committed full-current class diagnostic. The original wrapper and its earlier execution remain historical; the committed successor exercises full live metadata with independent negative controls against archived original/main/21.x declarations. This source metadata role does not qualify table construction, private outlet hooks, templates/styles, native execution, artifacts or consumer floors.",
+      "prior_review": {
+        "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+        "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+      },
+      "prior_complete_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/core",
+        "symbol": "Component",
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "conclusion": "stable-public-peer",
+        "reviewer": "Codex primary implementer",
+        "prior_source_review": {
+          "path": "compatibility/f10/authored-use-reviews/table-virtual-context-requalified-boundaries.json",
+          "sha256": "589ffee7e1b8b90858ff9db80d1f7a5a7a872575cf5dcf4fbc5fb23d021d3897"
+        },
+        "current_role": {
+          "file": "legacy-table/table.ts",
+          "module": "@angular/core",
+          "symbol": "Component",
+          "local_name": "Component",
+          "frozen_use": true,
+          "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+          "references": [
+            {
+              "line": 41,
+              "expression": "Component({\n  standalone: false,\n  selector: 'mat-table, table[mat-table]',\n  exportAs: 'matTable',\n  template: `\n    <ng-content select=\"caption\"></ng-content>\n    <ng-content select=\"colgroup, col\"></ng-content>\n\n    @if (_isServer) {\n      <ng-content></ng-content>\n    }\n\n    @if (_isNativeHtmlTable) {\n      <thead role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"header\"></ng-container>\n      </thead>\n      <tbody role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"data\"></ng-container>\n        <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      </tbody>\n      <tfoot role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"footer\"></ng-container>\n      </tfoot>\n    } @else {\n      <ng-container legacyTableOutlet=\"header\"></ng-container>\n      <ng-container legacyTableOutlet=\"data\"></ng-container>\n      <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      <ng-container legacyTableOutlet=\"footer\"></ng-container>\n    }\n  `,\n  styleUrls: ['table.scss'],\n  host: {\n    'class': 'mat-table',\n    '[class.mat-table-fixed-layout]': 'fixedLayout',\n    'ngSkipHydration': '',\n  },\n  providers: [\n    {provide: CdkTable, useExisting: MatLegacyTable},\n    {provide: STICKY_POSITIONING_LISTENER, useValue: null},\n  ],\n  encapsulation: ViewEncapsulation.None,\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n})",
+              "target_class": "MatLegacyTable",
+              "fields": [
+                "standalone",
+                "selector",
+                "exportAs",
+                "template",
+                "styleUrls",
+                "host",
+                "providers",
+                "encapsulation",
+                "changeDetection"
+              ],
+              "standalone": false,
+              "historical_base_directive": false
+            }
+          ],
+          "unused_import_erasure": null
+        },
+        "decision": "Fresh existing domain inspection binds this imported public table role and compares it with its retained diagnostic case, excluding only source identity and observation line numbers. Metadata expressions, enum values/members and constructor guard scope remain unchanged. The complete preceding table is recovered by reversing only the new local helper import and class decorator. Its parent-construction interaction has separate genuine-minimum node-DI, strict declarations and Angular22 full/partial AOT diagnostics. Prior namespace/metadata/guard receipts retain their exact bytes and limited scope. This requalifies only the named public role, without native legacy-view, packed, actual21 compiler, floor, new helper-use or upstream SHA clearance.",
+        "independent_evidence": [
+          {
+            "path": "compatibility/rc/historical-menu-metadata-requalification-proof.json",
+            "sha256": "b4c95ab7701ba8658a5fb5d1e0733ebc127b77db26446f9d24021d0c26469955"
+          },
+          {
+            "path": "compatibility/rc/historical-menu-metadata-requalification-inputs.json",
+            "sha256": "bfcd78a74e342b3fba21ae07db148ac44e6839903e290cd055659bd6a397eaa9"
+          },
+          {
+            "path": "scripts/historical-menu-metadata-requalification.mjs",
+            "sha256": "e1b14a3150ef8cc453da0a6cea4d4b27c3069d82e1049b4a24ee187c61ba298f"
+          },
+          {
+            "path": "tests/historical_menu_metadata_requalification_probe.mjs",
+            "sha256": "cab8b568eda72c75abd3f9f95be1ff1127337615b486510895ac35331868abaa"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-implementation-decision.json",
+            "sha256": "3d0c87a6a9e02ef6d72fd8777db3385672e3f4edad4e50db0ae875df4d992a80"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-runtime-diagnostic.json",
+            "sha256": "ac1ae2ac0c9ef82f9fc156c7871a7d1268e2864f965ff1ca676e8e4324e4aeb8"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-minimum-api-diagnostic.json",
+            "sha256": "d839e740a4ea8628d075dc50cd89e182e1fd5d81464a1ee5475d825a5da873fc"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-cyph-sanity.json",
+            "sha256": "8ed9960741767b26652f3ddb045a0308556f5e743c67cad022aa29616d59ce69"
+          },
+          {
+            "path": "compatibility/rc/historical-menu-class-decorator-requalification-diagnostic.json",
+            "sha256": "efe6748c12b9dd75993cd80e91e7162b67cb1bdf1b0a6261a0298a4a7e92c320"
+          },
+          {
+            "path": "compatibility/f10/authored-use-reviews/public-class-decorator-boundary.json",
+            "sha256": "f6e1f31e0a291a63f14cd242591d06ea8ab312548c1eac850a060639da3539bd"
+          },
+          {
+            "path": "compatibility/rc/element-ref-public-subjects.json",
+            "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+            "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+            "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+          },
+          {
+            "path": "scripts/table-virtual-context-requalification.mjs",
+            "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-source-proof.json",
+            "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+            "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+          },
+          {
+            "path": "tests/table_virtual_context_requalification_probe.mjs",
+            "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+          },
+          {
+            "path": "scripts/class-decorator-use-review.mjs",
+            "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+          },
+          {
+            "path": "scripts/framework-enum-use-review.mjs",
+            "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+          },
+          {
+            "path": "scripts/current-injection-context-review.mjs",
+            "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-inputs.json",
+            "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+            "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+            "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-changes.diff",
+            "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+            "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+          },
+          {
+            "path": "tests/metadata_current_profile_probe.mjs",
+            "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+          },
+          {
+            "path": "tests/class_decorator_use_probe.mjs",
+            "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+          },
+          {
+            "path": "tests/framework_enum_use_probe.mjs",
+            "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+          },
+          {
+            "path": "tests/test_class_decorator_uses.py",
+            "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+            "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+            "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+            "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+            "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+          }
+        ],
+        "source_checker_requalification": {
+          "source_parent": "6eae6ac87f20e85d78166be94fa49913d608cf86",
+          "scope": "Existing individual decision, subject bytes and receipt scope retained. The current class/enum populations are explicit; complete preceding semantic validators and public namespace/type/protocol machinery are preserved, with current-only enum type-import rejection added. Old source/protocol controls remain and new population/retirement controls pass. No product behavior, native/packed/AOT/floor or upstream qualification is added.",
+          "current_metadata_role": {
+            "file": "legacy-table/table.ts",
+            "module": "@angular/core",
+            "symbol": "Component",
+            "local_name": "Component",
+            "frozen_use": true,
+            "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+            "references": [
+              {
+                "line": 41,
+                "expression": "Component({\n  standalone: false,\n  selector: 'mat-table, table[mat-table]',\n  exportAs: 'matTable',\n  template: `\n    <ng-content select=\"caption\"></ng-content>\n    <ng-content select=\"colgroup, col\"></ng-content>\n\n    @if (_isServer) {\n      <ng-content></ng-content>\n    }\n\n    @if (_isNativeHtmlTable) {\n      <thead role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"header\"></ng-container>\n      </thead>\n      <tbody role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"data\"></ng-container>\n        <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      </tbody>\n      <tfoot role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"footer\"></ng-container>\n      </tfoot>\n    } @else {\n      <ng-container legacyTableOutlet=\"header\"></ng-container>\n      <ng-container legacyTableOutlet=\"data\"></ng-container>\n      <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      <ng-container legacyTableOutlet=\"footer\"></ng-container>\n    }\n  `,\n  styleUrls: ['table.scss'],\n  host: {\n    'class': 'mat-table',\n    '[class.mat-table-fixed-layout]': 'fixedLayout',\n    'ngSkipHydration': '',\n  },\n  providers: [\n    {provide: CdkTable, useExisting: MatLegacyTable},\n    {provide: STICKY_POSITIONING_LISTENER, useValue: null},\n  ],\n  encapsulation: ViewEncapsulation.None,\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n})",
+                "target_class": "MatLegacyTable",
+                "fields": [
+                  "standalone",
+                  "selector",
+                  "exportAs",
+                  "template",
+                  "styleUrls",
+                  "host",
+                  "providers",
+                  "encapsulation",
+                  "changeDetection"
+                ],
+                "standalone": false,
+                "historical_base_directive": false
+              }
+            ],
+            "unused_import_erasure": null
+          },
+          "source_proof": {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          "historical_table_replay": {
+            "scope": "Replay only the historical table-review independent checker/producer receipts. Current table/helper/legacy API source and all15 corruption controls stay actual. Imported current domain implementations are justified by the independently checked complete preserved validator/helper bodies; current whole populations have separate genuine namespace diagnostics.",
+            "original_fifteen_control_bodies_recovered_exactly": true,
+            "all_fifteen_controls_reexecuted": true,
+            "current_table_helper_and_product_source_unchanged": true
+          }
+        }
+      },
+      "historical_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "commit": "e84b891955807c58da5c3eeae964a7cb0396df3a",
+        "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+      },
+      "current_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+      },
+      "current_class_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/core",
+        "symbol": "Component",
+        "local_name": "Component",
+        "frozen_use": true,
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "references": [
+          {
+            "line": 41,
+            "expression": "Component({\n  standalone: false,\n  selector: 'mat-table, table[mat-table]',\n  exportAs: 'matTable',\n  template: `\n    <ng-content select=\"caption\"></ng-content>\n    <ng-content select=\"colgroup, col\"></ng-content>\n\n    @if (_isServer) {\n      <ng-content></ng-content>\n    }\n\n    @if (_isNativeHtmlTable) {\n      <thead role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"header\"></ng-container>\n      </thead>\n      <tbody role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"data\"></ng-container>\n        <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      </tbody>\n      <tfoot role=\"rowgroup\">\n        <ng-container legacyTableOutlet=\"footer\"></ng-container>\n      </tfoot>\n    } @else {\n      <ng-container legacyTableOutlet=\"header\"></ng-container>\n      <ng-container legacyTableOutlet=\"data\"></ng-container>\n      <ng-container legacyTableOutlet=\"empty\"></ng-container>\n      <ng-container legacyTableOutlet=\"footer\"></ng-container>\n    }\n  `,\n  styleUrls: ['table.scss'],\n  host: {\n    'class': 'mat-table',\n    '[class.mat-table-fixed-layout]': 'fixedLayout',\n    'ngSkipHydration': '',\n  },\n  providers: [\n    {provide: CdkTable, useExisting: MatLegacyTable},\n    {provide: STICKY_POSITIONING_LISTENER, useValue: null},\n  ],\n  encapsulation: ViewEncapsulation.None,\n  // See note on CdkTable for explanation on why this uses the default change detection strategy.\n  // tslint:disable-next-line:validate-decorators\n  changeDetection: ChangeDetectionStrategy.Eager,\n})",
+            "target_class": "MatLegacyTable",
+            "fields": [
+              "standalone",
+              "selector",
+              "exportAs",
+              "template",
+              "styleUrls",
+              "host",
+              "providers",
+              "encapsulation",
+              "changeDetection"
+            ],
+            "standalone": false,
+            "historical_base_directive": false
+          }
+        ],
+        "unused_import_erasure": null
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/historical-menu-metadata-requalification-proof.json",
+          "sha256": "b4c95ab7701ba8658a5fb5d1e0733ebc127b77db26446f9d24021d0c26469955"
+        },
+        {
+          "path": "compatibility/rc/historical-menu-metadata-requalification-inputs.json",
+          "sha256": "bfcd78a74e342b3fba21ae07db148ac44e6839903e290cd055659bd6a397eaa9"
+        },
+        {
+          "path": "scripts/historical-menu-metadata-requalification.mjs",
+          "sha256": "e1b14a3150ef8cc453da0a6cea4d4b27c3069d82e1049b4a24ee187c61ba298f"
+        },
+        {
+          "path": "tests/historical_menu_metadata_requalification_probe.mjs",
+          "sha256": "cab8b568eda72c75abd3f9f95be1ff1127337615b486510895ac35331868abaa"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-implementation-decision.json",
+          "sha256": "3d0c87a6a9e02ef6d72fd8777db3385672e3f4edad4e50db0ae875df4d992a80"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-runtime-diagnostic.json",
+          "sha256": "ac1ae2ac0c9ef82f9fc156c7871a7d1268e2864f965ff1ca676e8e4324e4aeb8"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-minimum-api-diagnostic.json",
+          "sha256": "d839e740a4ea8628d075dc50cd89e182e1fd5d81464a1ee5475d825a5da873fc"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-cyph-sanity.json",
+          "sha256": "8ed9960741767b26652f3ddb045a0308556f5e743c67cad022aa29616d59ce69"
+        },
+        {
+          "path": "compatibility/rc/historical-menu-class-decorator-requalification-diagnostic.json",
+          "sha256": "efe6748c12b9dd75993cd80e91e7162b67cb1bdf1b0a6261a0298a4a7e92c320"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/public-class-decorator-boundary.json",
+          "sha256": "f6e1f31e0a291a63f14cd242591d06ea8ab312548c1eac850a060639da3539bd"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+          "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+          "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+        },
+        {
+          "path": "scripts/table-virtual-context-requalification.mjs",
+          "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+          "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+        },
+        {
+          "path": "tests/table_virtual_context_requalification_probe.mjs",
+          "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+        },
+        {
+          "path": "scripts/class-decorator-use-review.mjs",
+          "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+        },
+        {
+          "path": "scripts/framework-enum-use-review.mjs",
+          "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-inputs.json",
+          "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+          "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+          "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+          "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-changes.diff",
+          "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+          "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+        },
+        {
+          "path": "tests/metadata_current_profile_probe.mjs",
+          "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+        },
+        {
+          "path": "tests/class_decorator_use_probe.mjs",
+          "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+        },
+        {
+          "path": "tests/framework_enum_use_probe.mjs",
+          "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+          "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+          "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+          "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+          "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-routing-5628.json",
+          "sha256": "fc9a0f8b13a024be54b63b079f6ea889d038fc654c39d8879e1763d82906b919"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-old-failure-5628.json",
+          "sha256": "e996ea5a97eb46429078df2462c19e39e7ee165141a2cb602e7ee56620cffc2c"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-diagnostic-v4.json",
+          "sha256": "2a94b9d173ad402137c3d96cd90799f2cf54c3ed7a7b3dab8fde09a2abb1eb35"
+        },
+        {
+          "path": "scripts/class-decorator-current-5628.mjs",
+          "sha256": "04272b6aabb51450c2af622a3293e7aaa409639a9e863f0a894ea23e53cef890"
+        },
+        {
+          "path": "tests/class_decorator_current_5628_probe.mjs",
+          "sha256": "8960f44d7c3e718c061808c342a72c97f6d02f26cbd62128427b06083230cf0b"
+        },
+        {
+          "path": "tests/test_class_decorator_uses.py",
+          "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-expected-deltas.json",
+          "sha256": "e5d7425ee7efa629610b29c8acddc7184e26ae894947dc0a0c996d2595e12337"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/core",
+      "symbol": "Directive",
+      "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex bounded table source reviewer",
+      "decision": "The genuine @angular/core Directive import in the unchanged current table source binds its single MatLegacyRecycleRows decorator with the exact metadata in the committed full-current class diagnostic. The original wrapper and its earlier execution remain historical; the committed successor exercises full live metadata with independent negative controls against archived original/main/21.x declarations. This source metadata role does not qualify table construction, private outlet hooks, templates/styles, native execution, artifacts or consumer floors.",
+      "prior_review": {
+        "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+        "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+      },
+      "prior_complete_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/core",
+        "symbol": "Directive",
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "conclusion": "stable-public-peer",
+        "reviewer": "Codex primary implementer",
+        "prior_source_review": {
+          "path": "compatibility/f10/authored-use-reviews/table-virtual-context-requalified-boundaries.json",
+          "sha256": "589ffee7e1b8b90858ff9db80d1f7a5a7a872575cf5dcf4fbc5fb23d021d3897"
+        },
+        "current_role": {
+          "file": "legacy-table/table.ts",
+          "module": "@angular/core",
+          "symbol": "Directive",
+          "local_name": "Directive",
+          "frozen_use": true,
+          "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+          "references": [
+            {
+              "line": 25,
+              "expression": "Directive({\n  standalone: false,\n  selector: 'mat-table[recycleRows], table[mat-table][recycleRows]',\n})",
+              "target_class": "MatLegacyRecycleRows",
+              "fields": [
+                "standalone",
+                "selector"
+              ],
+              "standalone": false,
+              "historical_base_directive": false
+            }
+          ],
+          "unused_import_erasure": null
+        },
+        "decision": "Fresh existing domain inspection binds this imported public table role and compares it with its retained diagnostic case, excluding only source identity and observation line numbers. Metadata expressions, enum values/members and constructor guard scope remain unchanged. The complete preceding table is recovered by reversing only the new local helper import and class decorator. Its parent-construction interaction has separate genuine-minimum node-DI, strict declarations and Angular22 full/partial AOT diagnostics. Prior namespace/metadata/guard receipts retain their exact bytes and limited scope. This requalifies only the named public role, without native legacy-view, packed, actual21 compiler, floor, new helper-use or upstream SHA clearance.",
+        "independent_evidence": [
+          {
+            "path": "compatibility/rc/historical-menu-metadata-requalification-proof.json",
+            "sha256": "b4c95ab7701ba8658a5fb5d1e0733ebc127b77db26446f9d24021d0c26469955"
+          },
+          {
+            "path": "compatibility/rc/historical-menu-metadata-requalification-inputs.json",
+            "sha256": "bfcd78a74e342b3fba21ae07db148ac44e6839903e290cd055659bd6a397eaa9"
+          },
+          {
+            "path": "scripts/historical-menu-metadata-requalification.mjs",
+            "sha256": "e1b14a3150ef8cc453da0a6cea4d4b27c3069d82e1049b4a24ee187c61ba298f"
+          },
+          {
+            "path": "tests/historical_menu_metadata_requalification_probe.mjs",
+            "sha256": "cab8b568eda72c75abd3f9f95be1ff1127337615b486510895ac35331868abaa"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-implementation-decision.json",
+            "sha256": "3d0c87a6a9e02ef6d72fd8777db3385672e3f4edad4e50db0ae875df4d992a80"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-runtime-diagnostic.json",
+            "sha256": "ac1ae2ac0c9ef82f9fc156c7871a7d1268e2864f965ff1ca676e8e4324e4aeb8"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-minimum-api-diagnostic.json",
+            "sha256": "d839e740a4ea8628d075dc50cd89e182e1fd5d81464a1ee5475d825a5da873fc"
+          },
+          {
+            "path": "compatibility/rc/owned-menu-item-cyph-sanity.json",
+            "sha256": "8ed9960741767b26652f3ddb045a0308556f5e743c67cad022aa29616d59ce69"
+          },
+          {
+            "path": "compatibility/rc/historical-menu-class-decorator-requalification-diagnostic.json",
+            "sha256": "efe6748c12b9dd75993cd80e91e7162b67cb1bdf1b0a6261a0298a4a7e92c320"
+          },
+          {
+            "path": "compatibility/f10/authored-use-reviews/public-class-decorator-boundary.json",
+            "sha256": "f6e1f31e0a291a63f14cd242591d06ea8ab312548c1eac850a060639da3539bd"
+          },
+          {
+            "path": "compatibility/rc/element-ref-public-subjects.json",
+            "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+            "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+            "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+          },
+          {
+            "path": "scripts/table-virtual-context-requalification.mjs",
+            "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-source-proof.json",
+            "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+          },
+          {
+            "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+            "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+          },
+          {
+            "path": "tests/table_virtual_context_requalification_probe.mjs",
+            "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+          },
+          {
+            "path": "scripts/class-decorator-use-review.mjs",
+            "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+          },
+          {
+            "path": "scripts/framework-enum-use-review.mjs",
+            "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+          },
+          {
+            "path": "scripts/current-injection-context-review.mjs",
+            "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-inputs.json",
+            "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+            "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+            "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-changes.diff",
+            "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+            "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+          },
+          {
+            "path": "tests/metadata_current_profile_probe.mjs",
+            "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+          },
+          {
+            "path": "tests/class_decorator_use_probe.mjs",
+            "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+          },
+          {
+            "path": "tests/framework_enum_use_probe.mjs",
+            "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+          },
+          {
+            "path": "tests/test_class_decorator_uses.py",
+            "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+            "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+            "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+            "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+          },
+          {
+            "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+            "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+          }
+        ],
+        "source_checker_requalification": {
+          "source_parent": "6eae6ac87f20e85d78166be94fa49913d608cf86",
+          "scope": "Existing individual decision, subject bytes and receipt scope retained. The current class/enum populations are explicit; complete preceding semantic validators and public namespace/type/protocol machinery are preserved, with current-only enum type-import rejection added. Old source/protocol controls remain and new population/retirement controls pass. No product behavior, native/packed/AOT/floor or upstream qualification is added.",
+          "current_metadata_role": {
+            "file": "legacy-table/table.ts",
+            "module": "@angular/core",
+            "symbol": "Directive",
+            "local_name": "Directive",
+            "frozen_use": true,
+            "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+            "references": [
+              {
+                "line": 25,
+                "expression": "Directive({\n  standalone: false,\n  selector: 'mat-table[recycleRows], table[mat-table][recycleRows]',\n})",
+                "target_class": "MatLegacyRecycleRows",
+                "fields": [
+                  "standalone",
+                  "selector"
+                ],
+                "standalone": false,
+                "historical_base_directive": false
+              }
+            ],
+            "unused_import_erasure": null
+          },
+          "source_proof": {
+            "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+            "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+          },
+          "historical_table_replay": {
+            "scope": "Replay only the historical table-review independent checker/producer receipts. Current table/helper/legacy API source and all15 corruption controls stay actual. Imported current domain implementations are justified by the independently checked complete preserved validator/helper bodies; current whole populations have separate genuine namespace diagnostics.",
+            "original_fifteen_control_bodies_recovered_exactly": true,
+            "all_fifteen_controls_reexecuted": true,
+            "current_table_helper_and_product_source_unchanged": true
+          }
+        }
+      },
+      "historical_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "commit": "e84b891955807c58da5c3eeae964a7cb0396df3a",
+        "sha256": "ffc54f5ee062b9b07c9826dc15e5222dec48c522c34497ab3f9b4da7d4611de6"
+      },
+      "current_wrapper": {
+        "path": "tests/test_class_decorator_uses.py",
+        "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+      },
+      "current_class_case": {
+        "file": "legacy-table/table.ts",
+        "module": "@angular/core",
+        "symbol": "Directive",
+        "local_name": "Directive",
+        "frozen_use": true,
+        "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+        "references": [
+          {
+            "line": 25,
+            "expression": "Directive({\n  standalone: false,\n  selector: 'mat-table[recycleRows], table[mat-table][recycleRows]',\n})",
+            "target_class": "MatLegacyRecycleRows",
+            "fields": [
+              "standalone",
+              "selector"
+            ],
+            "standalone": false,
+            "historical_base_directive": false
+          }
+        ],
+        "unused_import_erasure": null
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/historical-menu-metadata-requalification-proof.json",
+          "sha256": "b4c95ab7701ba8658a5fb5d1e0733ebc127b77db26446f9d24021d0c26469955"
+        },
+        {
+          "path": "compatibility/rc/historical-menu-metadata-requalification-inputs.json",
+          "sha256": "bfcd78a74e342b3fba21ae07db148ac44e6839903e290cd055659bd6a397eaa9"
+        },
+        {
+          "path": "scripts/historical-menu-metadata-requalification.mjs",
+          "sha256": "e1b14a3150ef8cc453da0a6cea4d4b27c3069d82e1049b4a24ee187c61ba298f"
+        },
+        {
+          "path": "tests/historical_menu_metadata_requalification_probe.mjs",
+          "sha256": "cab8b568eda72c75abd3f9f95be1ff1127337615b486510895ac35331868abaa"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-implementation-decision.json",
+          "sha256": "3d0c87a6a9e02ef6d72fd8777db3385672e3f4edad4e50db0ae875df4d992a80"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-runtime-diagnostic.json",
+          "sha256": "ac1ae2ac0c9ef82f9fc156c7871a7d1268e2864f965ff1ca676e8e4324e4aeb8"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-minimum-api-diagnostic.json",
+          "sha256": "d839e740a4ea8628d075dc50cd89e182e1fd5d81464a1ee5475d825a5da873fc"
+        },
+        {
+          "path": "compatibility/rc/owned-menu-item-cyph-sanity.json",
+          "sha256": "8ed9960741767b26652f3ddb045a0308556f5e743c67cad022aa29616d59ce69"
+        },
+        {
+          "path": "compatibility/rc/historical-menu-class-decorator-requalification-diagnostic.json",
+          "sha256": "efe6748c12b9dd75993cd80e91e7162b67cb1bdf1b0a6261a0298a4a7e92c320"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/public-class-decorator-boundary.json",
+          "sha256": "f6e1f31e0a291a63f14cd242591d06ea8ab312548c1eac850a060639da3539bd"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-inputs.json",
+          "sha256": "2a7c03164146767396417f65e73f6cb63a637ff25a3af4635ea86ee0314de0e0"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+          "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+        },
+        {
+          "path": "scripts/table-virtual-context-requalification.mjs",
+          "sha256": "0632b197418ee233b6e847771781e07179c139de4acae041b7d935d4b9af32d5"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+          "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+        },
+        {
+          "path": "tests/table_virtual_context_requalification_probe.mjs",
+          "sha256": "9aa6e2fff33c3c0f267ab718fea24afa06bec0c61c264e034f1cb5b2cab3beb3"
+        },
+        {
+          "path": "scripts/class-decorator-use-review.mjs",
+          "sha256": "2752ccbff10493a96b99942d195a9aaf3b78bda5633d958c39082c44648a6048"
+        },
+        {
+          "path": "scripts/framework-enum-use-review.mjs",
+          "sha256": "ee01c9e41d93984c7df508d8e34a15c6d18623d3e888e3d42028346980851ce8"
+        },
+        {
+          "path": "scripts/current-injection-context-review.mjs",
+          "sha256": "8b23e70d0281ffc731fa919a0d9dbb286625a6f34b5cb256b2286398e34ce4c3"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-inputs.json",
+          "sha256": "561af74da42f6e40cf5057711eb9009182273c20a33ae8ec6f65886fdfcdc54f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-source-proof.json",
+          "sha256": "e9ef9c1f4e189c5bf94ea7c3142e35087837f68ff3e5038f9b81083c3db89315"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-class-diagnostic.json",
+          "sha256": "678050c882861406257e514671cff6d4dc3bd090741e5cbeca9ba77bbb8b2eab"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-enum-diagnostic.json",
+          "sha256": "43de9818184d0ac7ff674a9b2fc249213977804c0c80eb66005b3cb49129a93f"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-changes.diff",
+          "sha256": "739f72ac0d4f137e363d7d32562f3893d50427705397cec1694601cc504f9c62"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-prior-contexts.json.gz",
+          "sha256": "2fd14a8dc3b8b2aa8f346be69fd1c42573ca81c53060f5e886e3b3a37028dd27"
+        },
+        {
+          "path": "tests/metadata_current_profile_probe.mjs",
+          "sha256": "432912ec2c63781275499bac2fb4eb0f39dc820f6dc5ff86aa8514b95f5a1086"
+        },
+        {
+          "path": "tests/class_decorator_use_probe.mjs",
+          "sha256": "cb263a28a23bbd978b7747362b5e7706e2e349bb1dce42a5006c8572292b5762"
+        },
+        {
+          "path": "tests/framework_enum_use_probe.mjs",
+          "sha256": "652180c3044e983f869df686dddf4bf29e69f0a62abd5757f37be0b7ea4c852e"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-inputs.json",
+          "sha256": "dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-replay-preimages.json.gz",
+          "sha256": "452d60b904c5337b2f44d5b2c7d5ec49b53be5fe75dbf9f93eb0a28ac8f4f76b"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay-controls.json",
+          "sha256": "3afb78fd51c2204aae1807d98dda793ab59d86ae718571e65da911982396cd1c"
+        },
+        {
+          "path": "compatibility/rc/metadata-current-profile-table-replay.diff",
+          "sha256": "c8eb16fe17b500bf017a852ba9cc4128be02452dc31dc494bad9b529b3ddbfa1"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/metadata-current-profile-requalified-boundaries.json",
+          "sha256": "170535b402f9ec4dc080d720770dce9190ce2368da1a56e0f7e5652163230126"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-routing-5628.json",
+          "sha256": "fc9a0f8b13a024be54b63b079f6ea889d038fc654c39d8879e1763d82906b919"
+        },
+        {
+          "path": "compatibility/rc/class-current-wrapper-old-failure-5628.json",
+          "sha256": "e996ea5a97eb46429078df2462c19e39e7ee165141a2cb602e7ee56620cffc2c"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-diagnostic-v4.json",
+          "sha256": "2a94b9d173ad402137c3d96cd90799f2cf54c3ed7a7b3dab8fde09a2abb1eb35"
+        },
+        {
+          "path": "scripts/class-decorator-current-5628.mjs",
+          "sha256": "04272b6aabb51450c2af622a3293e7aaa409639a9e863f0a894ea23e53cef890"
+        },
+        {
+          "path": "tests/class_decorator_current_5628_probe.mjs",
+          "sha256": "8960f44d7c3e718c061808c342a72c97f6d02f26cbd62128427b06083230cf0b"
+        },
+        {
+          "path": "tests/test_class_decorator_uses.py",
+          "sha256": "495e27da6648a50932ed773bd1db2d3a76c97b3092f5710528c670869b2b3cbf"
+        },
+        {
+          "path": "compatibility/rc/class-decorator-current-5628-expected-deltas.json",
+          "sha256": "e5d7425ee7efa629610b29c8acddc7184e26ae894947dc0a0c996d2595e12337"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Not release admission; no G11, consumer floor, packed or browser equivalence.",
+    "No public-stability claim for leading-underscore outlet fields or _outletAssigned, or changed constructor behavior.",
+    "Original namespace diagnostics and prior proof retain their recorded scopes; full current class producer does not execute native templates or styles."
+  ],
+  "g11_claim": "not-passed"
+}
