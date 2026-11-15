@@ -7,6 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 type NumberInput = string | number | null | undefined;
 import {Platform} from '@angular/cdk/platform';
@@ -14,7 +16,6 @@ import {legacyGetShadowRoot} from '@ngx-compat/material-legacy/legacy-core';
 import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {DOCUMENT} from '@angular/common';
 import {
-  ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -183,7 +184,7 @@ export class MatLegacyProgressSpinner
     elementRef: ElementRef<HTMLElement>,
     _platform: Platform,
     @Optional() @Inject(DOCUMENT) private _document: any,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode: string,
     @Inject(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS)
     defaults?: MatProgressSpinnerDefaultOptions,
     /**
@@ -208,7 +209,7 @@ export class MatLegacyProgressSpinner
     }
 
     this._noopAnimations =
-      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;
+      resolveLegacyAnimationMode(animationMode) === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;
 
     if (elementRef.nativeElement.nodeName.toLowerCase() === 'mat-spinner') {
       this.mode = 'indeterminate';

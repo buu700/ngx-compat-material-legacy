@@ -4280,6 +4280,7 @@ describe('autocomplete content-query lifecycle', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CommonModule, MatLegacyAutocompleteModule, NoopAnimationsModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
       declarations: [LifecycleHost, DynamicHost, OpenDuringChangesDirective, OpenDuringChangesHost, EarlyOpenOptionsHost],
     }).compileComponents();
   });

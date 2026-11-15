@@ -7,9 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {
-  ANIMATION_MODULE_TYPE,
   Attribute,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -87,7 +88,7 @@ export class MatLegacySlideToggle extends _MatSlideToggleBase<MatLegacySlideTogg
     @Attribute('tabindex') tabIndex: string,
     @Inject(MAT_LEGACY_SLIDE_TOGGLE_DEFAULT_OPTIONS)
     defaults: MatLegacySlideToggleDefaultOptions,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super(
       elementRef,
@@ -95,7 +96,7 @@ export class MatLegacySlideToggle extends _MatSlideToggleBase<MatLegacySlideTogg
       changeDetectorRef,
       tabIndex,
       defaults,
-      animationMode,
+      resolveLegacyAnimationMode(animationMode),
       'mat-slide-toggle-',
     );
   }

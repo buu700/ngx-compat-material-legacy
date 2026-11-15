@@ -7,10 +7,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {FocusMonitor} from '@angular/cdk/a11y';
 import {UniqueSelectionDispatcher} from '@angular/cdk/collections';
 import {
-  ANIMATION_MODULE_TYPE,
   Attribute,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -103,7 +104,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {
     changeDetector: ChangeDetectorRef,
     focusMonitor: FocusMonitor,
     radioDispatcher: UniqueSelectionDispatcher,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
     @Optional()
     @Inject(MAT_RADIO_DEFAULT_OPTIONS)
     providerOverride?: MatRadioDefaultOptions,
@@ -115,7 +116,7 @@ export class MatLegacyRadioButton extends _MatRadioButtonBase {
       changeDetector,
       focusMonitor,
       radioDispatcher,
-      animationMode,
+      resolveLegacyAnimationMode(animationMode),
       providerOverride,
       tabIndex,
     );

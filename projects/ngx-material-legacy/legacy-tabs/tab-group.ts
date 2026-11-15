@@ -7,8 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
+
 import {
-  ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -65,7 +66,7 @@ export class MatLegacyTabGroup extends _MatTabGroupBase {
     elementRef: ElementRef,
     changeDetectorRef: ChangeDetectorRef,
     @Inject(MAT_TABS_CONFIG) @Optional() defaultConfig?: MatTabsConfig,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super(elementRef, changeDetectorRef, defaultConfig, animationMode);
   }

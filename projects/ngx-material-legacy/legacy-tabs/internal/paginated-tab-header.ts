@@ -9,8 +9,9 @@
  * Owned Material-16 `MatPaginatedTabHeader` (M22 version is inject()-only).
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {
-  ANIMATION_MODULE_TYPE,
   ChangeDetectorRef,
   ElementRef,
   NgZone,
@@ -180,8 +181,9 @@ export abstract class MatPaginatedTabHeader
     @Optional() private _dir: Directionality,
     private _ngZone: NgZone,
     private _platform: Platform,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,
   ) {
+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);
     // Bind the `mouseleave` event on the outside since it doesn't change anything in the view.
     _ngZone.runOutsideAngular(() => {
       fromEvent(_elementRef.nativeElement, 'mouseleave')

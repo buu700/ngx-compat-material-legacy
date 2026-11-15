@@ -6,6 +6,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
 import {AriaDescriber, FocusMonitor} from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';
 import {BreakpointObserver, Breakpoints, BreakpointState} from '@angular/cdk/layout';
@@ -13,7 +15,6 @@ import {Overlay} from '@angular/cdk/overlay';
 import {Platform} from '@angular/cdk/platform';
 import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {
-  ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -123,7 +124,7 @@ export class LegacyTooltipComponent extends _TooltipComponentBase {
   constructor(
     changeDetectorRef: ChangeDetectorRef,
     breakpointObserver: BreakpointObserver,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super(changeDetectorRef, animationMode);
     this._isHandset = breakpointObserver.observe(Breakpoints.Handset);

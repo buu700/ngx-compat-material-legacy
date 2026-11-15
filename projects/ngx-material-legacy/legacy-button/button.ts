@@ -7,9 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {FocusMonitor, FocusableOption, FocusOrigin} from '@angular/cdk/a11y';
 import {
-  ANIMATION_MODULE_TYPE,
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
@@ -100,9 +101,10 @@ export class MatLegacyButton
   constructor(
     elementRef: ElementRef,
     private _focusMonitor: FocusMonitor,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode: string,
   ) {
     super(elementRef);
+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);
 
     // For each of the variant selectors that is present in the button's host
     // attributes, add the correct corresponding class.
@@ -185,7 +187,7 @@ export class MatLegacyAnchor extends MatLegacyButton implements AfterViewInit, O
   constructor(
     focusMonitor: FocusMonitor,
     elementRef: ElementRef,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode: string,
     /** @breaking-change 14.0.0 _ngZone will be required. */
     @Optional() private _ngZone?: NgZone,
   ) {

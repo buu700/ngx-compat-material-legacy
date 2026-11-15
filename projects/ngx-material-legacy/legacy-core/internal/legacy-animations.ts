@@ -7,16 +7,21 @@
  * found in the LICENSE file at https://angular.io/license
  *
  * Owned legacy motion helper. Reads the public MATERIAL_ANIMATIONS token and
- * public ANIMATION_MODULE_TYPE. Does not call private Material helpers
+ * an owned legacy mode token. Does not call private Material helpers
  * (_getAnimationsState / _animationsDisabled).
  */
 
 import {MediaMatcher} from '@angular/cdk/layout';
-import {ANIMATION_MODULE_TYPE, InjectionToken, assertInInjectionContext, inject} from '@angular/core';
+import {InjectionToken, assertInInjectionContext, inject} from '@angular/core';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
 
 /** Public re-export for consumers/docs that prefer the legacy-core entry. */
 export {MATERIAL_ANIMATIONS};
+
+/** Legacy-only animation policy. It is distinct from Material's token. */
+export const LEGACY_ANIMATION_MODE = new InjectionToken<'NoopAnimations' | 'BrowserAnimations'>(
+  'LEGACY_ANIMATION_MODE',
+);
 
 /** Owned state labels for lifecycle/tests (mirrors Material public semantics). */
 export type LegacyAnimationsState = 'enabled' | 'di-disabled' | 'reduced-motion';
@@ -24,7 +29,7 @@ export type LegacyAnimationsState = 'enabled' | 'di-disabled' | 'reduced-motion'
 /**
  * Optional override token for unit tests that cannot construct Material's
  * MATERIAL_ANIMATIONS provider graph. Production code should prefer
- * MATERIAL_ANIMATIONS / ANIMATION_MODULE_TYPE.
+ * MATERIAL_ANIMATIONS / LEGACY_ANIMATION_MODE.
  */
 export const LEGACY_ANIMATIONS_TEST_OVERRIDE = new InjectionToken<LegacyAnimationsState | null>(
   'LEGACY_ANIMATIONS_TEST_OVERRIDE',
@@ -45,7 +50,7 @@ export function getLegacyAnimationsState(): LegacyAnimationsState {
     return 'di-disabled';
   }
 
-  if (inject(ANIMATION_MODULE_TYPE, {optional: true}) === 'NoopAnimations') {
+  if (inject(LEGACY_ANIMATION_MODE, {optional: true}) === 'NoopAnimations') {
     return 'di-disabled';
   }
 
@@ -70,6 +75,11 @@ export function legacyAnimationsDisabled(): boolean {
     return false;
   }
   return getLegacyAnimationsState() !== 'enabled';
+}
+
+/** Preserve explicit historical constructor modes while applying ambient policy. */
+export function resolveLegacyAnimationMode<T extends string | null | undefined>(mode: T): T | 'NoopAnimations' {
+  return mode === 'NoopAnimations' || legacyAnimationsDisabled() ? 'NoopAnimations' : mode;
 }
 
 /** Zero-duration params used when dialog (and similar) should noop motion. */

@@ -9,11 +9,13 @@
  * Owned Material-16 `_MatTabHeaderBase`.
  */
 
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
+
 import {
   AfterContentChecked,
   AfterContentInit,
   AfterViewInit,
-  ANIMATION_MODULE_TYPE,
+
   ChangeDetectorRef,
   Directive,
   ElementRef,
@@ -54,7 +56,7 @@ export abstract class _MatTabHeaderBase
     @Optional() dir: Directionality,
     ngZone: NgZone,
     platform: Platform,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);
   }

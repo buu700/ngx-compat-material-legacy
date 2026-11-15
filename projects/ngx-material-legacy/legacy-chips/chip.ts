@@ -7,6 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {FocusableOption} from '@angular/cdk/a11y';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 type BooleanInput = string | boolean | null | undefined;
@@ -14,7 +16,6 @@ import {BACKSPACE, DELETE, SPACE} from '@angular/cdk/keycodes';
 import {Platform} from '@angular/cdk/platform';
 import {DOCUMENT} from '@angular/common';
 import {
-  ANIMATION_MODULE_TYPE,
   Attribute,
   ChangeDetectorRef,
   ContentChild,
@@ -313,7 +314,7 @@ export class MatLegacyChip
     globalRippleOptions: RippleGlobalOptions | null,
     private _changeDetectorRef: ChangeDetectorRef,
     @Inject(DOCUMENT) _document: any,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
     @Attribute('tabindex') tabIndex?: string,
   ) {
     super(elementRef);
@@ -330,7 +331,7 @@ export class MatLegacyChip
     this._chipRipple.setupTriggerEvents(elementRef);
 
     this.rippleConfig = globalRippleOptions || {};
-    this._animationsDisabled = animationMode === 'NoopAnimations';
+    this._animationsDisabled = resolveLegacyAnimationMode(animationMode) === 'NoopAnimations';
     this.tabIndex = tabIndex != null ? parseInt(tabIndex) || -1 : -1;
   }
 

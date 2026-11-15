@@ -11,6 +11,8 @@ export {MatCommonModule as MatLegacyCommonModule} from './internal/common-module
 
 export {
   MATERIAL_ANIMATIONS,
+  LEGACY_ANIMATION_MODE,
+  resolveLegacyAnimationMode,
   LEGACY_ANIMATIONS_TEST_OVERRIDE,
   LEGACY_ZERO_ANIMATION_PARAMS,
   getLegacyAnimationsState,

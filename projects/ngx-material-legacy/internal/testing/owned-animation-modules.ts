@@ -6,19 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /**
- * Test providers that publish ANIMATION_MODULE_TYPE without importing
+ * Test providers that publish LEGACY_ANIMATION_MODE without importing
  * `@angular/animations` or `@angular/platform-browser/animations`.
  * These are providers, not NgModules, so artifact-mode spec bundles can load
  * them. Legacy components read the token; they do not run the animation engine.
  */
-import {ANIMATION_MODULE_TYPE, Provider} from '@angular/core';
+import {Provider} from '@angular/core';
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
 
 export const LEGACY_NOOP_ANIMATIONS: Provider = {
-  provide: ANIMATION_MODULE_TYPE,
+  provide: LEGACY_ANIMATION_MODE,
   useValue: 'NoopAnimations',
 };
 
 export const LEGACY_ENABLED_ANIMATIONS: Provider = {
-  provide: ANIMATION_MODULE_TYPE,
+  provide: LEGACY_ANIMATION_MODE,
   useValue: 'BrowserAnimations',
 };

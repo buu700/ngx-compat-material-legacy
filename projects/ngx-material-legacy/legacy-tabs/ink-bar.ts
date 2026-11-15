@@ -7,8 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {
-  ANIMATION_MODULE_TYPE,
   Directive,
   ElementRef,
   Inject,
@@ -35,8 +36,10 @@ export class MatLegacyInkBar {
     private _elementRef: ElementRef<HTMLElement>,
     private _ngZone: NgZone,
     @Inject(_MAT_INK_BAR_POSITIONER) private _inkBarPositioner: _MatInkBarPositioner,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,
-  ) {}
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,
+  ) {
+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);
+  }
 
   /**
    * Calculates the styles from the provided element in order to align the ink-bar to that element.

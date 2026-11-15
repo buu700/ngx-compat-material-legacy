@@ -6,12 +6,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
 import {FocusMonitor} from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';
 import {Platform} from '@angular/cdk/platform';
 import {_LegacyViewport as ViewportRuler} from '@ngx-compat/material-legacy/legacy-core';
 import {
-  ANIMATION_MODULE_TYPE,
   Attribute,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -78,7 +79,7 @@ export class MatLegacyTabNav extends _MatTabNavBase {
     changeDetectorRef: ChangeDetectorRef,
     viewportRuler: ViewportRuler,
     platform: Platform,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super(elementRef, dir, ngZone, changeDetectorRef, viewportRuler, platform, animationMode);
   }
@@ -119,7 +120,7 @@ export class MatLegacyTabLink extends _MatTabLinkBase implements OnDestroy {
     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,
     @Attribute('tabindex') tabIndex: string,
     focusMonitor: FocusMonitor,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super(tabNavBar, elementRef, globalRippleOptions, tabIndex, focusMonitor, animationMode);
     this._tabLinkRipple = new RippleRenderer(this, ngZone, elementRef, platform);

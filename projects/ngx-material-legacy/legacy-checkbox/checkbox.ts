@@ -7,9 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {
-  ANIMATION_MODULE_TYPE,
   AfterViewInit,
   Attribute,
   ChangeDetectionStrategy,
@@ -100,12 +101,12 @@ export class MatLegacyCheckbox
     private _focusMonitor: FocusMonitor,
     ngZone: NgZone,
     @Attribute('tabindex') tabIndex: string,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
     @Optional()
     @Inject(MAT_CHECKBOX_DEFAULT_OPTIONS)
     options?: MatCheckboxDefaultOptions,
   ) {
-    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, animationMode, options);
+    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, resolveLegacyAnimationMode(animationMode), options);
   }
 
   protected _createChangeEvent(isChecked: boolean) {

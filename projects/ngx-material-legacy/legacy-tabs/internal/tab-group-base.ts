@@ -9,8 +9,9 @@
  * Owned Material-16 `_MatTabGroupBase`.
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {
-  ANIMATION_MODULE_TYPE,
   AfterContentChecked,
   AfterContentInit,
   ChangeDetectionStrategy,
@@ -233,9 +234,10 @@ export abstract class _MatTabGroupBase
     elementRef: ElementRef,
     protected _changeDetectorRef: ChangeDetectorRef,
     @Inject(MAT_TABS_CONFIG) @Optional() defaultConfig?: MatTabsConfig,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,
   ) {
     super(elementRef);
+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);
     this._groupId = nextId++;
     this.animationDuration =
       defaultConfig && defaultConfig.animationDuration ? defaultConfig.animationDuration : '500ms';

@@ -9,13 +9,15 @@
  * Owned legacy pseudo-checkbox (S22). Current MatPseudoCheckbox is @docs-private (S20).
  */
 
+import {LEGACY_ANIMATION_MODE} from '../internal/legacy-animations';
+
 import {
   ChangeDetectionStrategy,
   Component,
   Input,
   ViewEncapsulation,
   booleanAttribute,
-  ANIMATION_MODULE_TYPE,
+
   Inject,
   Optional,
   assertInInjectionContext,
@@ -61,7 +63,7 @@ export class MatLegacyPseudoCheckbox {
 
   private _diAnimationsDisabled = false;
 
-  constructor(@Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string) {
+  constructor(@Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string) {
     // Historical callers can construct this decorative control outside Angular.
     let inContext = true;
     try {

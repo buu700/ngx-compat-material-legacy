@@ -16,7 +16,7 @@ const {
 const {join, relative, resolve} = require('path');
 const {applyFileTransaction} = require('../lib/transaction-write.js');
 const {rewriteSassModuleSource} = require('../lib/sass-rewrite.js');
-const {rewriteLegacyTypescriptImports} = require('../lib/ts-rewrite.js');
+const {rewriteLegacyTypescriptImports, hasLegacyMigrationTarget} = require('../lib/ts-rewrite.js');
 
 const SCSS_RE = /\.(scss|sass)$/i;
 const TS_RE = /\.tsx?$/i;
@@ -97,8 +97,8 @@ function collectFiles(target) {
   throw new Error('Not a file or directory: ' + target);
 }
 
-function processFile(absPath, rewriteOptions) {
-  const content = readFileSync(absPath, 'utf8');
+function processFile(absPath, rewriteOptions, snapshot) {
+  const content = snapshot === undefined ? readFileSync(absPath, 'utf8') : snapshot;
   const indented = /\.sass$/i.test(absPath);
   const kind = indented ? 'sass' : SCSS_RE.test(absPath) ? 'scss' : 'ts';
   const result =
@@ -120,10 +120,10 @@ function processFile(absPath, rewriteOptions) {
   return record;
 }
 
-function concurrentEdits(records) {
+function concurrentEdits(records, legacyAnimationWorkspace) {
   const conflicts = [];
   for (const record of records) {
-    if (record.content == null || typeof record.original !== 'string') continue;
+    if ((!legacyAnimationWorkspace && record.content == null) || typeof record.original !== 'string') continue;
     let current;
     try {
       current = readFileSync(record.path, 'utf8');
@@ -205,6 +205,16 @@ function main(argv) {
     }
   }
 
+  const legacyAnimationWorkspace = records.some(r => r.kind === 'ts' && typeof r.original === 'string' && hasLegacyMigrationTarget(r.original));
+  if (legacyAnimationWorkspace) {
+    blocking = 0; safeEdits = 0;
+    for (let i=0;i<records.length;i++) {
+      if(records[i].kind==='ts' && typeof records[i].original==='string')
+        records[i]=processFile(records[i].path,Object.assign({},rewriteOptions,{legacyAnimationWorkspace:true}),records[i].original);
+      if(!records[i].ok)blocking++;
+      if(records[i].changed && records[i].ok)safeEdits++;
+    }
+  }
   let concurrentEdit = false;
   let transaction = null;
   if (apply && blocking === 0) {
@@ -216,7 +226,7 @@ function main(argv) {
         process.exit(1);
       }
     }
-    const conflicts = concurrentEdits(records);
+    const conflicts = concurrentEdits(records, legacyAnimationWorkspace);
     if (conflicts.length) {
       concurrentEdit = true;
       blocking += conflicts.length;

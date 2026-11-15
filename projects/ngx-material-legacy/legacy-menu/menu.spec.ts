@@ -1,3 +1,4 @@
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
 import {FocusMonitor} from '@angular/cdk/a11y';
 import {Direction, Directionality} from '@angular/cdk/bidi';
 import {
@@ -24,7 +25,6 @@ import {
   patchElementFocus,
 } from '../internal/testing/owned-test-events';
 import {
-  ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
   Component,
   Directive,
@@ -2112,7 +2112,7 @@ describe('MatMenu', () => {
       {
         name: 'enabled animations',
         providers: [
-          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+          {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},
           {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'},
         ],
         noop: false,
@@ -2120,20 +2120,20 @@ describe('MatMenu', () => {
       {
         name: 'disabled Material animations',
         providers: [
-          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+          {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},
           {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
         ],
         noop: true,
       },
       {
         name: 'Noop animations',
-        providers: [{provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations'}],
+        providers: [{provide: LEGACY_ANIMATION_MODE, useValue: 'NoopAnimations'}],
         noop: true,
       },
       {
         name: 'reduced motion',
         providers: [
-          {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+          {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},
           {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'reduced-motion'},
         ],
         noop: true,
@@ -2177,7 +2177,7 @@ describe('MatMenu', () => {
 
   it('keeps peer backdrop defaults for a custom menu panel', fakeAsync(() => {
     const fixture = createComponent(CustomMenu, [
-      {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+      {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},
       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
     ], [CustomMenuPanel]);
     fixture.detectChanges();

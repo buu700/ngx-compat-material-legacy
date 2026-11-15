@@ -6,10 +6,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 type NumberInput = string | number | null | undefined;
 import {
-  ANIMATION_MODULE_TYPE,
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
@@ -81,7 +82,7 @@ export class MatLegacyProgressBar
   constructor(
     elementRef: ElementRef,
     private _ngZone: NgZone,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,
     /**
      * @deprecated `location` parameter to be made required.
      * @breaking-change 8.0.0
@@ -97,6 +98,7 @@ export class MatLegacyProgressBar
     private _changeDetectorRef?: ChangeDetectorRef,
   ) {
     super(elementRef);
+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);
 
     // We need to prefix the SVG reference with the current path, otherwise they won't work
     // in Safari if the page has a `<base>` tag. Note that we need quotes inside the `url()`,

@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
-import {ANIMATION_MODULE_TYPE, Component, DebugElement} from '@angular/core';
-import {MatLegacyPseudoCheckbox, LEGACY_ANIMATIONS_TEST_OVERRIDE, MATERIAL_ANIMATIONS} from '@ngx-compat/material-legacy/legacy-core';
+import {Component, DebugElement} from '@angular/core';
+import {MatLegacyPseudoCheckbox, LEGACY_ANIMATION_MODE, LEGACY_ANIMATIONS_TEST_OVERRIDE, MATERIAL_ANIMATIONS} from '@ngx-compat/material-legacy/legacy-core';
 import {By} from '@angular/platform-browser';
 import {
   dispatchFakeEvent,
@@ -276,7 +276,7 @@ describe('owned pseudo-checkbox construction and motion', () => {
 
   it('keeps historical host classes, mutable mode and independent view lifetimes', () => {
     TestBed.configureTestingModule({imports: [MatLegacyPseudoCheckbox], providers: [
-      {provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations'},
+      {provide: LEGACY_ANIMATION_MODE, useValue: 'NoopAnimations'},
       {provide: LEGACY_ANIMATIONS_TEST_OVERRIDE, useValue: 'enabled'},
     ]});
     const first = TestBed.createComponent(MatLegacyPseudoCheckbox);
@@ -308,7 +308,7 @@ describe('owned pseudo-checkbox construction and motion', () => {
 
   it('retains the existing public Material motion-disable policy', () => {
     TestBed.configureTestingModule({imports: [MatLegacyPseudoCheckbox], providers: [
-      {provide: ANIMATION_MODULE_TYPE, useValue: 'BrowserAnimations'},
+      {provide: LEGACY_ANIMATION_MODE, useValue: 'BrowserAnimations'},
       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
     ]});
     const fixture = TestBed.createComponent(MatLegacyPseudoCheckbox);

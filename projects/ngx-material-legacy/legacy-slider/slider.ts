@@ -7,6 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';
 import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';
@@ -24,7 +26,6 @@ import {
   hasModifierKey,
 } from '@angular/cdk/keycodes';
 import {
-  ANIMATION_MODULE_TYPE,
   Attribute,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -528,9 +529,10 @@ export class MatLegacySlider
     @Attribute('tabindex') tabIndex: string,
     private _ngZone: NgZone,
     @Inject(DOCUMENT) _document: any,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,
   ) {
     super(elementRef);
+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);
     this._document = _document;
     this.tabIndex = parseInt(tabIndex) || 0;
 

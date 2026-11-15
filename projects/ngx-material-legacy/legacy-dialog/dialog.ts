@@ -7,10 +7,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
+
 import {Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';
 import {Location} from '@angular/common';
 import {
-  ANIMATION_MODULE_TYPE,
   Inject,
   Injectable,
   InjectionToken,
@@ -88,7 +89,7 @@ export class MatLegacyDialog extends _MatDialogBase<MatLegacyDialogContainer> {
      * @breaking-change 14.0.0
      */
     @Optional()
-    @Inject(ANIMATION_MODULE_TYPE)
+    @Inject(LEGACY_ANIMATION_MODE)
     animationMode?: 'NoopAnimations' | 'BrowserAnimations',
   ) {
     super(

@@ -10,6 +10,8 @@
  * factory provider (removed from Angular Material 22 public API).
  */
 
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
+
 import {AriaDescriber, FocusMonitor} from '@angular/cdk/a11y';
 import {Directionality} from '@angular/cdk/bidi';
 import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';
@@ -37,7 +39,7 @@ import {ScrollDispatcher} from '@angular/cdk/scrolling';
 import {DOCUMENT} from '@angular/common';
 import {
   AfterViewInit,
-  ANIMATION_MODULE_TYPE,
+
   ChangeDetectorRef,
   Directive,
   ElementRef,
@@ -865,7 +867,7 @@ export abstract class _TooltipComponentBase implements OnDestroy {
 
   constructor(
     private _changeDetectorRef: ChangeDetectorRef,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     this._animationsDisabled =
       legacyAnimationsDisabled() || animationMode === 'NoopAnimations';

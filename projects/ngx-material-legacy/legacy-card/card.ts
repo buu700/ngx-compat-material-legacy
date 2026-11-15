@@ -7,8 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
+
 import {
-  ANIMATION_MODULE_TYPE,
   Component,
   ViewEncapsulation,
   ChangeDetectionStrategy,
@@ -177,7 +178,9 @@ export class MatLegacyCardAvatar {}
 })
 export class MatLegacyCard {
   // @breaking-change 9.0.0 `_animationMode` parameter to be made required.
-  constructor(@Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string) {}
+  constructor(@Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string) {
+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);
+  }
 }
 
 /**

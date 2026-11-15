@@ -8,8 +8,9 @@
  *
  * Owned Material-16 tab-nav bases.
  */
+
+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';
 import {
-  ANIMATION_MODULE_TYPE,
   AfterContentChecked,
   AfterContentInit,
   AfterViewInit,
@@ -123,7 +124,7 @@ export abstract class _MatTabNavBase
     changeDetectorRef: ChangeDetectorRef,
     viewportRuler: ViewportRuler,
     platform: Platform,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);
   }
@@ -246,15 +247,15 @@ export class _MatTabLinkBase
     @Optional() @Inject(MAT_RIPPLE_GLOBAL_OPTIONS) globalRippleOptions: RippleGlobalOptions | null,
     @Attribute('tabindex') tabIndex: string,
     private _focusMonitor: FocusMonitor,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,
   ) {
     super();
 
     this.rippleConfig = globalRippleOptions || {};
     this.tabIndex = parseInt(tabIndex) || 0;
 
-    if (animationMode === 'NoopAnimations') {
-      this.rippleConfig.animation = {enterDuration: 0, exitDuration: 0};
+    if (resolveLegacyAnimationMode(animationMode) === 'NoopAnimations') {
+      this.rippleConfig = {...this.rippleConfig, animation: {enterDuration: 0, exitDuration: 0}};
     }
   }
 

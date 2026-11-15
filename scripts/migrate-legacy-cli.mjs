@@ -44,7 +44,7 @@ const engineDir = join(
 
 const {applyFileTransaction} = require(join(here, 'migrate-cli-bundle/transaction-write.js'));
 const {rewriteSassModuleSource} = require(join(engineDir, 'sass-rewrite.js'));
-const {rewriteLegacyTypescriptImports} = require(join(engineDir, 'ts-rewrite.js'));
+const {rewriteLegacyTypescriptImports, hasLegacyMigrationTarget} = require(join(engineDir, 'ts-rewrite.js'));
 
 const SCSS_RE = /\.(scss|sass)$/i;
 const TS_RE = /\.tsx?$/i;
@@ -130,8 +130,8 @@ function collectFiles(target) {
   throw new Error(`Not a file or directory: ${target}`);
 }
 
-function processFile(absPath, rewriteOptions) {
-  const content = readFileSync(absPath, 'utf8');
+function processFile(absPath, rewriteOptions, snapshot) {
+  const content = snapshot === undefined ? readFileSync(absPath, 'utf8') : snapshot;
   const indented = /\.sass$/i.test(absPath);
   const kind = indented ? 'sass' : SCSS_RE.test(absPath) ? 'scss' : 'ts';
   const result =
@@ -226,6 +226,18 @@ function main(argv) {
     }
   }
 
+  // Infer the requested target's legacy scope from the same snapshots used for
+  // planning. No Angular or TypeScript runtime is loaded from the workspace.
+  const legacyAnimationWorkspace = records.some(r => r.kind === 'ts' && typeof r.original === 'string' && hasLegacyMigrationTarget(r.original));
+  if (legacyAnimationWorkspace) {
+    blocking = 0; safeEdits = 0;
+    for (let i=0;i<records.length;i++) {
+      if(records[i].kind==='ts' && typeof records[i].original==='string')
+        records[i]=processFile(records[i].path,{...rewriteOptions,legacyAnimationWorkspace:true},records[i].original);
+      if(!records[i].ok)blocking++;
+      if(records[i].changed && records[i].ok)safeEdits++;
+    }
+  }
   let concurrentEdit = false;
   let transaction = null;
   if (apply && blocking === 0) {
@@ -239,7 +251,7 @@ function main(argv) {
     }
     const conflicts = [];
     for (const record of records) {
-      if (record.content == null || typeof record.original !== 'string') continue;
+      if ((!legacyAnimationWorkspace && record.content == null) || typeof record.original !== 'string') continue;
       let current;
       try {
         current = readFileSync(record.path, 'utf8');

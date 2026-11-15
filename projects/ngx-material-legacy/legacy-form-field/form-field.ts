@@ -7,6 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';
+
 import {Directionality} from '@angular/cdk/bidi';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 type BooleanInput = string | boolean | null | undefined;
@@ -47,7 +49,7 @@ import {Platform} from '@angular/cdk/platform';
 import {afterFormFieldRender} from './internal/after-form-field-render';
 import {nextLegacyHintId} from './internal/hint-id';
 import {AbstractControlDirective, ValidatorFn} from '@angular/forms';
-import {ANIMATION_MODULE_TYPE} from '@angular/core';
+
 import {MatFormFieldControl} from '@angular/material/form-field';
 import {
   MAT_LEGACY_ERROR as MAT_ERROR,
@@ -317,7 +319,7 @@ export class MatLegacyFormField
     private _defaults: MatLegacyFormFieldDefaultOptions,
     private _platform: Platform,
     private _ngZone: NgZone,
-    @Optional() @Inject(ANIMATION_MODULE_TYPE) _animationMode: string,
+    @Optional() @Inject(LEGACY_ANIMATION_MODE) _animationMode: string,
     private _injector?: Injector,
   ) {
     super(elementRef);

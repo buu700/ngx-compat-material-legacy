@@ -9,7 +9,7 @@
 'use strict';
 
 const {rewriteSassModuleSource} = require('./sass-rewrite');
-const {rewriteLegacyTypescriptImports} = require('./ts-rewrite');
+const {rewriteLegacyTypescriptImports, hasLegacyMigrationTarget} = require('./ts-rewrite');
 
 const SCSS_RE = /\.(scss|sass)$/;
 const TS_RE = /\.tsx?$/;
@@ -27,6 +27,16 @@ function migrateLegacy(options) {
 
   return (tree, context) => {
     const logger = context && context.logger ? context.logger : console;
+    const hasLegacyInTree = dirPath => {
+      const dir=tree.getDir(dirPath);
+      for(const file of dir.subfiles){
+        if(!TS_RE.test(file))continue;
+        const path=dirPath==='/' ? `/${file}` : `${dirPath}/${file}`;
+        const raw=tree.read(path);if(raw && hasLegacyMigrationTarget(raw.toString('utf8')))return true;
+      }
+      return dir.subdirs.filter(name=>!['node_modules','dist','.git'].includes(name)).some(name=>hasLegacyInTree(dirPath==='/' ? `/${name}` : `${dirPath}/${name}`));
+    };
+    rewriteOptions.legacyAnimationWorkspace=hasLegacyInTree('/');
     /** @type {{path: string, content: string, kind: string}[]} */
     const edits = [];
     /** @type {{path: string, diagnostics: string[]}[]} */
