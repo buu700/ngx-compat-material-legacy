@@ -70,8 +70,10 @@ class CurrentReaderSourceSuccessorsTests(unittest.TestCase):
 
     def test_retained_current_context_identity(self):
         report = self.run_probe('node', 'retained_current_context_identity_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 9)
-        self.assertEqual(report['products'], 1120)
+        self.assertEqual(report['cold_rejections'], 50)
+        self.assertEqual(report['products'], 1121)
+        self.assertEqual(report['continuation_paths'], 38)
+        self.assertTrue(report['intermediate_physical_bodies_tested'])
         self.assertEqual(report['before_contexts'], 3)
         for field in ['unknown_hash_rejected', 'wrong_length_rejected',
                       'accessor_not_invoked', 'public_metadata_isolated',

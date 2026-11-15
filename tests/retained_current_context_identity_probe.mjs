@@ -1,6 +1,7 @@
 /** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {chmodSync,copyFileSync,cpSync,existsSync,lstatSync,mkdirSync,mkdtempSync,readFileSync,renameSync,rmSync,symlinkSync,writeFileSync} from 'node:fs';
 import {basename,dirname,join} from 'node:path';
 import {tmpdir} from 'node:os';
@@ -40,10 +41,22 @@ const deltaPaths=[
  'testing/legacy-runner/karma.conf.cjs',
 ];
 for(const path of deltaPaths){const now=currentByPath.get(path),old=oldFrame.get(path);assert.ok(now,path);assert.deepEqual(live.resolveReference(now),{kind:'current',reference:now});if(old){assert.notEqual(old.sha256,now.sha256);assert.deepEqual(live.resolveReference({path:old.path,sha256:old.sha256,bytes:old.bytes}),{kind:'current',reference:now});}else assert.ok(path.endsWith('/hint-id.ts'));}
+// Every later transition must preserve the genuine intermediate descriptor and
+// reject old physical bodies and callback substitutions, including both inputs.
+const continuationCommit='5064419bd6dd267bb26fe4562c36c40c3aa3bd5d';
+const finalCommit='d443a7671cb7c5bbbd20211e5806a5de61b4af9e';
+const continuationPaths=execFileSync('git',['diff','--name-only','--no-renames',continuationCommit,finalCommit,'--','projects/ngx-material-legacy',...packet.current.inputs.map(ref=>ref.path)],{cwd:root,encoding:'utf8'}).trim().split('\n');
+assert.equal(continuationPaths.length,38);
+const intermediateBodies=new Map();
+for(const path of continuationPaths){
+ const raw=execFileSync('git',['show',`${continuationCommit}:${path}`],{cwd:root});
+ const ref={path,sha256:createHash('sha256').update(raw).digest('hex'),bytes:raw.length},now=currentByPath.get(path);
+ assert.ok(now);assert.notEqual(ref.sha256,now.sha256);assert.deepEqual(live.resolveReference(ref),{kind:'current',reference:now});intermediateBodies.set(path,raw);
+}
 let reenter=false,reentryScope;
 const reentryRead=path=>{const raw=physical(path);if(reenter&&path===deltaPaths[0]){try{reentryScope.assertCurrent();}catch{}}return raw;};
 reentryScope=make({root,read:reentryRead});reenter=true;assert.throws(()=>reentryScope.assertCurrent(),/reentry/);reenter=false;reentryScope.assertCurrent();
-const targets=[...new Set([live.bound[0].path,live.bound[1].path,...live.beforeContexts.map(row=>row.report.path),changed.path,added.path,'flake.nix','.github/workflows/ci.yml',...deltaPaths])];
+const targets=[...new Set([live.bound[0].path,live.bound[1].path,...live.beforeContexts.map(row=>row.report.path),changed.path,added.path,'flake.nix','.github/workflows/ci.yml',...deltaPaths,...continuationPaths])];
 assert.equal(new Set(targets).size,targets.length);
 for(const target of targets){
  let bad=false;
@@ -97,6 +110,7 @@ try{
   assert.throws(()=>make({root:scratch,read}),undefined,'cold old/missing '+path);
   writeFileSync(target,fresh);clone.assertCurrent();
  }
+ for(const path of continuationPaths){const target=join(scratch,path),fresh=read(path);writeFileSync(target,intermediateBodies.get(path));assert.throws(()=>clone.assertCurrent(),undefined,'intermediate physical '+path);assert.throws(()=>make({root:scratch,read}),undefined,'cold intermediate physical '+path);writeFileSync(target,fresh);clone.assertCurrent();}
  const changedPath=join(scratch,changed.path),original=read(changed.path);
  rmSync(changedPath);assert.throws(()=>clone.assertCurrent());writeFileSync(changedPath,original);clone.assertCurrent();
  // A callback for the final report changes a member already observed. Only a
@@ -110,6 +124,6 @@ try{
 assert.equal(live.current_source_admission_granted,false);assert.equal(live.source_judgments_requalified,false);
 assert.equal(live.current_source_reader_returned,false);assert.equal(live.g11_claim,'not-passed');
 console.log(JSON.stringify({result:'pass',products:1121,inputs:68,before_contexts:3,retired_paths:23,
- cold_rejections:targets.length,late_rejections:targets.length,recovery:targets.length,
+ cold_rejections:targets.length,late_rejections:targets.length,recovery:targets.length,continuation_paths:continuationPaths.length,intermediate_physical_bodies_tested:true,
  real_gitignore_ignored_extra_rejected:true,peer_and_ancestor_symlink_rejected:true,walk_error_rejected:process.getuid()!==0,six_successor_paths_tested:true,physical_old_or_missing_rejected_and_recovered:true,reentry_rejected_and_recovered:true,unknown_hash_rejected:true,wrong_length_rejected:true,accessor_not_invoked:true,public_metadata_isolated:true,
  extra_missing_retired_members_rejected:true,cross_member_physical_mutation_rejected:true,source_or_audit_admission_granted:false}));
