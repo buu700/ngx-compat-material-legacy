@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "role": "main-private-card-js-source-e7-successor",
+  "source_scope_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "css_or_artifact_admission_granted": false,
+  "parent": "ce9cd3d0b76e240ad0ffc03e2a05ff41f8f363ab",
+  "commit": "e7b2861ad179572aaf88d81453524c47091323ed",
+  "previous_packet": {
+    "path": "compatibility/rc/current-main-private-card-select-owner-v2.json",
+    "sha256": "62ec4d7ab837c520899b47c8809c767cacb79c233b6145e915086918256d6f8a",
+    "bytes": 5107
+  },
+  "update": {
+    "path": "scripts/sass-private-card-gate.mjs",
+    "before": {
+      "path": "scripts/sass-private-card-gate.mjs",
+      "sha256": "66a73c2c481508f6e68d797bce08d1213db67505bfdf69ecceaba41f9ba62473",
+      "bytes": 16228
+    },
+    "after": {
+      "path": "scripts/sass-private-card-gate.mjs",
+      "sha256": "0e77126999e55981473c2ca69ea07119d125cc5693ce407b6c8d94d02d334b13",
+      "bytes": 16671
+    },
+    "edits": [
+      {
+        "offset": 540,
+        "before": "",
+        "after": " for(const [path,pin] of [['scripts/select-program-transition-source-v2.mjs','57547362588551377bd6b644bf15237943019144e44a7962eacab51cc6685560'],['scripts/select_program_transition_source_v2.py','58dda9df6faf52876bc8c65f5c3037b5b5b56c05e2f7d2470cfa65bb1bd1f9f0']])if(createHash('sha256').update(read(path)).digest('hex')!==pin)throw Error('changed current select successor');\n"
+      },
+      {
+        "offset": 1715,
+        "before": "import {selectProgramTransitions} from './select-program-transition-source.mjs';import{createRequire}from'node:module';import{readFileSync,lstatSync,realpathSync}from'node:fs';import{resolve,join,relative,isAbsolute}from'node:path';import{pathToFileURL,fileURLToPath}from'node:url';import{isDeepStrictEqual,types}from'node:util';\n",
+        "after": "import {selectProgramTransitions} from './select-program-transition-source-v2.mjs';import{createRequire}from'node:module';import{readFileSync,lstatSync,realpathSync}from'node:fs';import{resolve,join,relative,isAbsolute}from'node:path';import{pathToFileURL,fileURLToPath}from'node:url';import{isDeepStrictEqual,types}from'node:util';\n"
+      },
+      {
+        "offset": 7305,
+        "before": "export function createPrivateCardGateContext(args){if(!args||typeof args!=='object'||types.isProxy(args)||Object.getPrototypeOf(args)!==Object.prototype)throw Error('context arguments');const ds=Object.getOwnPropertyDescriptors(args);if(!isDeepStrictEqual(Reflect.ownKeys(ds),['root'])||!Object.hasOwn(ds.root,'value')||!ds.root.enumerable||typeof ds.root.value!=='string')throw Error('context arguments');let root=resolve(ds.root.value);const source=createCurrentSpinnerSnackContract({root}),line=source.line,sets=Object.values(source.source_sets);if(sets.length!==1)throw Error('source closure');const expectedSources=plain(sets[0]),historical=JSON.parse(read(root,'compatibility/rc/original16-sass-source-diagnostic-identity.json')),origSets=Object.values(historical.loaded_source_sets);if(origSets.length!==1||origSets[0].length!==286)throw Error('original closure');const originalSources=plain(origSets[0]),oracle=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json')),cases=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json')),call=cases.mixins['private-check-duplicate-theme-styles'].call,program=\"@use '__entry__' as m;\\n\"+oracle.standard_theme+'\\n'+call+'\\n';if(sha(program)!==programHash||oracle.members.mixins['private-check-duplicate-theme-styles'].invocation.css_sha256!==originalHash)throw Error('plan changed');const compiler=createRequire(join(root,'package.json'))('sass'),compilerInfo=compiler.info,compile=compiler.compileString,descriptor=plain({contract,source:source.descriptor}),prov=JSON.parse(read(root,'reference/material-16.2.14/PROVENANCE.json')).isolated_environment,lock=JSON.parse(read(root,'reference/material-16.2.14/environment-package-lock.json')),expectedIdentity={material_version:'16.2.14',material_manifest_sha256:prov.material_manifest_sha256,lock_sha256:prov.package_lock_sha256,material_integrity:lock.packages['node_modules/@angular/material'].integrity,catalog:'compatibility/rc/oracles/material-16.2.14-sass-api.json',catalog_sha256:pins['compatibility/rc/oracles/material-16.2.14-sass-api.json'],sass_version:compilerInfo,expected_source:'untouched-installed-material16',candidate_source:'packed-facade'};if(line==='main'){if(sha(read(root,'scripts/main-select-program-proof.mjs'))!=='ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29')throw Error('select proof helper changed');runSelectOwner(root,path=>read(root,path));}const successor=selectProgramTransitions({root,line,read:path=>read(root,path)});const check=()=>{source.assertCurrent();if(line==='main'){if(sha(read(root,'scripts/main-select-program-proof.mjs'))!=='ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29')throw Error('select proof helper changed');runSelectOwner(root,path=>read(root,path));}successor.assertCurrent();if(!readFileSync(new URL(import.meta.url)).equals(image))throw Error('gate changed');for(const [path,hash]of Object.entries(pins))if(sha(read(root,path))!==(successor.refs.get(path)??hash))throw Error('changed proof input '+path);if(compiler.info!==compilerInfo||compiler.compileString!==compile)throw Error('compiler changed');source.assertCurrent()};check();const ctx=Object.freeze({line});contexts.set(ctx,{root,line,source,expectedSources,originalSources,program,call,compiler,compile,compilerInfo,expectedIdentity,descriptor,check});return ctx;}\n",
+        "after": "export function createPrivateCardGateContext(args){if(!args||typeof args!=='object'||types.isProxy(args)||Object.getPrototypeOf(args)!==Object.prototype)throw Error('context arguments');const ds=Object.getOwnPropertyDescriptors(args);if(!isDeepStrictEqual(Reflect.ownKeys(ds),['root'])||!Object.hasOwn(ds.root,'value')||!ds.root.enumerable||typeof ds.root.value!=='string')throw Error('context arguments');let root=resolve(ds.root.value);const source=createCurrentSpinnerSnackContract({root}),line=source.line,sets=Object.values(source.source_sets);if(sets.length!==1)throw Error('source closure');const expectedSources=plain(sets[0]),historical=JSON.parse(read(root,'compatibility/rc/original16-sass-source-diagnostic-identity.json')),origSets=Object.values(historical.loaded_source_sets);if(origSets.length!==1||origSets[0].length!==286)throw Error('original closure');const originalSources=plain(origSets[0]),oracle=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-api.json')),cases=JSON.parse(read(root,'compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json')),call=cases.mixins['private-check-duplicate-theme-styles'].call,program=\"@use '__entry__' as m;\\n\"+oracle.standard_theme+'\\n'+call+'\\n';if(sha(program)!==programHash||oracle.members.mixins['private-check-duplicate-theme-styles'].invocation.css_sha256!==originalHash)throw Error('plan changed');const compiler=createRequire(join(root,'package.json'))('sass'),compilerInfo=compiler.info,compile=compiler.compileString,descriptor=plain({contract,source:source.descriptor}),prov=JSON.parse(read(root,'reference/material-16.2.14/PROVENANCE.json')).isolated_environment,lock=JSON.parse(read(root,'reference/material-16.2.14/environment-package-lock.json')),expectedIdentity={material_version:'16.2.14',material_manifest_sha256:prov.material_manifest_sha256,lock_sha256:prov.package_lock_sha256,material_integrity:lock.packages['node_modules/@angular/material'].integrity,catalog:'compatibility/rc/oracles/material-16.2.14-sass-api.json',catalog_sha256:pins['compatibility/rc/oracles/material-16.2.14-sass-api.json'],sass_version:compilerInfo,expected_source:'untouched-installed-material16',candidate_source:'packed-facade'};if(line==='main'){if(sha(read(root,'scripts/main-select-program-proof.mjs'))!=='ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29')throw Error('select proof helper changed');runSelectOwner(root,path=>read(root,path));}const successor=selectProgramTransitions({root,line,read:path=>read(root,path)});const check=()=>{source.assertCurrent();if(line==='main'){if(sha(read(root,'scripts/main-select-program-proof.mjs'))!=='ae495586f3584e26a1e324b810b4f6b0e0fa42773857495f9f9ce8bf8246dd29')throw Error('select proof helper changed');runSelectOwner(root,path=>read(root,path));}successor.assertCurrent();if(!readFileSync(new URL(import.meta.url)).equals(image)||!read(root,'scripts/sass-private-card-gate.mjs').equals(image))throw Error('gate changed');for(const [path,hash]of Object.entries(pins))if(sha(read(root,path))!==(successor.refs.get(path)??hash))throw Error('changed proof input '+path);if(compiler.info!==compilerInfo||compiler.compileString!==compile)throw Error('compiler changed');source.assertCurrent()};check();const ctx=Object.freeze({line});contexts.set(ctx,{root,line,source,expectedSources,originalSources,program,call,compiler,compile,compilerInfo,expectedIdentity,descriptor,check});return ctx;}\n"
+      }
+    ]
+  },
+  "support": [
+    {
+      "path": "scripts/select-program-transition-source-v2.mjs",
+      "sha256": "57547362588551377bd6b644bf15237943019144e44a7962eacab51cc6685560",
+      "bytes": 8571
+    },
+    {
+      "path": "scripts/select_program_transition_source_v2.py",
+      "sha256": "58dda9df6faf52876bc8c65f5c3037b5b5b56c05e2f7d2470cfa65bb1bd1f9f0",
+      "bytes": 15073
+    },
+    {
+      "path": "compatibility/rc/current-main-density-source-ae9-successor-v1.json",
+      "sha256": "131257b8e6861e23d77aaf9a347bbccb4ad571a00039f98d8b4300fe91d52790",
+      "bytes": 35487
+    }
+  ]
+}

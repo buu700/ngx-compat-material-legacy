@@ -57,6 +57,8 @@ _OWNER_NATIVE=(_native_owner,_native_owner.__code__,_native_owner.__defaults__,_
 
 def _run_select_owner(root,read,*,native=_OWNER_NATIVE):
     for path in ('compatibility/rc/current-main-select-density-program-v1.json','scripts/select-program-transition-source.mjs','scripts/select_program_transition_source.py'):read(path)
+    for path,pin in (('scripts/select-program-transition-source-v2.mjs','57547362588551377bd6b644bf15237943019144e44a7962eacab51cc6685560'),('scripts/select_program_transition_source_v2.py','58dda9df6faf52876bc8c65f5c3037b5b5b56c05e2f7d2470cfa65bb1bd1f9f0')):
+        if hashlib.sha256(read(path)).hexdigest()!=pin:raise ValueError('changed current select successor')
     launch,code,defaults,mapping,items,closure,spawn,pipe,close,native_read,waitpid,kill,poll,clock,node,path,dup2,close_action,nohang,launcher=native;current=launch.__kwdefaults__
     if globals().get('_native_owner') is not launch or launch.__code__ is not code or launch.__defaults__ is not defaults or current is not mapping or tuple(current.items())!=items or launch.__closure__ is not closure:raise ValueError('changed native owner')
     launch(root,'scripts/main-select-program-owner.mjs','55718e8697a51fb0b087c9f2f7d15508917c61001667bd0a3d75b534d6a53ccc',(),spawn=spawn,pipe=pipe,close=close,read=native_read,waitpid=waitpid,kill=kill,poll=poll,clock=clock,node=node,path=path,dup2=dup2,close_action=close_action,nohang=nohang,launcher=launcher)
@@ -65,7 +67,7 @@ import hashlib,json,re,weakref,subprocess,shutil,os
 from pathlib import Path
 
 from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
-from select_program_transition_source import select_program_transitions
+from select_program_transition_source_v2 import select_program_transitions
 _ROOT=Path(__file__).resolve().parents[1];_IMAGE=Path(__file__).read_bytes();_CONTEXTS=weakref.WeakKeyDictionary()
 _CASE='mixin-css/private-check-duplicate-theme-styles';_CONTRACT='historical-private-card-with-public-peer-overrides';_PROGRAM='f74770ded45c82a9caa9ae8b630ffb39aafa7a6bd1b2050004ba5e46a4776c7d';_ORIGINAL='b4e40842f13244e578d93b26919c69f5668e24a0736a46742c1d79cc747fe9ca'
 _PINS={'scripts/current_sass_spinner_snack_admission.py':'1af5a8902551ceddaf6d773d6b0abef10e2733ffa85ec5472bae0f6a9feb6c5b','scripts/current_sass_source.py':'1bf1bd2ff60bf3ee7b1aa44c7e0f443ae0642098cdac8f1d9d81f2aa0587bbbb','scripts/sass-private-card-gate.mjs':'46792f1e6f2b128c206c31d0f1edbfe9ca542c45ff1833bacd9da917cc8f6f5e','scripts/private-card-composition.mjs':'bde7f5ea938282acfcf98e5c8f03f9c9660650ddd815287b76a832dbeeb16d54','scripts/private-card-peer-check.mjs':'7f85cf94963c240325393367786faae1984a822000aa48935b77270c50b11bca','scripts/private_card_composition.py':'7adf1a44d80a49b2a61d197fd449e0218db1c391d7f6d8c9f44ce8e34b6eb810','fixtures/sass/private-card-peer-pins.json':'975904b6287c0be803cff023d58603fcc2a565be4515545718e60e604a6ea69c','fixtures/sass/private-card-peer.scss':'28bcb7a6c8c582ad187d46f9705ba6898aede018555f6088df6481487fad7ca5','compatibility/rc/original16-sass-source-diagnostic-identity.json':'324762d77a76762518b1a1b4328a4abaf2c388597fd03b1ef4323d736441ddbe','compatibility/rc/oracles/material-16.2.14-sass-api.json':'76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2d','compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json':'8613cc1432b2ae351e655a59b3e39b2c48d80da12c875b5233f4fac2192d657a','reference/material-16.2.14/PROVENANCE.json':'d13d466669cbf96d386ceabfe3de0241b91bcbd3dce98ac70c31093609100f34','reference/material-16.2.14/environment-package-lock.json':'ad2f9d62bf04758f87650cae408f805e667236f992cd6d8e481c5577c939d130'}
@@ -118,8 +120,21 @@ def _verify_private_js_owner(root):
     old=b''.join([*parts,middle[at:]]);assert dict(path=name,sha256=_hash(old),bytes=len(old))==r['before'] and git(p['source_parent'])==old;at=0;parts=[]
     for e in r['edits']:
         assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(old);before=e['before'].encode();assert old[e['offset']:e['offset']+len(before)]==before;parts.extend((old[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)
-    result=b''.join([*parts,old[at:]]);assert r['after']['path']==name and (_hash(result),len(result))==(r['after']['sha256'],r['after']['bytes']) and _read(root,name)==result
-    return r['after']['sha256']
+    result=b''.join([*parts,old[at:]]);assert r['after']['path']==name and (_hash(result),len(result))==(r['after']['sha256'],r['after']['bytes'])
+    successor_path='compatibility/rc/current-main-private-card-js-source-e7-v1.json';successor_raw=_read(root,successor_path);assert (_hash(successor_raw),len(successor_raw))==('d452597a80685d87a556850c8f5e029262d860b98ba654a6d2846fe31e6d6bf8',9715);successor=json.loads(successor_raw)
+    assert successor['schema_version']==1 and successor['role']=='main-private-card-js-source-e7-successor' and successor['source_scope_only'] is True and successor['historical_programs_executed'] is False and successor['historical_packets_rewritten'] is False and successor['css_or_artifact_admission_granted'] is False
+    assert successor['parent']=='ce9cd3d0b76e240ad0ffc03e2a05ff41f8f363ab' and successor['commit']=='e7b2861ad179572aaf88d81453524c47091323ed' and successor['previous_packet']==dict(path=path,sha256=_hash(raw),bytes=len(raw))
+    command=lambda *args:subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',*args],cwd=root,env=env)
+    assert command('rev-list','--parents','-n','1',successor['commit']).decode().strip()==successor['commit']+' '+successor['parent'];command('merge-base','--is-ancestor',successor['commit'],'HEAD')
+    supports=['scripts/select-program-transition-source-v2.mjs','scripts/select_program_transition_source_v2.py','compatibility/rc/current-main-density-source-ae9-successor-v1.json'];assert [x['path'] for x in successor['support']]==supports
+    for item in successor['support']:
+        data=command('show',successor['commit']+':'+item['path']);assert dict(path=item['path'],sha256=_hash(data),bytes=len(data))==item and _read(root,item['path'])==data
+    update=successor['update'];assert update['path']==name and update['before']==r['after'] and git(successor['parent'])==result;at=0;parts=[]
+    for e in update['edits']:
+        assert set(e)=={'offset','before','after'} and type(e['offset']) is int and at<=e['offset']<=len(result);before=e['before'].encode();assert result[e['offset']:e['offset']+len(before)]==before;parts.extend((result[at:e['offset']],e['after'].encode()));at=e['offset']+len(before)
+    current=b''.join(parts+[result[at:]]);assert update['after']['path']==name and (_hash(current),len(current))==(update['after']['sha256'],update['after']['bytes']) and git(successor['commit'])==current and _read(root,name)==current
+    assert _read(root,successor_path)==successor_raw
+    return update['after']['sha256']
 class PrivateCardGateContext:
     __slots__=('__weakref__',)
     def __init__(self,root):
@@ -142,7 +157,7 @@ class PrivateCardGateContext:
     def assert_current(self):
         if not __debug__:raise RuntimeError('optimized mode cannot authenticate source')
         s=_CONTEXTS[self];s['source'].assert_current();_verify_private_js_owner(s['root']) if s['line']=='main' else None;(_hash(_read(s['root'],'scripts/main_select_program_proof.py'))=='b107f2f2f59d783721409eb673cab3fb7e534353ba68fbb1aca5afebbc3a45a2' or (_ for _ in ()).throw(ValueError('select proof helper changed'))) if s['line']=='main' else None;s['select_checked'](s['root'],lambda p:_read(s['root'],p)) if s['line']=='main' else None;s['successor_current']()
-        if Path(__file__).read_bytes()!=_IMAGE:raise ValueError('gate changed')
+        if Path(__file__).read_bytes()!=_IMAGE or _read(s['root'],'scripts/sass_private_card_gate.py')!=_IMAGE:raise ValueError('gate changed')
         for path,digest in _PINS.items():
             if _hash(_read(s['root'],path))!=s['successor'].get(path,digest):raise ValueError('proof input changed')
         s['source'].assert_current()
