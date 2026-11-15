@@ -1,6 +1,6 @@
 /** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
 /** Main-only finite inherited table live execution. Does not decide G11. */
-import {createHash,randomBytes} from 'node:crypto';import {spawnSync} from 'node:child_process';import {writeFileSync,lstatSync,realpathSync} from 'node:fs';import {join,resolve} from 'node:path';import {isDeepStrictEqual as eq} from 'node:util';import {readEvidenceMember,validatePackedConsumerRun} from './upstream-packed-run-evidence.mjs';import {tableCases,tableFaultControls} from '../testing/table-inherited/contracts.mjs';import {selectInheritedNativeProfile} from './inherited-native-profiles.mjs';
+import {createHash,randomBytes} from 'node:crypto';import {spawnSync} from 'node:child_process';import {writeFileSync,lstatSync,realpathSync} from 'node:fs';import {join,resolve} from 'node:path';import {isDeepStrictEqual as eq} from 'node:util';import {readEvidenceMember,validatePackedConsumerRun} from './upstream-packed-run-evidence.mjs';import {verifyTableLiveBody} from './table-inherited-live-evidence.mjs';import {selectInheritedNativeProfile} from './inherited-native-profiles.mjs';
 const subjects=new Map([
  ['27dae25a420e76817a1209f373326084ae6dd11c','47e892b47ed2aa20c923cfffd2d16678db74f658c41b8c03914178560d5a4945'],
  ['3b6ca5c9880996b57e08caffb408f6c12ed78de4','041149dad79ac5c7e41b02607b5474178d87096024a4df965a53dd36cdc633bb'],
@@ -10,6 +10,7 @@ const members=new Map([
   ["compatibility/rc/table-inherited-review/27dae25a420e76817a1209f373326084ae6dd11c.patch", "47e892b47ed2aa20c923cfffd2d16678db74f658c41b8c03914178560d5a4945"],
   ["compatibility/rc/table-inherited-review/3b6ca5c9880996b57e08caffb408f6c12ed78de4.patch", "041149dad79ac5c7e41b02607b5474178d87096024a4df965a53dd36cdc633bb"],
   ["compatibility/rc/table-inherited-review/59b8f433c28e81c213668ccf7d220f12e3524635.patch", "7535ba9015a99e689cb727af4826a91674fae7fdc530d00d000b61292306a6b8"],
+  ["scripts/table-inherited-live-evidence.mjs", "d20c5c91494a0ed27fd4b15d7ef2d5e2ef9210ac9087d00476243e8c816d904b"],
   ["testing/table-inherited/readonly-negative.ts", "4e8e6676eb5d07ae41bd6941154b45b7676575f9c8f1fbebfa0699133e995546"],
   ["fixtures/sass/stepper-historical-bridge-oracle.json", "a952c70fbb725c5ec0bd78d8b6bb7b54ac506c5dcf0600616c29e328f8bf67d9"],
   ["tests/fixtures/stepper-material-16/source-manifest.json", "ed9b9c8e69c63bb134b71a25ded9d68d21f1d120cdd513ba423126864986fe74"],
@@ -23,17 +24,22 @@ const members=new Map([
   ["projects/ngx-material-legacy/legacy-table/table.ts", "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"],
   ["projects/ngx-material-legacy/legacy-table/cell.ts", "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb"],
   ["projects/ngx-material-legacy/legacy-table/row.ts", "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d"],
-  ["projects/ngx-material-legacy/legacy-core/public-api.ts", "3d56b9e01f502995bd25dea21be8bee5713596655f5d159899858b58b4ffccf2"],
+  ["projects/ngx-material-legacy/legacy-core/public-api.ts", "f78b50ea144140825dc7bcb175b533ddce2f33925ff24c929bdd31dcf339f5bd"],
   ["projects/ngx-material-legacy/legacy-core/internal/common-module.ts", "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6"],
   ["projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts", "8756b0495ab4f02518887dff55ab844ff433a267c5e899a9b6abfe005863e9d7"],
   ["projects/ngx-material-legacy/legacy-core/internal/test-environment.ts", "83f0fb37e81c2e5294719bac3b337f1fa7983152ae9693ff8c9d4459e66b0408"],
   ["projects/ngx-material-legacy/legacy-table/table-module.ts", "435daec2cf8013ea58b59f5542d8e4b89ca3ea1c03d587e867a04bf6f29186e3"],
   ["projects/ngx-material-legacy/legacy-table/text-column.ts", "157c01cc18f67ff7e499442e6f16a7a23ec08284d069b2318a5d8bae11dc4431"],
+  ["projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts", "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771"],
+  ["projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts", "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"],
+  ["projects/ngx-material-legacy/legacy-table/internal/definition-owner.ts", "6a115eb4ae6c5d50814d1460fd4ba7c2a6cab2eab6d213af5964ab1e3aa6b5dc"],
+  ["projects/ngx-material-legacy/legacy-table/internal/column-classes.ts", "58ad7e5915fd944328fa3442ad0a5c02f09623694219dbdb04fa1b11907d5f64"],
   ["projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts", "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e"],
-  ["scripts/table-inherited-native-run.mjs", "3511b98d313f5d5649ab6fc51169d4411621e81c3cb91b5c4df6eaa5296a2c8c"],
-  ["testing/table-inherited/consumer.ts", "341c87bf34f13a58a5508b0cf1b4f9d45c58b033b252120880bc7b9a0a241696"],
+  ["scripts/table-inherited-native-run.mjs", "fe32415c858fd37d61a41b996225ace85f9b9a0672800346d86724da38bee567"],
+  ["testing/table-inherited/consumer.ts", "32517f6ec055a791a8230155b6354dc67943ca27e91c0d9ffabfe6dafc8ad027"],
+  ["testing/table-inherited/supplemental.ts", "b217165e8ac3584b0b1726f232439ed9e44a7f75780d8232ec8053687417b0cf"],
   ["testing/table-inherited/negative.ts", "b2879f41ffe1dea008f9af0c2701b9560cd0ea529e185dea52aea954d0edf8e0"],
-  ["testing/table-inherited/contracts.mjs", "bf616fe4095cc34ccd5e27848686b533891bdce324affe2400e1b085d3220567"],
+  ["testing/table-inherited/contracts.mjs", "62f9c29f8ec64b1fa4aae14ce6b660091b7651f287df03d7f1442762b474ce5c"],
   ["scripts/check-companion-computed-styles.mjs", "bcc2808b58064868e366c8cdcb7cbb4d80724e178579b924a1062b7e688b561c"],
   ["scripts/safe-package-extract.mjs", "da44c3a23b8f4edb778e9719d2a9a053c99717022ed2dc859487fa566e03b4d1"],
   ["scripts/chromium-debug-endpoint.mjs", "7febf1ef79e18b76f2f64073960b5a6bd92fd3f6291101ccc50744321bca8e7c"],
@@ -44,7 +50,7 @@ const members=new Map([
   ["scripts/consumer-animation-engine.mjs", "37aa5b5bf2a0cd0527e72304da17f9413cbac0aaa915709d642b34a40c7d3dcb"],
   ["scripts/companion-computed-cases.mjs", "a1f821021b0a726980897cd745df23538a89e58bbd8c9b2b82d77480a4cd148a"],
   ["scripts/companion-bridge-peer-oracle.mjs", "0d569ba0f3bb3d389b0cd0001b25dec373184a2606c566defab63cb4c058123e"],
-  ["compatibility/rc/table-inherited-deps-main.json", "d7d7f93c4677ceeaa28f7fe8c54b71fed317e3d657431e04b8d6537b14a9b3b5"],
+  ["compatibility/rc/table-inherited-deps-main.json", "3117e18c03cba6173d2c0da57399d9383dc1f73a4fdddc7fee3b69e4e0140aef"],
   ["pnpm-lock.yaml", "4aa1a53cd8947fa48a5088007a615bc788471d40fefd40f8fb0cd6202871a068"],
   ["toolchain-lock.json", "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b"],
   ["package.json", "e55e954caf2e9313f8f6e94d7427ac27fc1c1e780f91dff1a3ee988cdd7ee6d6"],
@@ -69,12 +75,13 @@ export function validateTableInherited({root,entry,proof,request,line}){
    const manifest=JSON.parse(readEvidenceMember(request.runDir,'run.json')),lib=manifest.artifacts.find(x=>x.id==='library'),nonce=randomBytes(16).toString('hex');const env={PATH:process.env.PATH,HOME:process.env.HOME,CHROME_BIN:process.env.CHROME_BIN,NODE_OPTIONS:'',LANG:'C.UTF-8'};
    const child=spawnSync(process.execPath,[join(root,'scripts/table-inherited-native-run.mjs'),join(request.runDir,lib.path),runtime.library.sha256,request.outputDir,nonce],{cwd:root,env,encoding:'utf8',timeout:240000,maxBuffer:8*1024*1024});
    need(child.status===0&&!child.error&&!child.signal,'table producer failed: '+String(child.error?.message||child.stderr||child.status).slice(-1000));const observation=JSON.parse(child.stdout);
-   need(observation.kind==='table-inherited-live-native'&&observation.nonce===nonce&&observation.artifact_sha256===runtime.library.sha256&&observation.observation?.nonce===nonce&&observation.browser===profile.browser_product&&observation.toolchain_profile===profile.id,'wrong live table identity');
-   need(eq(observation.source_before,observation.source_after)&&eq(observation.tool_before,observation.tool_after)&&observation.toolchain_verified_before_and_after===true&&observation.toolchain_record_sha256===members.get(profile.arch==='arm64'?'compatibility/rc/overlay-inherited-toolchain-main.json':'compatibility/rc/overlay-inherited-toolchain-main-x64-provisional.json')&&observation.aot_positive===0&&Number.isInteger(observation.aot_missing_module_negative)&&observation.aot_missing_module_negative!==0&&observation.aot_negative_has_ng8002===true&&typeof observation.aot_negative_diagnostic==='string'&&observation.aot_negative_diagnostic.includes('NG8002')&&Number.isInteger(observation.aot_readonly_negative)&&observation.aot_readonly_negative!==0&&observation.aot_readonly_has_ts2339===true&&typeof observation.aot_readonly_diagnostic==='string'&&observation.aot_readonly_diagnostic.includes('TS2339'),'incomplete table execution');
+   const recordHash=members.get(profile.arch==='arm64'?'compatibility/rc/overlay-inherited-toolchain-main.json':'compatibility/rc/overlay-inherited-toolchain-main-x64-provisional.json');
+   const body={run_id:request.runId,invocation_id:request.invocation,binding:request.binding,source_commit:request.binding.source_commit,source_tree:request.binding.source_tree,library:runtime.library,role:'table-inherited-live-evidence',...observation};
+   const combined=verifyTableLiveBody(body,{binding:request.binding,runId:request.runId,invocation:request.invocation,library:runtime.library,profile:{id:profile.id,browser_product:profile.browser_product,recordHash},sourcePins:Object.fromEntries(members)});
    for(const [path,digest] of members)if(Object.hasOwn(observation.source_before,path))need(observation.source_before[path]===digest,'table producer source mismatch '+path);
-   profile.check();const actual=tableCases(observation.observation),controls=tableFaultControls(observation.observation);need(eq(actual,observation.cases)&&Object.values(actual).every(Boolean)&&eq(controls,observation.controls)&&controls.length===17&&controls.every(x=>x.rejected)&&observation.controls_are_upstream_mutations===false,'table case or fault control failed');
-   const output=`table-live-${nonce}.json`,bytes=Buffer.from(JSON.stringify({run_id:request.runId,invocation_id:request.invocation,...observation})+'\n');writeFileSync(join(request.outputDir,output),bytes,{flag:'wx'});live={output,sha256:hash(bytes),nonce,run_id:request.runId,invocation_id:request.invocation,library:runtime.library,cases:actual};cache.set(key,live);
+   profile.check();const output=`table-live-${nonce}.json`,bytes=Buffer.from(JSON.stringify(body)+'\n');writeFileSync(join(request.outputDir,output),bytes,{flag:'wx'});live={output,sha256:hash(bytes),bytes:bytes.length,nonce,run_id:request.runId,invocation_id:request.invocation,library:runtime.library,modes:combined};cache.set(key,live);
   }
-  need(live.cases[entry.sha]===true,'table case failed');return{ok:true,detail:'Fixed producer ran the same packed artifact with the minimum peer and native browser; observation mutation controls are not upstream implementation mutants. Full audit remains separate.',execution:'live-packed-native-table',...live};
+  const raw=readEvidenceMember(request.runDir,`evidence/upstream-audit-disposition/${request.invocation}/${live.output}`);need(raw.length===live.bytes&&hash(raw)===live.sha256,'table live evidence changed');const recordHash=members.get(profile.arch==='arm64'?'compatibility/rc/overlay-inherited-toolchain-main.json':'compatibility/rc/overlay-inherited-toolchain-main-x64-provisional.json');const replay=verifyTableLiveBody(JSON.parse(raw),{binding:request.binding,runId:request.runId,invocation:request.invocation,library:runtime.library,profile:{id:profile.id,browser_product:profile.browser_product,recordHash},sourcePins:Object.fromEntries(members)});need(eq(replay,live.modes),'table cached observations changed');
+  need(['zoneless','zoneful'].every(mode=>live.modes[mode].cases[entry.sha]===true),'table case failed');return{ok:true,detail:'Fixed producer ran the same packed artifact with the minimum peer and native browser; observation mutation controls are not upstream implementation mutants. Full audit remains separate.',execution:'live-packed-native-table',...live};
  }catch(error){return{ok:false,detail:error.message}}
 }

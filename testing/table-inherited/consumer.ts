@@ -1,5 +1,6 @@
+import {observeTableSupplemental} from './supplemental';
 import '@angular/compiler';
-import {Component, ViewChild, ViewChildren, QueryList, ErrorHandler, provideZonelessChangeDetection} from '@angular/core';
+import {Component, ViewChild, ViewChildren, QueryList, ErrorHandler, NgZone, provideZoneChangeDetection, provideZonelessChangeDetection} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {BrowserDynamicTestingModule, platformBrowserDynamicTesting} from '@angular/platform-browser-dynamic/testing';
 import {CdkTable,CdkCellDef,CdkHeaderCellDef,CdkFooterCellDef,CdkColumnDef,CdkHeaderCell,CdkFooterCell,CdkCell,CdkHeaderRowDef,CdkFooterRowDef,CdkRowDef,CdkCellOutlet,CdkHeaderRow,CdkFooterRow,CdkRow,CdkNoDataRow,CdkRecycleRows,DataRowOutlet,HeaderRowOutlet,FooterRowOutlet,NoDataRowOutlet,CdkTextColumn} from '@angular/cdk/table';
@@ -25,14 +26,18 @@ window.addEventListener('error', e=>{delivered.push({channel:'window-error',mess
 class CaptureErrors implements ErrorHandler {handleError(e:unknown){delivered.push({channel:'angular-error-handler',message:String(e)})}}
 async function run() {
  TestBed.initTestEnvironment(BrowserDynamicTestingModule,platformBrowserDynamicTesting());
- TestBed.configureTestingModule({providers:[provideZonelessChangeDetection(),{provide:ErrorHandler,useClass:CaptureErrors}]});
+ const mode=(window as unknown as {__tableMode:string}).__tableMode;
+ if(mode!=='zoneful'&&mode!=='zoneless')throw Error('invalid mode');
+ TestBed.configureTestingModule({providers:[mode==='zoneful'?provideZoneChangeDetection():provideZonelessChangeDetection(),{provide:ErrorHandler,useClass:CaptureErrors}]});
+ const zone=TestBed.inject(NgZone),zone_active=zone.run(()=>NgZone.isInAngularZone());
  const f=TestBed.createComponent(GoodTable); f.detectChanges(); await f.whenStable(); f.detectChanges();
  const instance=f.componentInstance, table=instance.table;
  const snapshot=()=>({ids:table.renderedRows.map(x=>x.data.id),indices:table.renderedRows.map(x=>x.dataIndex),dom:Array.from(f.nativeElement.querySelectorAll('tbody tr')).map((x:any)=>x.textContent.trim()),peer_identity:instance.peer===table,owned_identity:table instanceof MatLegacyTable});
  const first=snapshot();table.dataSource=[];table.renderRows();f.detectChanges();const empty=snapshot();table.dataSource=[{id:'C'}];table.renderRows();f.detectChanges();const restored=snapshot(); f.destroy();
  function tryDuplicate(multi:boolean){const x=TestBed.createComponent(DuplicateRows);x.componentInstance.multi=multi;let error=null;try{x.detectChanges()}catch(e){error=String(e)}finally{x.destroy()}return error}
  async function tryMissing(match:boolean){const start=delivered.length;const x=TestBed.createComponent(MissingRow);if(match)x.componentInstance.matches=()=>true;let error=null;try{x.detectChanges();await x.whenStable();x.componentInstance.table.dataSource=[{id:'A'}];x.componentInstance.table.renderRows();x.detectChanges();await new Promise(resolve=>setTimeout(resolve,50))}catch(e){error=String(e)}const delivery=delivered.slice(start).find(e=>e.message.includes('matching row definition'))??null;error=error??delivery?.message??null;const defs=x.componentInstance.defs?.length??0;x.destroy();return {error,defs,delivery}}
- const data={nonce:(window as unknown as {__tableNonce:string}).__tableNonce,first,empty,restored,duplicate_error:tryDuplicate(false),duplicate_multi:tryDuplicate(true),missing_error:await tryMissing(false),missing_match:await tryMissing(true),standalone_compiled:typeof StandaloneCdkConsumer==='function'};
+ const supplemental=await observeTableSupplemental();
+ const data={mode,zone_active,supplemental,nonce:(window as unknown as {__tableNonce:string}).__tableNonce,first,empty,restored,duplicate_error:tryDuplicate(false),duplicate_multi:tryDuplicate(true),missing_error:await tryMissing(false),missing_match:await tryMissing(true),standalone_compiled:typeof StandaloneCdkConsumer==='function'};
  document.body.innerHTML='<pre id="result"></pre>';document.getElementById('result')!.textContent=JSON.stringify(data);
 }
 run().catch(e=>{document.body.innerHTML='<pre id="error"></pre>';document.getElementById('error')!.textContent=String(e?.stack??e)});

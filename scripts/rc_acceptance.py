@@ -276,6 +276,146 @@ def validate_datepicker_live_outputs(snapshot, root, run_path, run, report, bind
     return [assertion_path, *expected]
 
 
+TABLE_LOADED_FILES = frozenset({
+    'scripts/packed-consumer-evidence.mjs',
+    'compatibility/rc/inherited-native-profiles.json',
+    'compatibility/rc/overlay-inherited-toolchain-main-x64-provisional.json',
+    'compatibility/rc/overlay-inherited-toolchain-main.json',
+    'compatibility/rc/table-inherited-deps-main.json',
+    'compatibility/rc/table-inherited-review/27dae25a420e76817a1209f373326084ae6dd11c.patch',
+    'compatibility/rc/table-inherited-review/3b6ca5c9880996b57e08caffb408f6c12ed78de4.patch',
+    'compatibility/rc/table-inherited-review/59b8f433c28e81c213668ccf7d220f12e3524635.patch',
+    'compatibility/rc/table-inherited-toolchain-main.json',
+    'fixtures/sass/stepper-historical-bridge-oracle.json',
+    'package.json',
+    'pnpm-lock.yaml',
+    'projects/ngx-material-legacy/legacy-core/internal/common-module.ts',
+    'projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts',
+    'projects/ngx-material-legacy/legacy-core/internal/test-environment.ts',
+    'projects/ngx-material-legacy/legacy-core/public-api.ts',
+    'projects/ngx-material-legacy/legacy-table/cell.ts',
+    'projects/ngx-material-legacy/legacy-table/internal/column-classes.ts',
+    'projects/ngx-material-legacy/legacy-table/internal/definition-owner.ts',
+    'projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts',
+    'projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts',
+    'projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts',
+    'projects/ngx-material-legacy/legacy-table/row.ts',
+    'projects/ngx-material-legacy/legacy-table/table-module.ts',
+    'projects/ngx-material-legacy/legacy-table/table.ts',
+    'projects/ngx-material-legacy/legacy-table/text-column.ts',
+    'scripts/badge-high-contrast-contract.mjs',
+    'scripts/bundle-consumer-harness.mjs',
+    'scripts/check-companion-computed-styles.mjs',
+    'scripts/check-upstream-audit-disposition.mjs',
+    'scripts/chromium-debug-endpoint.mjs',
+    'scripts/companion-bridge-peer-oracle.mjs',
+    'scripts/companion-computed-cases.mjs',
+    'scripts/consumer-animation-engine.mjs',
+    'scripts/inherited-native-profiles.mjs',
+    'scripts/npm-tooling-options.mjs',
+    'scripts/overlay-inherited-archive.mjs',
+    'scripts/rc_acceptance.py',
+    'scripts/resolve-run-library.mjs',
+    'scripts/revalidate-table-inherited.mjs',
+    'scripts/safe-package-extract.mjs',
+    'scripts/table-inherited-live-evidence.mjs',
+    'scripts/table-inherited-native-run.mjs',
+    'scripts/table-inherited-toolchain.mjs',
+    'scripts/upstream-individual-evidence-scope.mjs',
+    'scripts/upstream-inherited-execution-evidence.mjs',
+    'scripts/upstream-packed-run-evidence.mjs',
+    'scripts/upstream-table-inherited-evidence.mjs',
+    'testing/table-inherited/consumer.ts',
+    'testing/table-inherited/contracts.mjs',
+    'testing/table-inherited/negative.ts',
+    'testing/table-inherited/readonly-negative.ts',
+    'testing/table-inherited/supplemental.ts',
+    'tests/fixtures/stepper-material-16/shape-observation.json',
+    'tests/fixtures/stepper-material-16/source-manifest.json',
+    'toolchain-lock.json',
+})
+TABLE_SHAS = frozenset({
+    '27dae25a420e76817a1209f373326084ae6dd11c',
+    '3b6ca5c9880996b57e08caffb408f6c12ed78de4',
+    '59b8f433c28e81c213668ccf7d220f12e3524635',
+})
+
+def validate_table_live_outputs(snapshot, root, run_path, run, report, binding, invocation, library):
+    """Retain and replay both-mode table evidence even if the child failed."""
+    cid = "upstream-audit-disposition"
+    prefix = assertion_directory(cid, invocation) + "/"
+    outputs = report.get("outputs")
+    require(isinstance(outputs, list), "table: missing output roster")
+    live_present = any(isinstance(r, dict) and isinstance(r.get("path"), str)
+                       and r["path"].startswith(prefix + "table-live-") for r in outputs)
+    ledger_path = root / "compatibility/f10/disposition-ledger/ledger.json"
+    if not ledger_path.is_file() and not live_present:
+        return []
+    ledger_key = ("repository", "compatibility/f10/disposition-ledger/ledger.json")
+    ledger = snapshot.json("repository", ledger_key[1], snapshot.roles.get(ledger_key, "table-ledger"))
+    required = {e.get("sha") for e in ledger.get("entries", []) if isinstance(e, dict)
+                and e.get("sha") in TABLE_SHAS and isinstance(e.get("individual_proof"), dict)
+                and e["individual_proof"].get("proof_kind") == "main-table-inherited-native"}
+    if not required and not live_present:
+        return []
+    assertion_path = prefix + "disposition-observations.json"
+    assertions = [r for r in outputs if isinstance(r, dict) and r.get("path") == assertion_path]
+    require(len(assertions) == 1, "table: missing or duplicate audit assertion")
+    assertion = snapshot.json("run", assertion_path, "assertion-output", assertions[0])
+    require(assertion.get("run_id") == run["run_id"] and assertion.get("invocation_id") == invocation
+            and assertion.get("binding") == binding, "table: stale audit assertion")
+    entries = assertion.get("inherited_execution_evidence")
+    require(isinstance(entries, list), "table: missing inherited evidence")
+    rows = [r for r in entries if isinstance(r, dict) and r.get("execution") == "live-packed-native-table"]
+    require({r.get("sha") for r in rows} == required and len(rows) == len(required), "table: missing or duplicate subject result")
+    expected = {}
+    for row in rows:
+        nonce, filename = row.get("nonce"), row.get("output")
+        require(isinstance(nonce, str) and bool(re.fullmatch(r"[a-f0-9]{32}", nonce)) and filename == f"table-live-{nonce}.json"
+                and row.get("run_id") == run["run_id"] and row.get("invocation_id") == invocation
+                and row.get("library") == library, "table: wrong subject output identity")
+        record = {"path": prefix + filename, "sha256": row.get("sha256"), "bytes": row.get("bytes")}
+        require(record["path"] not in expected or expected[record["path"]] == record, "table: conflicting live output")
+        expected[record["path"]] = record
+    live_outputs = [r for r in outputs if isinstance(r, dict) and isinstance(r.get("path"), str)
+                    and r["path"].startswith(prefix + "table-live-")]
+    require(len(live_outputs) == len(expected) and {r.get("path") for r in live_outputs} == set(expected), "table: missing, duplicate or substituted live output")
+    for path in TABLE_LOADED_FILES:
+        key = ("repository", path)
+        if key in snapshot.files:
+            checked_file(root, snapshot.files[key], "table existing source identity")
+        else:
+            snapshot.capture("repository", path, "table-checker")
+    replays = {}
+    for record in live_outputs:
+        require(record == expected[record["path"]], "table: changed output identity")
+        snapshot.checked("run", record, "assertion-output")
+        args = {"root": str(root), "runDir": str(run_path.parent), "record": record, "binding": binding,
+                "runId": run["run_id"], "invocation": invocation, "library": library}
+        completed = subprocess.run(["node", str(root / "scripts/revalidate-table-inherited.mjs")],
+                                   input=json.dumps(args), text=True, capture_output=True, cwd=root)
+        require(completed.returncode == 0, "table: revalidation failed: " + completed.stderr.strip())
+        replay = parse_json_value(completed.stdout.encode(), "table revalidation")
+        require(replay.get("ok") is True and replay.get("record") == record, "table: wrong revalidation identity")
+        inputs = replay.get("validated_run_files")
+        require(isinstance(inputs, list) and len(inputs) >= 2, "table: missing validated stage inputs")
+        seen_inputs = set()
+        for item in inputs:
+            require(isinstance(item, dict) and isinstance(item.get("path"), str)
+                    and item["path"].startswith(prefix + "table-live-") and item["path"] not in seen_inputs,
+                    "table: wrong or duplicate stage input")
+            seen_inputs.add(item["path"])
+            snapshot.checked("run", item, "table-live-input")
+        replays[record["path"]] = replay
+    for row in rows:
+        replay = replays[prefix + row["output"]]
+        modes = replay.get("modes")
+        require(isinstance(modes, dict) and set(modes) == {"zoneful", "zoneless"} and modes == row.get("modes")
+                and all(modes[m].get("cases", {}).get(row["sha"]) is True for m in modes)
+                and row.get("ok") is True, "table: reported subject differs from re-evaluated observations")
+    return [assertion_path, *expected]
+
+
 def prepack_binding_for(run_id: str, inputs: dict[str, Any], environment: dict[str, Any],
                         oracles: dict[str, Any], matrix_sha256: str) -> dict[str, Any]:
     """Input identity assigned before packing; deliberately has no output digest."""
@@ -558,6 +698,8 @@ def evaluate_run(
                         "datepicker: wrong report identity")
                 captured = validate_datepicker_live_outputs(snapshot, root, run_path, run, report, binding, invocation, artifacts["library"])
                 assertion_paths.extend((cid, path) for path in captured)
+                captured = validate_table_live_outputs(snapshot, root, run_path, run, report, binding, invocation, artifacts["library"])
+                assertion_paths.extend((cid, path) for path in captured if (cid, path) not in assertion_paths)
             require(type(actual_exit) is int and actual_exit == 0, f"{cid}: child failed or was not invoked (exit={actual_exit})")
             report_path = run_path.parent / report_rel
             report_digest = snapshot.files[("run", report_rel)]["sha256"]
