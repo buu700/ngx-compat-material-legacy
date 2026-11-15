@@ -28,6 +28,7 @@ import {packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs
 import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contract.mjs';
 import {allConsumerCaseIds,declarationObservations,declarationKeys,librarySpec,harnessCaseIds,loadExportKeys,writeAcceptanceReport} from '../scripts/packed-consumer-evidence.mjs';
 import {nativeDatePackedSample} from './native_date_packed_sample.mjs';
+import {reverseNativeDateProducerSuccessor} from '../scripts/native-date-producer-successor.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFileSync(join(root,p));
 const ts=createRequire(import.meta.url)('typescript'),hash=value=>createHash('sha256').update(value).digest('hex');
 const path='scripts/packed-consumer-aot-smoke.mjs',raw=read(path).toString(),file=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
@@ -94,7 +95,7 @@ const prior=JSON.parse(priorRaw);assert.equal(prior.source_parent,task.source_pa
 const original=prior.members.find(row=>row.path===path);assert.ok(original);assert.equal(hash(original.text),original.sha256);
 assert.equal(execFileSync('git',['show',task.source_parent+':'+path],{cwd:root,encoding:'utf8'}),original.text);
 const rules=JSON.parse(read('compatibility/rc/native-date-packed-integration-edits.json'));assert.equal(rules.producer_edits.length,8);
-let restored=raw;for(const [before,after]of [...rules.producer_edits].reverse()){assert.equal(restored.split(after).length,2);restored=restored.replace(after,()=>before);}
+let restored=reverseNativeDateProducerSuccessor(raw);for(const [before,after]of [...rules.producer_edits].reverse()){assert.equal(restored.split(after).length,2);restored=restored.replace(after,()=>before);}
 assert.equal(restored,original.text,'Original complete producer not recovered');
 function generated(source){
  const ast=ts.createSourceFile('producer.mjs',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);const values=[];
