@@ -118840,19 +118840,70 @@
         "src/material/paginator/paginator.ts"
       ],
       "diff_sha256": "6185d886b2b7710234346a8fbdbe2acc69effc5eaca13b1a2dda1e8f05c1c94b",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/416c64e40e6ab53aa9cbe2cbd530c851a31b34d8.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
-      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-material-020-source-2026-11-14/416c64e40e6ab53aa9cbe2cbd530c851a31b34d8.json",
+      "batch_id": "c04-small-material-020-source-2026-11-14",
+      "recorded_at_utc": "2026-11-15T04:17:54Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/paginator/paginator.ts changes `inject,`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/paginator imported by projects/ngx-material-legacy/legacy-paginator/paginator.ts"
-      }
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "source-reviewed",
+      "reason": "The upstream modern paginator replaces its page-size label counter with private CDK _IdGenerator. The owned and Material 16 legacy templates display a page-size label and independently bind the select aria-label to the same intl text; neither template associates the label by an ID. The 16 legacy class extends the historical shared base, whereas the ID field belongs to the separate modern MatPaginator class, not that base; the owned class extends its own base. Do not transplant the modern private generator into the owned component. Multiple instances, accessible names and supported hydration behavior remain open runtime questions; this source decision does not establish equivalence.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/paginator.html",
+            "sha256": "3fc7b35a5dd392ac0f80fdc39583f9ae7426535c89ec3cce95008ed6052ff12d",
+            "bytes": 4015
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/paginator.ts",
+            "sha256": "4f050bc5f5818f13d33c7428bdd9d7a8a36b4bf70dbb77ac12e088002bbd9540",
+            "bytes": 4639
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/internal/paginator-base.ts",
+            "sha256": "e4d141cb81e6133ce23446afb3a74f13a3f827684517b224e1426796ed5a97e7",
+            "bytes": 9453
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/public-api.ts",
+            "sha256": "de4896e1ea794f2b0a9e4928e52343b13abb3ace1525e55b7ded779a94a0ce87",
+            "bytes": 867
+          }
+        ],
+        "diff_sha256": "eb3075f12cf5d3f154e8340134aa0cbf42b3fd7cc98704ce2e8a60e5d722a5f9",
+        "review_depth": "individual-semantic",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream modern paginator replaces its page-size label counter with private CDK _IdGenerator. The owned and Material 16 legacy templates display a page-size label and independently bind the select aria-label to the same intl text; neither template associates the label by an ID. The 16 legacy class extends the historical shared base, whereas the ID field belongs to the separate modern MatPaginator class, not that base; the owned class extends its own base. Do not transplant the modern private generator into the owned component. Multiple instances, accessible names and supported hydration behavior remain open runtime questions; this source decision does not establish equivalence."
+      },
+      "prior_dispositions": [
+        {
+          "sha": "416c64e40e6ab53aa9cbe2cbd530c851a31b34d8",
+          "bucket": "needs-triage",
+          "subject": "refactor(material/paginator): use ID generator",
+          "files": [
+            "src/material/paginator/paginator.ts"
+          ],
+          "diff_sha256": "6185d886b2b7710234346a8fbdbe2acc69effc5eaca13b1a2dda1e8f05c1c94b",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/416c64e40e6ab53aa9cbe2cbd530c851a31b34d8.json",
+          "batch_id": "unread-seed-content-review-2026-10-02",
+          "recorded_at_utc": "2026-10-02T18:49:16Z",
+          "g11_claim": "not-passed",
+          "final_disposition": "inherited",
+          "read_note_disposition": "inherited",
+          "reason": "The diff in src/material/paginator/paginator.ts changes `inject,`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+          "peer_floor": {
+            "package": "@angular/material",
+            "installed": "22.1.7",
+            "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+            "delegation": "@angular/material/paginator imported by projects/ngx-material-legacy/legacy-paginator/paginator.ts"
+          }
+        }
+      ]
     },
     {
       "sha": "557d55f6ea1d99ded4e8e4a217605b6cb33b6658",
@@ -127768,19 +127819,100 @@
         "src/material/paginator/_m2-paginator.scss"
       ],
       "diff_sha256": "fabb9c370876aafe55dcf77e9189a460793571cf973170b086b44e55801bf455",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0f26b91425b5b7f34fdabf877e0f84929a6c8032.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
-      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/c04-small-material-020-source-2026-11-14/0f26b91425b5b7f34fdabf877e0f84929a6c8032.json",
+      "batch_id": "c04-small-material-020-source-2026-11-14",
+      "recorded_at_utc": "2026-11-15T04:17:54Z",
       "g11_claim": "not-passed",
-      "final_disposition": "inherited",
-      "read_note_disposition": "inherited",
-      "reason": "The diff in src/material/paginator/_m2-paginator.scss changes `@use '../core/tokens/m3-utils';`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
-      "peer_floor": {
-        "package": "@angular/material",
-        "installed": "22.1.7",
-        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
-        "delegation": "@angular/material/paginator imported by projects/ngx-material-legacy/legacy-paginator/paginator.ts"
-      }
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "source-reviewed",
+      "reason": "The upstream M2 paginator token switches disabled icon color from foreground base at 12% to system on-surface at 38%. The owned exported paginator-color route calls its companion M2 token map, which retains foreground base at 12%, as in the Material 16 token map; its separate exported legacy-paginator-color route and legacy component theme retain the historical foreground disabled key for disabled navigation borders. Preserve both historical routes rather than transplanting the later system-color rewrite. Custom-palette and light/dark rendered CSS, including mixed modern and legacy use, remain open; this source decision does not establish rendered equivalence.",
+      "individual_proof": {
+        "proof_kind": "individual-contextual-source-review",
+        "source_conclusion_only": true,
+        "execution_claim": "not-claimed",
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/_index.scss",
+            "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+            "bytes": 14151
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/_paginator-theme.scss",
+            "sha256": "4b6699ff59c993af4f8617b1445c2dd453615d1d07ec4a69a8c17a5f70c53652",
+            "bytes": 3180
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/_paginator-theme.import.scss",
+            "sha256": "e7efff488c91b85ee97a3ac0d75e467bef104bc0d79c2ffe68f9eb6c2682dd6c",
+            "bytes": 495
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-paginator/_paginator-legacy-index.scss",
+            "sha256": "05fe02c7429f36b5014ab2621fa44fac4e30cf625b6f2f135004f115ef4f1ebc",
+            "bytes": 112
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/legacy-paginator/_paginator-theme.scss",
+            "sha256": "d329ffcca1d67bb450224fd3a79cb7569f3dc2eef28e8c941a9e34609e6fb6b2",
+            "bytes": 3152
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/paginator/_paginator-theme.scss",
+            "sha256": "e0bb4447525166f2b8c8825d1c5cc02cde5330375d4773f99ba5b9ec956fb807",
+            "bytes": 2268
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_paginator.scss",
+            "sha256": "08c25a7ae38267496aa60551f15d711e7a316a7dd77fe2aadf79f598b52dab83",
+            "bytes": 2436
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+            "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+            "bytes": 3938
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/legacy-core/theming/_all-theme.scss",
+            "sha256": "bcc15a0593fe733501d6d1c002dc706c79fe1ba66d7d26dd072d69681ebfe63f",
+            "bytes": 4265
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+            "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+            "bytes": 35009
+          }
+        ],
+        "diff_sha256": "a3b2fd550da5698fadb43059754f23c299b7ca2c2ee324588d0b8843f37bba88",
+        "review_depth": "individual-semantic",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The upstream M2 paginator token switches disabled icon color from foreground base at 12% to system on-surface at 38%. The owned exported paginator-color route calls its companion M2 token map, which retains foreground base at 12%, as in the Material 16 token map; its separate exported legacy-paginator-color route and legacy component theme retain the historical foreground disabled key for disabled navigation borders. Preserve both historical routes rather than transplanting the later system-color rewrite. Custom-palette and light/dark rendered CSS, including mixed modern and legacy use, remain open; this source decision does not establish rendered equivalence."
+      },
+      "prior_dispositions": [
+        {
+          "sha": "0f26b91425b5b7f34fdabf877e0f84929a6c8032",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/paginator): update tokens to system colors (#31286)",
+          "files": [
+            "src/material/paginator/_m2-paginator.scss"
+          ],
+          "diff_sha256": "fabb9c370876aafe55dcf77e9189a460793571cf973170b086b44e55801bf455",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0f26b91425b5b7f34fdabf877e0f84929a6c8032.json",
+          "batch_id": "unread-seed-content-review-2026-10-02",
+          "recorded_at_utc": "2026-10-02T18:49:16Z",
+          "g11_claim": "not-passed",
+          "final_disposition": "inherited",
+          "read_note_disposition": "inherited",
+          "reason": "The diff in src/material/paginator/_m2-paginator.scss changes `@use '../core/tokens/m3-utils';`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+          "peer_floor": {
+            "package": "@angular/material",
+            "installed": "22.1.7",
+            "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+            "delegation": "@angular/material/paginator imported by projects/ngx-material-legacy/legacy-paginator/paginator.ts"
+          }
+        }
+      ]
     },
     {
       "sha": "28f2763f96427239514b03a87ad6543c7bf1ce98",

@@ -1,0 +1,132 @@
+{
+  "sha": "0f26b91425b5b7f34fdabf877e0f84929a6c8032",
+  "role": "C04 small Material individual contextual source review",
+  "line": "main",
+  "diff_sha256": "a3b2fd550da5698fadb43059754f23c299b7ca2c2ee324588d0b8843f37bba88",
+  "diff": "diff --git a/src/material/paginator/_m2-paginator.scss b/src/material/paginator/_m2-paginator.scss\nindex 92ef577b5..4bc0a6ff2 100644\n--- a/src/material/paginator/_m2-paginator.scss\n+++ b/src/material/paginator/_m2-paginator.scss\n@@ -3,6 +3,7 @@\n @use '../core/theming/theming';\n @use '../core/theming/inspection';\n @use '../core/tokens/m2-utils';\n+@use '../core/tokens/m3-utils';\n \n // Tokens that can't be configured through Angular Material's current theming API,\n // but may be in a future version of the theming API.\n@@ -18,7 +19,7 @@\n     paginator-container-text-color: map.get($system, on-surface),\n     paginator-container-background-color: map.get($system, surface),\n     paginator-enabled-icon-color: map.get($system, on-surface-variant),\n-    paginator-disabled-icon-color: inspection.get-theme-color($theme, foreground, base, 0.12),\n+    paginator-disabled-icon-color: m3-utils.color-with-opacity(map.get($system, on-surface), 38%),\n   );\n }\n \n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/_paginator-theme.scss",
+      "sha256": "4b6699ff59c993af4f8617b1445c2dd453615d1d07ec4a69a8c17a5f70c53652",
+      "bytes": 3180
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/_paginator-theme.import.scss",
+      "sha256": "e7efff488c91b85ee97a3ac0d75e467bef104bc0d79c2ffe68f9eb6c2682dd6c",
+      "bytes": 495
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/_paginator-legacy-index.scss",
+      "sha256": "05fe02c7429f36b5014ab2621fa44fac4e30cf625b6f2f135004f115ef4f1ebc",
+      "bytes": 112
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-paginator/_paginator-theme.scss",
+      "sha256": "d329ffcca1d67bb450224fd3a79cb7569f3dc2eef28e8c941a9e34609e6fb6b2",
+      "bytes": 3152
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/paginator/_paginator-theme.scss",
+      "sha256": "e0bb4447525166f2b8c8825d1c5cc02cde5330375d4773f99ba5b9ec956fb807",
+      "bytes": 2268
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_paginator.scss",
+      "sha256": "08c25a7ae38267496aa60551f15d711e7a316a7dd77fe2aadf79f598b52dab83",
+      "bytes": 2436
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+      "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+      "bytes": 3938
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-core/theming/_all-theme.scss",
+      "sha256": "bcc15a0593fe733501d6d1c002dc706c79fe1ba66d7d26dd072d69681ebfe63f",
+      "bytes": 4265
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+      "bytes": 35009
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "The upstream M2 paginator token switches disabled icon color from foreground base at 12% to system on-surface at 38%. The owned exported paginator-color route calls its companion M2 token map, which retains foreground base at 12%, as in the Material 16 token map; its separate exported legacy-paginator-color route and legacy component theme retain the historical foreground disabled key for disabled navigation borders. Preserve both historical routes rather than transplanting the later system-color rewrite. Custom-palette and light/dark rendered CSS, including mixed modern and legacy use, remain open; this source decision does not establish rendered equivalence.",
+  "prior_entry": {
+    "sha": "0f26b91425b5b7f34fdabf877e0f84929a6c8032",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/paginator): update tokens to system colors (#31286)",
+    "files": [
+      "src/material/paginator/_m2-paginator.scss"
+    ],
+    "diff_sha256": "fabb9c370876aafe55dcf77e9189a460793571cf973170b086b44e55801bf455",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0f26b91425b5b7f34fdabf877e0f84929a6c8032.json",
+    "batch_id": "unread-seed-content-review-2026-10-02",
+    "recorded_at_utc": "2026-10-02T18:49:16Z",
+    "g11_claim": "not-passed",
+    "final_disposition": "inherited",
+    "read_note_disposition": "inherited",
+    "reason": "The diff in src/material/paginator/_m2-paginator.scss changes `@use '../core/tokens/m3-utils';`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "peer_floor": {
+      "package": "@angular/material",
+      "installed": "22.1.7",
+      "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+      "delegation": "@angular/material/paginator imported by projects/ngx-material-legacy/legacy-paginator/paginator.ts"
+    }
+  },
+  "review_context": {
+    "original_subject": "fix(material/paginator): update tokens to system colors (#31286)",
+    "parent": "8523397fd29a1cb5c08c88420367d0def020bf12",
+    "changed_paths": [
+      "src/material/paginator/_m2-paginator.scss"
+    ],
+    "prior_reason": "The diff in src/material/paginator/_m2-paginator.scss changes `@use '../core/tokens/m3-utils';`. That line is not in the legacy sources. @angular/material/paginator is exercised by projects/ngx-material-legacy/legacy-paginator/paginator.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "root": "/home/parallels/tmp/material16-reference-verified/src/material",
+      "files": [
+        {
+          "path": "legacy-paginator/_paginator-theme.scss",
+          "sha256": "d329ffcca1d67bb450224fd3a79cb7569f3dc2eef28e8c941a9e34609e6fb6b2",
+          "bytes": 3152
+        },
+        {
+          "path": "core/tokens/m2/mat/_paginator.scss",
+          "sha256": "08c25a7ae38267496aa60551f15d711e7a316a7dd77fe2aadf79f598b52dab83",
+          "bytes": 2436
+        },
+        {
+          "path": "paginator/_paginator-theme.scss",
+          "sha256": "e0bb4447525166f2b8c8825d1c5cc02cde5330375d4773f99ba5b9ec956fb807",
+          "bytes": 2268
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/material/paginator/_m2-paginator.scss",
+        "sha256": "dbf38a0f3ec0497728ae0843f2e0b94e88ee9c9b8432e0236986c32826ec79ba",
+        "bytes": 2514
+      },
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      }
+    ],
+    "installed_peer_source_observation": "Installed peer M2 paginator token uses on-surface at 38%; the owned legacy theme is separate.",
+    "runtime_obligations": "Peer M2 paginator replaces foreground base at 12% with system on-surface at 38% opacity. Candidate legacy paginator theme uses foreground.disabled on disabled navigation border and foreground.icon otherwise; verified 16 legacy theme uses same disabled key. Candidate separately has styles/core/tokens/m2/mat/_paginator.scss and peer modern paginator theming. Test custom foreground icon/disabled/base divergence and both light/dark CSS against untouched 16; no token substitution.",
+    "owned_boundary": "Root Sass facade exports paginator and legacy-paginator mixins. styles/paginator theme uses the owned M2 token map; its all-theme invokes that theme. styles/legacy-paginator and the legacy component theme use the disabled foreground palette entry; legacy all-theme and companion overrides reach the legacy theme. The component import and legacy-index forward its theme. The two 16.2.14 theme routes and token map were compared."
+  }
+}
