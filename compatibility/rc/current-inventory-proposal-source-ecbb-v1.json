@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "role": "current-inventory-proposal-metadata-source-successor",
+  "source_parent": "13801025c266396ff0129fe90a751bea7848ab98",
+  "source_commit": "ecbb2126f24aab9eed97ba9082085c9c494787e9",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "path": "scripts/inventory-reference-proposal.mjs",
+  "before": {
+    "path": "scripts/inventory-reference-proposal.mjs",
+    "sha256": "9b919e1e28c0581a02ccea741247e00e72408cefcb34be5747fc197a292e090a",
+    "bytes": 25380
+  },
+  "after": {
+    "path": "scripts/inventory-reference-proposal.mjs",
+    "sha256": "2ac429d13a0bb76721067925f587f1ad1a060ff660ecad49a8903ba099094db1",
+    "bytes": 26030
+  },
+  "edits": [
+    {
+      "offset": 9223,
+      "before": "",
+      "after": "/** Resolve the existing historical inventory binding through both live source owners. */\nexport function resolveCurrentInventoryReference(tool,matrixOwner){\n const current=tool.qualify({path:INVENTORY_REFERENCE_PATH,sha256:nextInventoryHash});assert.ok(current);assert.equal(current.path,INVENTORY_REFERENCE_PATH);\n const matrixRef=matrixOwner.bound.find(ref=>ref.path===INVENTORY_REFERENCE_PATH);assert.ok(matrixRef);assert.equal(current.sha256,matrixRef.sha256);matrixOwner.assertCurrent();tool.assertCurrent();return {...current};\n}\n"
+    },
+    {
+      "offset": 16543,
+      "before": " const inventoryPre=prebind(INVENTORY_REFERENCE_PATH);assert.equal(hash(inventoryPre),line==='main'?nextInventoryHash:pin.inventory);\n",
+      "after": " const currentInventoryRef=line==='main'?resolveCurrentInventoryReference(tool,matrixOwner):{path:INVENTORY_REFERENCE_PATH,sha256:pin.inventory};\n const inventoryPre=prebind(INVENTORY_REFERENCE_PATH);assert.equal(hash(inventoryPre),currentInventoryRef.sha256);\n"
+    },
+    {
+      "offset": 18090,
+      "before": "  if(expected){const ref={path,sha256:expected};const selected=line==='main' && path===INVENTORY_REFERENCE_PATH && expected===pin.inventory ? {...ref,sha256:nextInventoryHash} : tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}\n",
+      "after": "  if(expected){const ref={path,sha256:expected};const selected=line==='main' && path===INVENTORY_REFERENCE_PATH && expected===pin.inventory ? currentInventoryRef : tool.qualify(product.qualify(ref)??ref)??product.qualify(ref)??ref;assert.equal(hash(raw),selected.sha256,'unqualified inventory proposal input '+path);}\n"
+    }
+  ]
+}

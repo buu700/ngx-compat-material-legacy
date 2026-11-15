@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "role": "current-inventory-caller-source-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/historical-repair-live-source-successor.mjs",
+      "source_parent": "ba462bb008c86f5ceea217b99dd683dd17e065d4",
+      "source_commit": "5959376779dd1fcce209c6077c0afb3b7e466865",
+      "before": {
+        "path": "scripts/historical-repair-live-source-successor.mjs",
+        "sha256": "8a850621667de632c95a5f27dca2a13f3d300639e77a53d1b60f124817e1e21e",
+        "bytes": 12215
+      },
+      "after": {
+        "path": "scripts/historical-repair-live-source-successor.mjs",
+        "sha256": "bec38fb9fdb33ade34414d7c4b376570907889935fd4f8f621fc122b86fd1f6b",
+        "bytes": 16851
+      },
+      "edits": [
+        {
+          "offset": 2545,
+          "before": "",
+          "after": "// Compare the registered historical support bytes while the caller independently\n// binds and sweeps the continued physical image.\nexport function assertHistoricalLiveSupportComparison(prior,ref,comparison){\n assert.ok(Buffer.isBuffer(prior));assert.equal(typeof comparison,'function');assert.ok(same(prior,comparison(ref)),'historical live support comparison mismatch');\n}\n// The live owner also retains its pre-tab identity; the tab owner authenticates\n// every later identity and owns its callback and reentry guards.\nexport function qualifyHistoricalLiveAuthored(ref,authoredTab,oldest,sweep){\n const original=Object.getOwnPropertyDescriptors(ref);\n let result;\n if(ref.sha256===oldest.sha256){assert.equal(ref.path,oldest.path);if(Object.hasOwn(ref,'bytes'))assert.equal(ref.bytes,oldest.bytes);const current=authoredTab.qualify(authoredTab.before);result={path:current.path,sha256:current.sha256,...(Object.hasOwn(ref,'bytes')?{bytes:current.bytes}:{})};}\n else result=authoredTab.qualify(ref);\n assert.ok(result);sweep();assert.deepEqual(Object.getOwnPropertyDescriptors(ref),original,'historical live authored reference changed');return result;\n}\n"
+        },
+        {
+          "offset": 2775,
+          "before": " const add=historical=>{const ref=authoredTab.qualify(historical)??historical;const prior=bound.get(ref.path);if(prior){assert.deepEqual(prior,ref);return;}const bytes=physical(ref.path);exact(bytes,ref);bound.set(ref.path,{...ref});};\n add({path:SELF,sha256:hash(image),bytes:image.length});for(const r of refs)add(r);add(authoredEpochRef);for(const ref of [...authoredTab.bound,...sourceRouting.bound])add(ref);\n",
+          "after": " const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};\n const git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,maxBuffer:8*1024*1024});\n const continuationRef={path:'compatibility/rc/historical-repair-live-physical-continuation-v1.json',sha256:'d7fdc4bfb4b5c3495b489244fc053d9b1de724a50602ec543d084418e033c2c4',bytes:15237},continuationRaw=physical(continuationRef.path);exact(continuationRaw,continuationRef);const continuation=JSON.parse(continuationRaw);\n assert.equal(continuation.schema_version,1);assert.equal(continuation.role,'finite-historical-repair-live-physical-continuation');assert.equal(continuation.source_only,true);assert.equal(continuation.historical_programs_executed,false);assert.equal(continuation.artifact_or_audit_admission_granted,false);assert.equal(continuation.g11_claim,'not-passed');\n const expected=[['projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts',['89c5be9ff19f10760112dedf15b11273dcdb3f33','ceb5ab6ff0b910436768384a622299f4b01d2da3']],['projects/ngx-material-legacy/legacy-form-field/form-field.ts',['7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad','ceb5ab6ff0b910436768384a622299f4b01d2da3']],['tests/form-field-subscript-motion/manual-probe.mjs',['7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad']],['scripts/authored-additional-use-baseline.mjs',['5d366f7a97e96dffa390d3b4da102e7d113066bf']],['scripts/form-field-retired-use.mjs',['5d366f7a97e96dffa390d3b4da102e7d113066bf']],['compatibility/rc/api/export-name-allowlist.json',['ceb5ab6ff0b910436768384a622299f4b01d2da3']]];\n assert.deepEqual(continuation.groups.map(g=>[g.path,g.steps.map(s=>s.commit)]),expected);const histories=new Map();\n for(const group of continuation.groups){let previous,previousCommit;const images=new Map();for(const step of group.steps){assert.equal(step.path,group.path);assert.equal(step.before.path,group.path);assert.equal(step.after.path,group.path);assert.equal(git(['rev-list','--parents','-n','1',step.commit]).toString().trim(),step.commit+' '+step.parent);if(previousCommit)git(['merge-base','--is-ancestor',previousCommit,step.parent]);git(['merge-base','--is-ancestor',step.commit,'HEAD']);const before=git(['show',step.parent+':'+step.path]),after=git(['show',step.commit+':'+step.path]);exact(before,step.before);exact(after,step.after);if(previous)assert.ok(same(before,previous));assert.ok(same(replay(before,step.edits),after));images.set(step.before.sha256,before);images.set(step.after.sha256,after);previous=after;previousCommit=step.commit;}assert.ok(same(physical(group.path),previous));histories.set(group.path,{group,images});}\n const project=ref=>{const history=histories.get(ref.path);if(!history)return null;const step=history.group.steps.find(s=>s.before.sha256===ref.sha256||s.after.sha256===ref.sha256);assert.ok(step,'unknown live continuation source');const known=step.before.sha256===ref.sha256?step.before:step.after;assert.deepEqual(ref,known);return history.group.steps.at(-1).after;};\n const comparison=ref=>{const history=histories.get(ref.path);if(!history)return physical(ref.path);project(ref);return Buffer.from(history.images.get(ref.sha256));};\n const add=historical=>{const ref=authoredTab.qualify(historical)??project(historical)??historical;const prior=bound.get(ref.path);if(prior){assert.deepEqual(prior,ref);return;}const bytes=physical(ref.path);exact(bytes,ref);bound.set(ref.path,{...ref});};\n add({path:SELF,sha256:hash(image),bytes:image.length});for(const r of refs)add(r);add(authoredEpochRef);add(continuationRef);for(const ref of [...authoredTab.bound,...sourceRouting.bound])add(ref);\n"
+        },
+        {
+          "offset": 5062,
+          "before": " const env={PATH:process.env.PATH,LANG:'C',LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1'};\n const git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,maxBuffer:8*1024*1024});\n",
+          "after": ""
+        },
+        {
+          "offset": 6039,
+          "before": " const nav=transition(tab.source_parent,tab.source_commit,tab.before,tab.after,tab.edits),f=form.form_field,ff=transition(f.parent,f.commit,f.before,f.after,f.edits);assert.ok(same(nav.next,physical(tab.after.path)));assert.ok(same(ff.next,physical(f.after.path)));const auth=transition(authored.source_parent,authored.source_commit,authored.before,authored.after,authored.edits);assert.ok(same(auth.next,physical(authored.after.path)));\n",
+          "after": " const nav=transition(tab.source_parent,tab.source_commit,tab.before,tab.after,tab.edits),f=form.form_field,ff=transition(f.parent,f.commit,f.before,f.after,f.edits);assert.ok(same(nav.next,comparison(tab.after)));assert.ok(same(ff.next,comparison(f.after)));const auth=transition(authored.source_parent,authored.source_commit,authored.before,authored.after,authored.edits);assert.ok(same(auth.next,physical(authored.after.path)));\n"
+        },
+        {
+          "offset": 7763,
+          "before": " assert.deepEqual(support.transitions.map(x=>x.path),['scripts/authored-additional-use-baseline.mjs','scripts/bidi-isolated-packed-evidence-requalification.mjs','tests/snack_exit_runtime_subject.mjs','compatibility/rc/api/export-name-allowlist.json']);assert.deepEqual(support.transitions.map(x=>x.steps.map(y=>y.source_commit)),[['547abe83d86c4682a173a6e01d2c783b6bb1d855'],['547abe83d86c4682a173a6e01d2c783b6bb1d855'],['fd372025ef5c37f523ef222a84e4a1c3a0f640ef'],['8f9f724615ede1b0af0e2c4c347449c5952710e5','fdcdadee28c4552e3500b5099de9f42e456adb5c']]);for(const row of support.transitions){let prior;for(const step of row.steps){assert.equal(step.before.path,row.path);const proof=transition(step.source_parent,step.source_commit,step.before,step.after,step.edits);if(prior)assert.ok(same(prior,proof.old));prior=proof.next;}if(row.path!=='scripts/authored-additional-use-baseline.mjs')assert.ok(same(prior,physical(row.path)));}\n const authoredEpoch=JSON.parse(physical(authoredEpochRef.path));assert.equal(authoredEpoch.schema_version,1);assert.equal(authoredEpoch.role,'historical-repair-current-authored-epoch-v2-successor');assert.equal(authoredEpoch.source_parent,'252689f364aee65c5d755d4b16e91987f6e305a5');assert.equal(authoredEpoch.source_commit,'197d8ebb6527dff53e716bc08c63bb5afab8d054');assert.equal(authoredEpoch.source_only,true);assert.equal(authoredEpoch.historical_programs_executed,false);assert.equal(authoredEpoch.artifact_or_audit_admission_granted,false);assert.equal(authoredEpoch.g11_claim,'not-passed');assert.deepEqual(authoredEpoch.transitions.map(x=>x.path),['scripts/authored-additional-use-baseline.mjs','compatibility/f10/authored-dependency-current-dispositions.json']);assert.deepEqual(authoredEpoch.transitions[0].before,support.transitions[0].steps.at(-1).after);for(const ref of authoredEpoch.support){add(ref);assert.ok(same(git(['show',authoredEpoch.source_commit+':'+ref.path]),physical(ref.path)),'authored committed support differs '+ref.path);}for(const step of authoredEpoch.transitions){const images=transition(authoredEpoch.source_parent,authoredEpoch.source_commit,step.before,step.after,step.edits);const current=authoredTab.qualify(step.after);add(step.after);if(current){assert.deepEqual(step.after,authoredTab.before);exact(images.next,authoredTab.before);exact(physical(step.path),current);}else assert.ok(same(images.next,physical(step.path)));}\n const transitions=[{before:signature.steps[0].before,after:signature.steps[1].after,accepted:[signature.steps[0].before,signature.steps[0].after,signature.steps[1].after]},{before:tab.before,after:tab.after,accepted:[tab.before,tab.after]},{before:f.before,after:f.after,accepted:[f.before,f.after]},{before:authored.before,after:authored.after,accepted:[authored.before,authored.after]},...support.transitions.map(row=>{const successor=authoredEpoch.transitions.find(x=>x.path===row.path);return {before:row.steps[0].before,after:successor?.after??row.steps.at(-1).after,accepted:[row.steps[0].before,...row.steps.map(step=>step.after),...(successor?[successor.after]:[])]};}),{before:authoredEpoch.transitions[1].before,after:authoredTab.after,accepted:[authoredEpoch.transitions[1].before,authoredEpoch.transitions[1].after,authoredTab.after]},...sourceRouting.transitions.map(row=>({...row,accepted:[row.before,row.after]}))];\n const sweep=()=>{for(const r of bound.values())exact(physical(r.path),r);};\n const qualify=ref=>{assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const d=Object.getOwnPropertyDescriptors(ref),keys=Reflect.ownKeys(d);assert.ok(keys.every(k=>typeof k==='string'));assert.deepEqual(keys.sort(),Object.hasOwn(d,'bytes')?['bytes','path','sha256']:['path','sha256']);for(const descriptor of Object.values(d))assert.ok(Object.hasOwn(descriptor,'value')&&descriptor.enumerable);const path=d.path.value,row=transitions.find(x=>x.before.path===path);if(!row)return null;const prior=row.accepted.find(x=>x.sha256===d.sha256.value);assert.ok(prior,'unknown live source identity');if(d.bytes)assert.equal(d.bytes.value,prior.bytes);sweep();return {path,sha256:row.after.sha256,...(d.bytes?{bytes:row.after.bytes}:{})};};\n sweep();return {bound:[...bound.values()].map(r=>({...r})),qualify,assertPhysical:sweep,signatureBefore:signature.steps[0].before,signatureAfter:signature.steps[1].after,tabBefore:tab.before,tabAfter:tab.after,formBefore:f.before,formAfter:f.after};\n",
+          "after": " assert.deepEqual(support.transitions.map(x=>x.path),['scripts/authored-additional-use-baseline.mjs','scripts/bidi-isolated-packed-evidence-requalification.mjs','tests/snack_exit_runtime_subject.mjs','compatibility/rc/api/export-name-allowlist.json']);assert.deepEqual(support.transitions.map(x=>x.steps.map(y=>y.source_commit)),[['547abe83d86c4682a173a6e01d2c783b6bb1d855'],['547abe83d86c4682a173a6e01d2c783b6bb1d855'],['fd372025ef5c37f523ef222a84e4a1c3a0f640ef'],['8f9f724615ede1b0af0e2c4c347449c5952710e5','fdcdadee28c4552e3500b5099de9f42e456adb5c']]);for(const row of support.transitions){let prior;for(const step of row.steps){assert.equal(step.before.path,row.path);const proof=transition(step.source_parent,step.source_commit,step.before,step.after,step.edits);if(prior)assert.ok(same(prior,proof.old));prior=proof.next;}if(row.path!=='scripts/authored-additional-use-baseline.mjs')assertHistoricalLiveSupportComparison(prior,row.steps.at(-1).after,comparison);}\n const authoredEpoch=JSON.parse(physical(authoredEpochRef.path));assert.equal(authoredEpoch.schema_version,1);assert.equal(authoredEpoch.role,'historical-repair-current-authored-epoch-v2-successor');assert.equal(authoredEpoch.source_parent,'252689f364aee65c5d755d4b16e91987f6e305a5');assert.equal(authoredEpoch.source_commit,'197d8ebb6527dff53e716bc08c63bb5afab8d054');assert.equal(authoredEpoch.source_only,true);assert.equal(authoredEpoch.historical_programs_executed,false);assert.equal(authoredEpoch.artifact_or_audit_admission_granted,false);assert.equal(authoredEpoch.g11_claim,'not-passed');assert.deepEqual(authoredEpoch.transitions.map(x=>x.path),['scripts/authored-additional-use-baseline.mjs','compatibility/f10/authored-dependency-current-dispositions.json']);assert.deepEqual(authoredEpoch.transitions[0].before,support.transitions[0].steps.at(-1).after);for(const ref of authoredEpoch.support){add(ref);assert.ok(same(git(['show',authoredEpoch.source_commit+':'+ref.path]),comparison(ref)),'authored committed support differs '+ref.path);}for(const step of authoredEpoch.transitions){const images=transition(authoredEpoch.source_parent,authoredEpoch.source_commit,step.before,step.after,step.edits);const current=authoredTab.qualify(step.after);add(step.after);if(current){assert.deepEqual(step.after,authoredTab.before);exact(images.next,authoredTab.before);exact(physical(step.path),current);}else assert.ok(same(images.next,comparison(step.after)));}\n const transitions=[{before:signature.steps[0].before,after:signature.steps[1].after,accepted:[signature.steps[0].before,signature.steps[0].after,signature.steps[1].after]},{before:tab.before,after:project(tab.after),accepted:[tab.before,tab.after,...histories.get(tab.after.path).group.steps.map(s=>s.after)]},{before:f.before,after:project(f.after),accepted:[f.before,f.after,...histories.get(f.after.path).group.steps.map(s=>s.after)]},{before:authored.before,after:authored.after,accepted:[authored.before,authored.after]},...support.transitions.map(row=>{const successor=authoredEpoch.transitions.find(x=>x.path===row.path);return {before:row.steps[0].before,after:project(successor?.after??row.steps.at(-1).after)??successor?.after??row.steps.at(-1).after,accepted:[row.steps[0].before,...row.steps.map(step=>step.after),...(successor?[successor.after]:[]),...(histories.get(row.path)?.group.steps.map(s=>s.after)??[])]};}),{before:authoredEpoch.transitions[1].before,after:authoredTab.after,accepted:[authoredEpoch.transitions[1].before,authoredEpoch.transitions[1].after,authoredTab.after]},...sourceRouting.transitions.map(row=>({...row,accepted:[row.before,row.after]}))];\n const sweep=()=>{authoredTab.assertCurrent();for(const r of bound.values())exact(physical(r.path),r);};\n const qualify=ref=>{assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const d=Object.getOwnPropertyDescriptors(ref),keys=Reflect.ownKeys(d);assert.ok(keys.every(k=>typeof k==='string'));assert.deepEqual(keys.sort(),Object.hasOwn(d,'bytes')?['bytes','path','sha256']:['path','sha256']);for(const descriptor of Object.values(d))assert.ok(Object.hasOwn(descriptor,'value')&&descriptor.enumerable);const path=d.path.value,row=transitions.find(x=>x.before.path===path);if(!row)return null;if(path===authoredTab.before.path)return qualifyHistoricalLiveAuthored(ref,authoredTab,authoredEpoch.transitions[1].before,sweep);const prior=row.accepted.find(x=>x.sha256===d.sha256.value);assert.ok(prior,'unknown live source identity');if(d.bytes)assert.equal(d.bytes.value,prior.bytes);sweep();return {path,sha256:row.after.sha256,...(d.bytes?{bytes:row.after.bytes}:{})};};\n sweep();return {bound:[...bound.values()].map(r=>({...r})),qualify,assertPhysical:sweep,signatureBefore:signature.steps[0].before,signatureAfter:signature.steps[1].after,tabBefore:tab.before,tabAfter:project(tab.after),formBefore:f.before,formAfter:project(f.after)};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-reference-proposal.mjs",
+      "source_parent": "ba462bb008c86f5ceea217b99dd683dd17e065d4",
+      "source_commit": "5959376779dd1fcce209c6077c0afb3b7e466865",
+      "before": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "9d460ad966ad9d9aa46ee8057c2ca85ab14d9ecdef6b2437b0f38a924a3876d6",
+        "bytes": 23989
+      },
+      "after": {
+        "path": "scripts/inventory-reference-proposal.mjs",
+        "sha256": "9b919e1e28c0581a02ccea741247e00e72408cefcb34be5747fc197a292e090a",
+        "bytes": 25380
+      },
+      "edits": [
+        {
+          "offset": 14108,
+          "before": "  product=loaded.selectDialogFiniteSuccessor({root,line,read:physical});\n",
+          "after": "  const current={path:'scripts/select-dialog-finite-source-v8.mjs',sha256:'7b61b26fb9a07d38c99100193e1b9a918a2ca952608c01ca7c81eed32ed30004',bytes:21123};\n  const currentPhysical=physical(current.path),currentLoaded=readFileSync(fileURLToPath(new URL('./select-dialog-finite-source-v8.mjs',import.meta.url)));assert.equal(hash(currentPhysical),current.sha256);assert.equal(currentPhysical.length,current.bytes);assert.equal(hash(currentLoaded),current.sha256);assert.equal(currentLoaded.length,current.bytes);\n  const next=require('./select-dialog-finite-source-v8.mjs');assert.ok(Object.isFrozen(next.selectDialogFiniteLoadedImage));assert.deepEqual(next.selectDialogFiniteLoadedImage,current);assert.equal(hash(apply(functionToString,next.selectDialogFiniteSuccessor,[])),'a96a3c38e6ab001b457b846a87952a9e11e85fd4f9dd8138260e83f312712856');\n  const sweepV7=()=>{const raw=physical(owner.path);assert.equal(hash(raw),owner.sha256);assert.equal(raw.length,owner.bytes);};\n  const guardedRead=path=>{sweepV7();const raw=physical(path);sweepV7();return raw;};\n  const selected=next.selectDialogFiniteSuccessor({root,line,read:guardedRead});\n  const wrap=fn=>(...args)=>{sweepV7();const value=fn(...args);sweepV7();return value;};\n  product={...selected,bound:[...selected.bound,{...owner}],qualify:wrap(selected.qualify),historicalReference:wrap(selected.historicalReference),assertCurrent:wrap(selected.assertCurrent),assertPhysical:wrap(selected.assertPhysical)};\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "source_parent": "5959376779dd1fcce209c6077c0afb3b7e466865",
+      "source_commit": "4efde3a09297b36e126e547417a945bfd5709149",
+      "before": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "3df378a1d57ab5d9f06e5df225c12f278e9d99344298fece794ad0fbf5a647a4",
+        "bytes": 50123
+      },
+      "after": {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "sha256": "666219d90ed459993fa4e8543cc9eb802a0b240eb629be06f26f89c7c2a7786b",
+        "bytes": 50670
+      },
+      "edits": [
+        {
+          "offset": 2607,
+          "before": "",
+          "after": "import {datepickerOutputRecords} from './datepicker-inherited-live-evidence.mjs';\nimport {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\n"
+        },
+        {
+          "offset": 45985,
+          "before": "",
+          "after": "  const liveOutputs = datepickerOutputRecords(report.inherited_execution_evidence, request.runId, request.invocation);\n  for (const item of liveOutputs) {\n    const bytes = readEvidenceMember(request.runDir, item.path);\n    if (bytes.length !== item.bytes || createHash('sha256').update(bytes).digest('hex') !== item.sha256) throw Error('datepicker live evidence changed');\n  }\n"
+        },
+        {
+          "offset": 46999,
+          "before": "    outputs: [output],\n",
+          "after": "    outputs: [output, ...liveOutputs],\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-individual-evidence-scope.mjs",
+      "source_parent": "5959376779dd1fcce209c6077c0afb3b7e466865",
+      "source_commit": "4efde3a09297b36e126e547417a945bfd5709149",
+      "before": {
+        "path": "scripts/upstream-individual-evidence-scope.mjs",
+        "sha256": "9fe6bf06ca747cc59c39202e7a27fc079b3a5c503eef91f4bad9f3f71bd9d16e",
+        "bytes": 9551
+      },
+      "after": {
+        "path": "scripts/upstream-individual-evidence-scope.mjs",
+        "sha256": "552199b7d1b6221ee34c3eada11a3e7724f25f1dd7d193e162a5889576a3b437",
+        "bytes": 9589
+      },
+      "edits": [
+        {
+          "offset": 4376,
+          "before": "",
+          "after": "  \"main-datepicker-inherited-native\",\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/inventory-finite-tool-successor.mjs",
+      "source_parent": "4efde3a09297b36e126e547417a945bfd5709149",
+      "source_commit": "13801025c266396ff0129fe90a751bea7848ab98",
+      "before": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "9bb76dc5767dade03703ae4147ac8e34295ac92a53d3be7fbfd082709c05378c",
+        "bytes": 28000
+      },
+      "after": {
+        "path": "scripts/inventory-finite-tool-successor.mjs",
+        "sha256": "0e6d426b442af86a6fa281edafd34f771b7afd5aff90ddfab60057e725d9abde",
+        "bytes": 28342
+      },
+      "edits": [
+        {
+          "offset": 19527,
+          "before": "  assert.ok(physical(priorRef.path).equals(current));matrix.assertCurrent();\n  ownerMatrix=matrix;finalInventory=transition.after;\n  assert.deepEqual(frame.proposal_transition.before,packet.after);const proposal=replay(after,frame.proposal_transition);assert.equal(hash(proposal),frame.proposal_transition.after.sha256);assert.equal(proposal.length,frame.proposal_transition.after.bytes);assert.ok(physical(packet.after.path).equals(proposal));\n",
+          "after": "  assert.ok(sourceRouting.comparisonBytes(transition.after).equals(current));const currentInventory=sourceRouting.qualify(transition.after);assert.ok(currentInventory);matrix.assertCurrent();\n  ownerMatrix=matrix;finalInventory=currentInventory;\n  assert.deepEqual(frame.proposal_transition.before,packet.after);const proposal=replay(after,frame.proposal_transition);assert.equal(hash(proposal),frame.proposal_transition.after.sha256);assert.equal(proposal.length,frame.proposal_transition.after.bytes);assert.ok(sourceRouting.comparisonBytes(frame.proposal_transition.after).equals(proposal));const currentProposal=sourceRouting.qualify(frame.proposal_transition.after);assert.ok(currentProposal);\n"
+        },
+        {
+          "offset": 22737,
+          "before": "  ownerEpoch={...packet,terminal_owner:{...terminal,after:currentOwnerReference},terminal_owner_previous:[terminal.after,ownerProgram.after],after:inventoryFrame.proposal_transition.after,current_inventory:finalInventory,priorInventory:{path:packet.current_inventory.path,sha256:hash(oldInventory),bytes:oldInventory.length}};\n",
+          "after": "  ownerEpoch={...packet,terminal_owner:{...terminal,after:currentOwnerReference},terminal_owner_previous:[terminal.after,ownerProgram.after],after:currentProposal,current_inventory:finalInventory,priorCurrentInventory:transition.after,priorInventory:{path:packet.current_inventory.path,sha256:hash(oldInventory),bytes:oldInventory.length}};\n"
+        },
+        {
+          "offset": 24677,
+          "before": " const qualify=ref=>{const baseRow=rows.find(item=>item.path===ref?.path);const row=baseRow && ownerEpoch && baseRow.path===ownerEpoch.after.path ? {before:baseRow.before,after:ownerEpoch.after} : baseRow??(ownerEpoch&&ref?.path===ownerEpoch.current_inventory.path?{before:ownerEpoch.priorInventory,after:ownerEpoch.current_inventory}:ownerEpoch&&ref?.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner:ref?.path===workflow.current.path?{before:workflow.historical_after,after:ciFrame?ciFrame[0].after:workflow.current}:ref?.path===helperTest.current.path?{before:helperTest.before,after:ciFrame?ciFrame[1].after:helperTest.current}:null);if(!row)return null;const intermediates=ownerEpoch&&ref.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner_previous:ownerEpoch&&ref.path===ownerEpoch.after.path?[ownerEpoch.before,inventoryFrame.proposal_transition.before]:ownerEpoch&&ref.path===ownerEpoch.current_inventory.path?[...inventoryFrame.inventory_transitions.map(t=>t.before),inventoryFrame.inventory_transitions.at(-1).after]:ciFrame&&ref.path===workflow.current.path?[workflow.current]:ciFrame&&ref.path===helperTest.current.path?[helperTest.current]:[];const prior=[row.before,...intermediates,row.after].find(item=>item.sha256===ref.sha256);assert.ok(prior,'unknown inventory verifier predecessor');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:row.after.sha256,...(ref.bytes===undefined?{}:{bytes:row.after.bytes})};};const inventoryHistoricalBytes=ref=>{assert.ok(inventoryFrame,'historical inventory comparisons require main');assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const descriptors=Object.getOwnPropertyDescriptors(ref);assert.deepEqual(Reflect.ownKeys(descriptors).sort(),['bytes','path','sha256']);for(const d of Object.values(descriptors))assert.ok(Object.hasOwn(d,'value')&&d.enumerable);ref={path:descriptors.path.value,sha256:descriptors.sha256.value,bytes:descriptors.bytes.value};assert.equal(typeof ref.path,'string');assert.equal(typeof ref.sha256,'string');assert.ok(Number.isSafeInteger(ref.bytes)&&ref.bytes>=0);const transition=inventoryFrame.inventory_transitions.find(t=>t.before.path===ref.path&&t.before.sha256===ref.sha256&&t.before.bytes===ref.bytes);assert.ok(transition,'unknown historical inventory image');assertCurrent();const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',transition.parent+':'+ref.path],{cwd:root,env,maxBuffer:2*1024*1024});assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);assertCurrent();return Buffer.from(raw);};assertCurrent();return{bound:structuredClone(bound),qualify,assertCurrent,inventoryHistoricalBytes,workflow:{before:{...workflow.historical_after},current:{...(ciFrame?ciFrame[0].after:workflow.current)},targets:structuredClone(ciFrame?[ciFrame[2].after,workflow.targets[1]]:workflow.targets),source_test_expectations:structuredClone(ciFrame?[{path:workflow.targets[0].path,cases:48,mutants_rejected:17},workflow.current_source_test_expectations[1]]:workflow.current_source_test_expectations),helper_test:{before:{...helperTest.before},current:{...(ciFrame?ciFrame[1].after:helperTest.current)}},full_Actions_execution_qualified:false}};\n",
+          "after": " const qualify=ref=>{const baseRow=rows.find(item=>item.path===ref?.path);const row=baseRow && ownerEpoch && baseRow.path===ownerEpoch.after.path ? {before:baseRow.before,after:ownerEpoch.after} : baseRow??(ownerEpoch&&ref?.path===ownerEpoch.current_inventory.path?{before:ownerEpoch.priorInventory,after:ownerEpoch.current_inventory}:ownerEpoch&&ref?.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner:ref?.path===workflow.current.path?{before:workflow.historical_after,after:ciFrame?ciFrame[0].after:workflow.current}:ref?.path===helperTest.current.path?{before:helperTest.before,after:ciFrame?ciFrame[1].after:helperTest.current}:null);if(!row)return null;const intermediates=ownerEpoch&&ref.path===ownerEpoch.terminal_owner.after.path?ownerEpoch.terminal_owner_previous:ownerEpoch&&ref.path===ownerEpoch.after.path?[ownerEpoch.before,inventoryFrame.proposal_transition.before,inventoryFrame.proposal_transition.after]:ownerEpoch&&ref.path===ownerEpoch.current_inventory.path?[...inventoryFrame.inventory_transitions.map(t=>t.before),inventoryFrame.inventory_transitions.at(-1).after,ownerEpoch.priorCurrentInventory]:ciFrame&&ref.path===workflow.current.path?[workflow.current]:ciFrame&&ref.path===helperTest.current.path?[helperTest.current]:[];const prior=[row.before,...intermediates,row.after].find(item=>item.sha256===ref.sha256);assert.ok(prior,'unknown inventory verifier predecessor');if(ref.bytes!==undefined)assert.equal(ref.bytes,prior.bytes);return {...ref,sha256:row.after.sha256,...(ref.bytes===undefined?{}:{bytes:row.after.bytes})};};const inventoryHistoricalBytes=ref=>{assert.ok(inventoryFrame,'historical inventory comparisons require main');assert.ok(ref&&typeof ref==='object'&&!types.isProxy(ref)&&Object.getPrototypeOf(ref)===Object.prototype);const descriptors=Object.getOwnPropertyDescriptors(ref);assert.deepEqual(Reflect.ownKeys(descriptors).sort(),['bytes','path','sha256']);for(const d of Object.values(descriptors))assert.ok(Object.hasOwn(d,'value')&&d.enumerable);ref={path:descriptors.path.value,sha256:descriptors.sha256.value,bytes:descriptors.bytes.value};assert.equal(typeof ref.path,'string');assert.equal(typeof ref.sha256,'string');assert.ok(Number.isSafeInteger(ref.bytes)&&ref.bytes>=0);const transition=inventoryFrame.inventory_transitions.find(t=>t.before.path===ref.path&&t.before.sha256===ref.sha256&&t.before.bytes===ref.bytes);assert.ok(transition,'unknown historical inventory image');assertCurrent();const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',transition.parent+':'+ref.path],{cwd:root,env,maxBuffer:2*1024*1024});assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);assertCurrent();return Buffer.from(raw);};assertCurrent();return{bound:structuredClone(bound),qualify,assertCurrent,inventoryHistoricalBytes,workflow:{before:{...workflow.historical_after},current:{...(ciFrame?ciFrame[0].after:workflow.current)},targets:structuredClone(ciFrame?[ciFrame[2].after,workflow.targets[1]]:workflow.targets),source_test_expectations:structuredClone(ciFrame?[{path:workflow.targets[0].path,cases:48,mutants_rejected:17},workflow.current_source_test_expectations[1]]:workflow.current_source_test_expectations),helper_test:{before:{...helperTest.before},current:{...(ciFrame?ciFrame[1].after:helperTest.current)}},full_Actions_execution_qualified:false}};\n"
+        }
+      ]
+    }
+  ]
+}

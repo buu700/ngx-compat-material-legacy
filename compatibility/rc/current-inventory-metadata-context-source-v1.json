@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "role": "current-inventory-metadata-context-source-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/retained-current-context-identity.mjs",
+      "source_parent": "42d16b15d9e852a9c959506f67046cf531faa6f4",
+      "source_commit": "a0b778d5b3268bb6cb218f0487b7ce5e28d6ac1f",
+      "before": {
+        "path": "scripts/retained-current-context-identity.mjs",
+        "sha256": "634e1aa2b394cb81e52f63010d5f2cd0c61eb5a4567a08f072c181f431691134",
+        "bytes": 40963
+      },
+      "after": {
+        "path": "scripts/retained-current-context-identity.mjs",
+        "sha256": "b33650180f6467963f9f473623df616eafbd7a550e23831de1be87f879ce6570",
+        "bytes": 42671
+      },
+      "edits": [
+        {
+          "offset": 4323,
+          "before": "",
+          "after": "const METADATA_PARENT='cd7830f9f2feeeb639ac0dd99efcd3dc610a22c2',METADATA_COMMIT='ce9cd3d0b76e240ad0ffc03e2a05ff41f8f363ab',METADATA_TREE='9680b88bc512cb06fcbc52c4fe4d558a9d8072f4';\nconst METADATA_BEFORE={path:'testing/legacy-runner/historical-inventory.json',sha256:'912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15',bytes:113388,blob_oid:'4631656e660d51b1f742a8bae2e17d77ad9c67d6'};\nconst METADATA_AFTER={path:METADATA_BEFORE.path,sha256:'c15f9b3b21f0ae6001246243e85be4e61155e60af50c86c9272dd6289514504b',bytes:118011,blob_oid:'487d67c9621be5266b4f98731ceb7cd2c60efe18'};\n\n"
+        },
+        {
+          "offset": 35325,
+          "before": " const products=intermediateProducts.map(ref=>continuation.get(ref.path)?.after??ref),inputs=intermediateInputs.map(ref=>continuation.get(ref.path)?.after??ref);\n verifyGit(SUCCESSOR,intermediate,SUCCESSOR);verifyGit(CURRENT,[...products,...inputs],CURRENT);\n",
+          "after": " const products=intermediateProducts.map(ref=>continuation.get(ref.path)?.after??ref),currentInputs=intermediateInputs.map(ref=>continuation.get(ref.path)?.after??ref);\n verifyGit(SUCCESSOR,intermediate,SUCCESSOR);verifyGit(CURRENT,[...products,...currentInputs],CURRENT);\n // The inventory's seven candidate identities are a committed source update;\n // the previous receipt remains comparison data and does not grant execution.\n assert.equal(git(['rev-list','--parents','-n','1',METADATA_COMMIT]).toString().trim(),METADATA_COMMIT+' '+METADATA_PARENT);git(['merge-base','--is-ancestor',CURRENT,METADATA_PARENT]);git(['merge-base','--is-ancestor',METADATA_COMMIT,'HEAD']);assert.equal(git(['rev-parse',METADATA_COMMIT+'^{tree}']).toString().trim(),METADATA_TREE);\n assert.deepEqual(git(['diff','--name-status','--no-renames',CURRENT,METADATA_COMMIT,'--','projects/ngx-material-legacy',...oldInputs.map(ref=>ref.path)]).toString().trim().split('\\n'),['M\\t'+METADATA_BEFORE.path]);assert.deepEqual(currentInputs.find(ref=>ref.path===METADATA_BEFORE.path),METADATA_BEFORE);verifyGit(METADATA_PARENT,[METADATA_BEFORE],METADATA_PARENT);verifyGit(METADATA_COMMIT,[METADATA_AFTER],METADATA_COMMIT);identity(METADATA_BEFORE);\n const inputs=currentInputs.map(ref=>ref.path===METADATA_BEFORE.path?METADATA_AFTER:ref);verifyGit(METADATA_COMMIT,[...products,...inputs],METADATA_COMMIT);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/retained-validator-program-source.mjs",
+      "source_parent": "a0b778d5b3268bb6cb218f0487b7ce5e28d6ac1f",
+      "source_commit": "266129da55a620f1df8525654b4ce5827e0062ca",
+      "before": {
+        "path": "scripts/retained-validator-program-source.mjs",
+        "sha256": "d5c1b9a53475dff2127c0c3c3287d4a06699b9394fe2bc896df21971fa38fa36",
+        "bytes": 11628
+      },
+      "after": {
+        "path": "scripts/retained-validator-program-source.mjs",
+        "sha256": "b575ec6d7fa336f62490852d86c500fff3d940ed95b044c93dab662d72c3539d",
+        "bytes": 13439
+      },
+      "edits": [
+        {
+          "offset": 1170,
+          "before": "",
+          "after": "const METADATA_CONTINUATION={path:'compatibility/rc/retained-validator-context-successor-a0b77.json',sha256:'3b212875082485079b0def1efbb881bf0cbab2de6a4302ea69f3f6c2074d13fa',bytes:2524};\n"
+        },
+        {
+          "offset": 8088,
+          "before": "",
+          "after": " // Authenticate the committed metadata context source and its exact test cut.\n const metadataRaw=physical(METADATA_CONTINUATION.path);exact(metadataRaw,METADATA_CONTINUATION);const metadata=JSON.parse(metadataRaw),metadataParent='42d16b15d9e852a9c959506f67046cf531faa6f4',metadataCommit='a0b778d5b3268bb6cb218f0487b7ce5e28d6ac1f';\n assert.equal(metadata.schema_version,1);assert.equal(metadata.role,'retained-validator-metadata-context-source-continuation');assert.equal(metadata.source_parent,metadataParent);assert.equal(metadata.source_commit,metadataCommit);for(const [key,value]of Object.entries({source_only:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(metadata[key],value,key);\n assert.equal(git(['rev-list','--parents','-n','1',metadataCommit]).toString().trim(),metadataCommit+' '+metadataParent);git(['merge-base','--is-ancestor',continuationCommit,metadataParent]);git(['merge-base','--is-ancestor',metadataCommit,'HEAD']);assert.deepEqual(metadata.transitions.map(row=>row.path),continuationPaths);assert.deepEqual(git(['diff','--name-status','--no-renames',metadataParent,metadataCommit]).toString().trim().split('\\n'),continuationPaths.map(path=>'M\\t'+path));for(let i=0;i<continuationPaths.length;i++){const row=metadata.transitions[i];assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);assert.deepEqual(row.before,continuation.transitions[i].after);}verifyGit(metadataParent,metadata.transitions.map(row=>row.before));verifyGit(metadataCommit,metadata.transitions.map(row=>row.after));\n"
+        },
+        {
+          "offset": 9101,
+          "before": " for(const ref of packet.support)add(ref.path===successorPaths[0]?continuation.transitions[0].after:ref);\n add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);for(const row of continuation.transitions.slice(1))add(row.after);\n",
+          "after": " for(const ref of packet.support)add(ref.path===successorPaths[0]?metadata.transitions[0].after:ref);\n add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);add(METADATA_CONTINUATION);for(const row of metadata.transitions.slice(1))add(row.after);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/retained_validator_program_source_probe.mjs",
+      "source_parent": "a0b778d5b3268bb6cb218f0487b7ce5e28d6ac1f",
+      "source_commit": "266129da55a620f1df8525654b4ce5827e0062ca",
+      "before": {
+        "path": "tests/retained_validator_program_source_probe.mjs",
+        "sha256": "b59cb3bc98fc5ee255d24b4257690261ee9fb8d11db1db53297fa91c241d9a0b",
+        "bytes": 6591
+      },
+      "after": {
+        "path": "tests/retained_validator_program_source_probe.mjs",
+        "sha256": "52000ebe635600e6768d71df7df3763b248b1511e114c93da26272a6d9f5797c",
+        "bytes": 6945
+      },
+      "edits": [
+        {
+          "offset": 559,
+          "before": "assert.equal(live.transitions.length,3);assert.equal(live.bound.length,24);\n",
+          "after": "assert.equal(live.transitions.length,3);assert.equal(live.bound.length,25);\n"
+        },
+        {
+          "offset": 739,
+          "before": "",
+          "after": "const metadataReceipt=JSON.parse(physical('compatibility/rc/retained-validator-context-successor-a0b77.json'));\n"
+        },
+        {
+          "offset": 843,
+          "before": "const expectedPaths=new Set(['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json',originalPacket.source_input.path,...originalPacket.programs.map(row=>row.path),...originalPacket.support.map(row=>row.path),'compatibility/rc/retained-validator-context-successor-4015.json','compatibility/rc/retained-validator-context-successor-149de.json',...receipt.transitions.map(row=>row.path)]);\n",
+          "after": "const expectedPaths=new Set(['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json',originalPacket.source_input.path,...originalPacket.programs.map(row=>row.path),...originalPacket.support.map(row=>row.path),'compatibility/rc/retained-validator-context-successor-4015.json','compatibility/rc/retained-validator-context-successor-149de.json','compatibility/rc/retained-validator-context-successor-a0b77.json',...receipt.transitions.map(row=>row.path)]);\n"
+        },
+        {
+          "offset": 2295,
+          "before": "for(const target of ['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json','tests/retained_current_context_identity_probe.mjs','tests/test_current_reader_source_successors.py','compatibility/rc/retained-validator-context-successor-149de.json']){\n",
+          "after": "for(const target of ['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json','tests/retained_current_context_identity_probe.mjs','tests/test_current_reader_source_successors.py','compatibility/rc/retained-validator-context-successor-149de.json','compatibility/rc/retained-validator-context-successor-a0b77.json']){\n"
+        },
+        {
+          "offset": 4849,
+          "before": " for(const row of receipt.transitions){\n",
+          "after": " for(const row of [...receipt.transitions,...metadataReceipt.transitions]){\n"
+        },
+        {
+          "offset": 4956,
+          "before": "  const before=execFileSync('git',['show',`${receipt.source_parent}:${row.path}`],{cwd:root});\n",
+          "after": "  const before=execFileSync('git',['show',`${metadataReceipt.transitions.includes(row)?metadataReceipt.source_parent:receipt.source_parent}:${row.path}`],{cwd:root});\n"
+        },
+        {
+          "offset": 6051,
+          "before": "console.log(JSON.stringify({result:'pass',programs:3,bound:24,cold_rejections:24,late_rejections:24,recoveries:24,whole_predecessor_bodies_rejected_and_recovered:true,exact_program_source_union:true,self_source_physical_rejected_and_recovered:true,\n",
+          "after": "console.log(JSON.stringify({result:'pass',programs:3,bound:25,cold_rejections:25,late_rejections:25,recoveries:25,whole_predecessor_bodies_rejected_and_recovered:true,exact_program_source_union:true,self_source_physical_rejected_and_recovered:true,\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_validator_program_source.py",
+      "source_parent": "a0b778d5b3268bb6cb218f0487b7ce5e28d6ac1f",
+      "source_commit": "266129da55a620f1df8525654b4ce5827e0062ca",
+      "before": {
+        "path": "tests/test_retained_validator_program_source.py",
+        "sha256": "353990634ea5d45fef1de2609cee7faa5288039358f9dc4185b8ae84e4106376",
+        "bytes": 1459
+      },
+      "after": {
+        "path": "tests/test_retained_validator_program_source.py",
+        "sha256": "1bcf0014ed88dee3720512ae55fd43262863f58049b9677863890c8c79433f2e",
+        "bytes": 1459
+      },
+      "edits": [
+        {
+          "offset": 745,
+          "before": "        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (24, 24, 24))\n",
+          "after": "        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (25, 25, 25))\n"
+        }
+      ]
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "source_parent": "cd7830f9f2feeeb639ac0dd99efcd3dc610a22c2",
+      "source_commit": "ce9cd3d0b76e240ad0ffc03e2a05ff41f8f363ab",
+      "before": {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15",
+        "bytes": 113388
+      },
+      "after": {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "c15f9b3b21f0ae6001246243e85be4e61155e60af50c86c9272dd6289514504b",
+        "bytes": 118011
+      },
+      "edits": [
+        {
+          "offset": 791,
+          "before": "      \"candidate_sha256\": \"b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6\",\n",
+          "after": "      \"candidate_sha256\": \"dc78585784c90399790f6a771b4a006435ce2677f3e7651857dcca440ea2d881\",\n"
+        },
+        {
+          "offset": 5735,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"b831b4d3ac6f17f0a9de9d0cd5594f6154ab5fe2b479e9a3b5289dbc1aeed1b6\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Source identity refreshed; no current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the committed source transition: Adds owned no-op provider to content-query lifecycle fixture. No execution credit.\"\n"
+        },
+        {
+          "offset": 24433,
+          "before": "      \"candidate_sha256\": \"a2ca25c7693a6fb8cf797517346d298f2b81e363e8b1d0348ffa1f91298269f9\",\n",
+          "after": "      \"candidate_sha256\": \"4d4db093a0d4628d86974b53893f68d302063a7a53488e07c039f21021c26f34\",\n"
+        },
+        {
+          "offset": 25236,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"a2ca25c7693a6fb8cf797517346d298f2b81e363e8b1d0348ffa1f91298269f9\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Candidate file is present. No current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the committed source transition: Replaces animation module hint with the owned mode token in pseudo-checkbox tests. No execution credit.\"\n"
+        },
+        {
+          "offset": 44614,
+          "before": "      \"candidate_sha256\": \"1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321\",\n",
+          "after": "      \"candidate_sha256\": \"1618f102fbd28b4d8c8eeb1b2d71e10e409f2ad103ebf8082e2b0d27517d6d65\",\n"
+        },
+        {
+          "offset": 47205,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"1f6c9025f1b04dc994e5e77247399546a2464c2281a01a46adeb50c828322321\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Source identity refreshed; no current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the committed source transition: Replaces animation module hint with the owned mode token in motion tests. No execution credit.\"\n"
+        },
+        {
+          "offset": 61954,
+          "before": "      \"candidate_sha256\": \"0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc\",\n",
+          "after": "      \"candidate_sha256\": \"b5d7beb6119249251920eb98e9503b9b86cc35ef9349ac82bb290c38e804ac0a\",\n"
+        },
+        {
+          "offset": 64227,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"0026c159543c040dc5e8c85baf25f37ec12130cab91841ff651eb96c797940fc\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Source identity refreshed; no current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the committed source transition: Adds interrupted Escape-exit overlay lifecycle coverage. No execution credit.\"\n"
+        },
+        {
+          "offset": 77544,
+          "before": "      \"candidate_sha256\": \"6987ae268b614e3d445852fe9eb99e05d1f7c6c5669505079ed142586ab47d1e\",\n",
+          "after": "      \"candidate_sha256\": \"a6d1f377085d4a05c2283e80f123fe1068beeec8f720310f30d4f149403c1424\",\n"
+        },
+        {
+          "offset": 79456,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"6987ae268b614e3d445852fe9eb99e05d1f7c6c5669505079ed142586ab47d1e\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Source identity refreshed; no current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the committed source transition: Adds nested native and flex table definition ownership coverage. No execution credit.\"\n"
+        },
+        {
+          "offset": 85579,
+          "before": "      \"candidate_sha256\": \"cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b\",\n",
+          "after": "      \"candidate_sha256\": \"552bd2b949215f12056f47b31d5b8e41d8a7110d5d7d16dda299d7d7df7e0cc8\",\n"
+        },
+        {
+          "offset": 86366,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"not-executed\",\n            \"bound_to_current_head\": false,\n            \"receipt\": null,\n            \"note\": \"Candidate file is present. No current-HEAD execution receipt.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the committed source transition: Adds small-overflow keyboard reachability coverage. No execution credit.\"\n"
+        },
+        {
+          "offset": 92258,
+          "before": "      \"candidate_sha256\": \"509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757\",\n",
+          "after": "      \"candidate_sha256\": \"fbbc7c87c7fa3d09bd95556dc8da1702b72bc9b41e0a06b9f9d5b5d79096dc25\",\n"
+        },
+        {
+          "offset": 93749,
+          "before": "",
+          "after": "        },\n        {\n          \"candidate_sha256\": \"509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757\",\n          \"adaptation\": \"adapted\",\n          \"execution\": {\n            \"state\": \"family-run\",\n            \"bound_to_current_head\": false,\n            \"receipt\": \"compatibility/rc/reports/legacy-tooltip.json\",\n            \"note\": \"Adapted for Angular 22 test hosts: Default change detection except the explicit OnPush demo, and the open-position spy is installed before the assignment because the setter repositions immediately. just test-legacy --family tooltip executed 79 and passed 79, including discovery and deliberate-fail probes. Not a release receipt and not bound to the commit that records it.\"\n          },\n          \"current_source_binding\": false,\n          \"reason\": \"Prior candidate identity retained before the committed source transition: Adds keyboard propagation and overlay routing coverage. No execution credit.\"\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/retained-validator-context-successor-a0b77.json",
+      "sha256": "3b212875082485079b0def1efbb881bf0cbab2de6a4302ea69f3f6c2074d13fa",
+      "bytes": 2524
+    }
+  ]
+}

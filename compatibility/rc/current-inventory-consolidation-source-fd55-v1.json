@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "role": "current-inventory-consolidation-source-successor",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/upstream-test-consolidation-evidence.mjs",
+      "source_parent": "e74f9b96f0ea8b25d3455d7447602d32bdbd838d",
+      "source_commit": "fd55b5545d229783e9a95d1a6fbac55510674685",
+      "before": {
+        "path": "scripts/upstream-test-consolidation-evidence.mjs",
+        "sha256": "a4e483bae45ff473c13fdd2a4d0fbfe655b8d05d4950c899e584d9dd47ecaca7",
+        "bytes": 20564
+      },
+      "after": {
+        "path": "scripts/upstream-test-consolidation-evidence.mjs",
+        "sha256": "d6e6fb9ac55e4d1a0fa5c64a32fa562bd98c5966096e59e7b34fe124bc6bec15",
+        "bytes": 26357
+      },
+      "edits": [
+        {
+          "offset": 399,
+          "before": "",
+          "after": "import {execFileSync} from 'node:child_process';\n"
+        },
+        {
+          "offset": 618,
+          "before": "",
+          "after": "import {retainedF10BuildSourceContext} from './retained-f10-build-source-context.mjs';\nimport {retainedF10InventorySourceContext} from './retained-f10-inventory-source-context.mjs';\n"
+        },
+        {
+          "offset": 19482,
+          "before": "",
+          "after": "// Explicitly main-only successor for the historical f10 caller. The old\n// both-line report and old inventory are verified as historical data; no old\n// source bytes or both-line result are served as a current qualification.\nlet f10MainActive=false,f10MainReentered=false;\nexport function qualifyRetainedF10ConsolidationMain(body,readRepo,currentProductPaths){\n if(f10MainActive){f10MainReentered=true;throw new Error('f10 main consolidation reentry');}f10MainActive=true;f10MainReentered=false;\n try{\n  const captured=ciCaptureReader(readRepo),read=captured.read,oldPath='compatibility/f10/disposition-ledger/evidence/harness-animation-preparation-test-consolidation.json';\n  const oldBytes=read(oldPath);assert.deepEqual(body,JSON.parse(oldBytes));assert.equal(body.line,'main');\n  const mainBytes=read(MAIN_REPORT);assert.equal(hash(mainBytes),MAIN_REPORT_SHA);const main=JSON.parse(mainBytes);\n  const {candidate_context:oldBuild,historical_suite_context:oldSuite,...oldRest}=body;\n  const {candidate_context:newBuild,historical_suite_context:newSuite,chip_source_scope_requalification,main_current_context,...newRest}=main;\n  assert.deepEqual(oldRest,newRest);assert.ok(chip_source_scope_requalification);assert.equal(main_current_context.line,'main');assert.equal(main_current_context.source_only,true);\n  const oldBuildBytes=read(oldBuild.path);assert.equal(hash(oldBuildBytes),oldBuild.sha256);const oldBuildBody=JSON.parse(oldBuildBytes);\n  const build=retainedF10BuildSourceContext({root:sourceRoot,read,body:oldBuildBody,currentProductPaths});\n  const inventory=retainedF10InventorySourceContext({root:sourceRoot,read});assert.equal(inventory.historical_candidates,57);assert.equal(inventory.changed_candidates,16);assert.equal(inventory.changed_shims,12);\n  for(const ref of oldSuite){const current=inventory.select(ref),raw=read(current.path);assert.equal(hash(raw),current.sha256);assert.equal(raw.length,current.bytes);}\n  // The f10 bridge has already compared all fourteen old and current rows.\n  // The unchanged current batch predicate independently reruns all fourteen\n  // build-scope decisions against the actual current source.\n  assert.equal(build.reviewed_shas,14);\n  assert.equal(testConsolidationBatchOk(main,read,currentProductPaths),true,'current main consolidation rejected');\n  // Compare each of the 32 historical ledger rows as historical data, then\n  // independently compare each current row with the authenticated main delta.\n  // The original both-line batch remains closed for current main evidence.\n  const receiptBytes=read('compatibility/rc/retained-f10-build-source-context-696.json');assert.equal(hash(receiptBytes),'5584f69863a38d665e612f5d626e37c876d1395d14e6ae61c547e7a54e5f04e0');const receipt=JSON.parse(receiptBytes);\n  const env={PATH:process.env.PATH,LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0'},git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:sourceRoot,env,maxBuffer:16*1024*1024});\n  const oldLedgerRef=receipt.original_ledger;assert.equal(oldLedgerRef.path,'compatibility/f10/disposition-ledger/ledger.json');assert.equal(git(['rev-parse',receipt.historical_report_commit+':'+oldLedgerRef.path]).toString().trim(),oldLedgerRef.blob_oid);\n  const oldLedgerBytes=git(['show',receipt.historical_report_commit+':'+oldLedgerRef.path]);assert.equal(hash(oldLedgerBytes),oldLedgerRef.sha256);assert.equal(oldLedgerBytes.length,oldLedgerRef.bytes);\n  const oldLedger=JSON.parse(oldLedgerBytes),oldEntries=oldLedger.entries.filter(row=>row.evidence_report===oldPath),currentLedger=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json')),currentEntries=currentLedger.entries.filter(row=>row.evidence_report===MAIN_REPORT),delta=JSON.parse(read(MAIN_DELTA));\n  assert.equal(oldEntries.length,32);assert.equal(currentEntries.length,32);assert.equal(delta.rows.length,32);\n  assert.deepEqual(oldEntries.map(row=>row.sha).sort(),[...body.scope_sha_ids].sort());assert.deepEqual(currentEntries.map(row=>row.sha).sort(),[...main.scope_sha_ids].sort());\n  for(const entry of oldEntries)assert.equal(testConsolidationEntryOk(body,entry,read,true),true,'historical f10 row mismatch '+entry.sha);\n  for(const entry of currentEntries){\n   const matches=delta.rows.filter(row=>row.sha===entry.sha);assert.equal(matches.length,1);assert.deepEqual(entry,matches[0]);\n   const row=main.reviews.find(r=>r.sha===entry.sha);assert.ok(row);assert.equal(entry.source_check.evidence_report_sha256,MAIN_REPORT_SHA);assert.equal(entry.final_disposition,row.final_disposition);assert.equal(entry.reason,row.decision);assert.deepEqual(entry.files,row.patch_paths);assert.deepEqual(entry.affected_branches,['main']);assert.equal(entry.review_depth,row.review_depth);assert.equal(entry.source_check.diff_sha256,row.diff_sha256);assert.equal(entry.source_check.patch_path,row.patch_file);assert.equal(entry.source_check.review_membership,row.sha);\n  }\n  build.assertCurrent();inventory.assertCurrent();assert.deepEqual(read('scripts/upstream-test-consolidation-evidence.mjs'),loadedConsolidationSource);captured.close();assert.equal(f10MainReentered,false,'f10 main consolidation reentry');\n  return Object.freeze({line:'main',source_only:true,reviewed_shas:32,historical_entry_bindings:32,current_entry_bindings:32,historical_execution_reattributed:false,runtime_or_floor_qualified:false,g11_claim:'not-passed'});\n }catch{return null;}finally{f10MainActive=false;}\n}\n\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/retained-current-consolidation-context.mjs",
+      "source_parent": "e74f9b96f0ea8b25d3455d7447602d32bdbd838d",
+      "source_commit": "fd55b5545d229783e9a95d1a6fbac55510674685",
+      "before": {
+        "path": "scripts/retained-current-consolidation-context.mjs",
+        "sha256": "be5f8df637a46932d8200796a97704e888d183a076563ab8621aff66a217377e",
+        "bytes": 7490
+      },
+      "after": {
+        "path": "scripts/retained-current-consolidation-context.mjs",
+        "sha256": "b8908dc4426edabc2e9ba496c34d16af3fabc320bdaf2c52497fca09b422e1ca",
+        "bytes": 13538
+      },
+      "edits": [
+        {
+          "offset": 616,
+          "before": "",
+          "after": "import {inspectHarnessPreparation} from './harness-animation-preparation-evidence.mjs';\n"
+        },
+        {
+          "offset": 908,
+          "before": "",
+          "after": "const CONTINUATION={path:'compatibility/rc/retained-main-consolidation-source-continuation-3ac.json',sha256:'f2d830fc2deb31492d9f3756b37478a1c446b4932c4d21465352732b9d26ed1c',bytes:4276};\n"
+        },
+        {
+          "offset": 2016,
+          "before": "export function retainedCurrentConsolidationContext({root,read,body}){\n",
+          "after": "let consolidationActive=false,consolidationReentered=false;\nfunction consolidationTransaction(fn){if(consolidationActive){consolidationReentered=true;throw new Error('retained consolidation reentry');}consolidationActive=true;consolidationReentered=false;try{const value=fn();assert.equal(consolidationReentered,false,'retained consolidation reentry');return value;}finally{consolidationActive=false;}}\nexport function retainedCurrentConsolidationContext(options){return consolidationTransaction(()=>createRetainedCurrentConsolidationContext(options));}\nfunction createRetainedCurrentConsolidationContext({root,read,body}){\n"
+        },
+        {
+          "offset": 4147,
+          "before": " const git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,maxBuffer:2*1024*1024});\n",
+          "after": " const git=(args,input)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,input,maxBuffer:64*1024*1024});\n"
+        },
+        {
+          "offset": 4350,
+          "before": " for(const ref of PROGRAMS){const raw=git(['show',COMMIT+':'+ref.path]);assert.equal(sha(raw),ref.sha256);assert.equal(raw.length,ref.bytes);member(ref.path,ref.sha256,ref.bytes);}\n const assertBuildChecker=()=>{assert.equal(sha(Buffer.from(buildScopeEvidenceOk.toString())),'586895c06859bafdf46f506f30e1909384f1d452e1e9d13496c18abb338d0080');for(const ref of PROGRAMS)member(ref.path,ref.sha256,ref.bytes);};\n",
+          "after": " const continuation=JSON.parse(member(CONTINUATION.path,CONTINUATION.sha256,CONTINUATION.bytes));\n for(const [key,value]of Object.entries({schema_version:1,role:'main-consolidation-current-source-continuation',original_testing_commit:'e1848d4e3a04b31cbb616f16b77d80525f6a7a5c',original_review_commit:COMMIT,inventory_metadata_commit:'ce9cd3d0b76e240ad0ffc03e2a05ff41f8f363ab',source_commit:'3ac10c5438c5636504f7dd909bf7c50387c649d7',source_only:true,original_reports_rewritten:false,runtime_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(continuation[key],value,key);\n for(const [a,b]of [[continuation.original_testing_commit,COMMIT],[COMMIT,continuation.inventory_metadata_commit],[continuation.inventory_metadata_commit,continuation.source_commit],[continuation.source_commit,'HEAD']])git(['merge-base','--is-ancestor',a,b]);\n const gitBody=(commit,ref)=>{assert.equal(git(['rev-parse',commit+':'+ref.path]).toString().trim(),ref.blob_oid);const raw=git(['show',commit+':'+ref.path]);assert.equal(sha(raw),ref.sha256,ref.path);assert.equal(raw.length,ref.bytes,ref.path);return raw;};\n assert.deepEqual(continuation.programs.map(row=>row.path),PROGRAMS.map(ref=>ref.path));\n for(let i=0;i<PROGRAMS.length;i++){\n  const old=PROGRAMS[i],row=continuation.programs[i];assert.deepEqual({path:row.before.path,sha256:row.before.sha256,bytes:row.before.bytes},old);assert.equal(row.current.path,row.path);\n  gitBody(COMMIT,row.before);const after=gitBody(continuation.source_commit,row.current);assert.ok(member(row.path,row.current.sha256,row.current.bytes).equals(after));\n  const log=git(['log','--format=%H',COMMIT+'..'+continuation.source_commit,'--',row.path]).toString().trim();assert.deepEqual(log?log.split('\\n'):[],row.history);\n }\n const assertBuildChecker=()=>{assert.equal(sha(Buffer.from(buildScopeEvidenceOk.toString())),'586895c06859bafdf46f506f30e1909384f1d452e1e9d13496c18abb338d0080');for(const row of continuation.programs)member(row.path,row.current.sha256,row.current.bytes);\n  // The last callback may change an earlier program; finish without callbacks.\n  for(const row of continuation.programs){const raw=physical(row.path);assert.equal(sha(raw),row.current.sha256,row.path);assert.equal(raw.length,row.current.bytes,row.path);}\n };\n"
+        },
+        {
+          "offset": 4978,
+          "before": " const beforeTesting=profile.products.filter(ref=>ref.path.includes('/testing/'));\n assert.equal(beforeTesting.length,163);assert.deepEqual(source.products.filter(ref=>ref.path.includes('/testing/')),beforeTesting);\n",
+          "after": " const beforeTesting=profile.products.filter(ref=>ref.path.includes('/testing/')),currentTesting=source.products.filter(ref=>ref.path.includes('/testing/'));\n assert.equal(beforeTesting.length,163);assert.equal(currentTesting.length,163);assert.deepEqual(beforeTesting.map(r=>r.path),currentTesting.map(r=>r.path));\n const oldTesting=continuation.original_testing_member,newTesting=continuation.current_testing_member;gitBody(continuation.original_testing_commit,oldTesting);gitBody(continuation.source_commit,newTesting);\n const differences=beforeTesting.filter((ref,i)=>ref.sha256!==currentTesting[i].sha256||ref.bytes!==currentTesting[i].bytes);assert.deepEqual(differences,[{path:oldTesting.path,sha256:oldTesting.sha256,bytes:oldTesting.bytes}]);assert.deepEqual(current.get(newTesting.path),{path:newTesting.path,sha256:newTesting.sha256,bytes:newTesting.bytes});\n // Bind every actual harness read and retain the unchanged original recipe;\n // no historical code body is used as a current physical source.\n const harnessRead=path=>{const raw=physical(path);return member(path,sha(raw),raw.length);},prepared=inspectHarnessPreparation(harnessRead);\n assert.equal(prepared.files,12);assert.equal(prepared.case_callbacks_unchanged,165);assert.equal(prepared.fixture_classes_unchanged,15);\n"
+        },
+        {
+          "offset": 5342,
+          "before": " // Historical JSON data only; no old program is executed or served as current.\n const beforeBytes=git(['show','e1848d4e3a04b31cbb616f16b77d80525f6a7a5c:'+inventoryPath]);assert.equal(sha(beforeBytes),oldRef.sha256);assert.equal(beforeBytes.length,oldRef.bytes);\n const before=JSON.parse(beforeBytes),after=JSON.parse(member(inventoryPath,current.get(inventoryPath).sha256));\n const {rows:oldRows,...oldHeader}=before,{rows:newRows,...newHeader}=after;assert.deepEqual(newHeader,oldHeader);assert.equal(newRows.length,57);\n let changed=0;\n",
+          "after": " const beforeBytes=gitBody(continuation.original_testing_commit,continuation.original_inventory);assert.equal(sha(beforeBytes),oldRef.sha256);assert.equal(beforeBytes.length,oldRef.bytes);\n const middleBytes=gitBody(COMMIT,continuation.review_inventory),nowBytes=gitBody(continuation.inventory_metadata_commit,continuation.current_inventory),actual=member(inventoryPath,current.get(inventoryPath).sha256,current.get(inventoryPath).bytes);assert.ok(actual.equals(nowBytes));\n const before=JSON.parse(beforeBytes),middle=JSON.parse(middleBytes),after=JSON.parse(nowBytes);\n const {rows:oldRows,...oldHeader}=before,{rows:middleRows,...middleHeader}=middle,{rows:newRows,...newHeader}=after;assert.deepEqual(middleHeader,oldHeader);assert.deepEqual(newHeader,middleHeader);assert.equal(oldRows.length,57);assert.equal(middleRows.length,57);assert.equal(newRows.length,57);\n // Authenticate all 57 original review-frame candidate bodies in one Git\n // transaction. This is the same whole-byte comparison, without 57 processes.\n const candidateBatch=git(['cat-file','--batch'],Buffer.from(middleRows.map(row=>COMMIT+':'+row.candidate+'\\n').join('')));let candidateOffset=0;\n for(const row of middleRows){const end=candidateBatch.indexOf(10,candidateOffset);assert.ok(end>=candidateOffset);const header=candidateBatch.subarray(candidateOffset,end).toString().split(' ');candidateOffset=end+1;assert.equal(header.length,3);assert.equal(header[1],'blob');const size=Number(header[2]);assert.ok(Number.isSafeInteger(size)&&size>=0&&candidateOffset+size<candidateBatch.length);const raw=candidateBatch.subarray(candidateOffset,candidateOffset+size);assert.equal(createHash('sha1').update(Buffer.from('blob '+size+'\\0')).update(raw).digest('hex'),header[0]);assert.equal(sha(raw),row.candidate_sha256,row.candidate);candidateOffset+=size;assert.equal(candidateBatch[candidateOffset++],10);}assert.equal(candidateOffset,candidateBatch.length);\n let changed=0,later=0;const changedLater=[];\n"
+        },
+        {
+          "offset": 6026,
+          "before": "  const {candidate_sha256:newSha,prior_candidate_snapshots:newHistory,...newRow}=newRows[index];assert.deepEqual(newRow,oldRow);\n  assert.equal(newRow.execution.bound_to_current_head,false);assert.equal(newSha,current.get(newRow.candidate)?.sha256,newRow.candidate);\n  assert.deepEqual((newHistory??[]).slice(0,oldHistory?.length??0),oldHistory??[]);\n  if(oldSha!==newSha){changed++;const prior=newHistory.find(row=>row.candidate_sha256===oldSha);assert.ok(prior);assert.deepEqual(prior.execution,oldRow.execution);assert.equal(prior.adaptation,oldRow.adaptation);}\n",
+          "after": "  const {candidate_sha256:middleSha,prior_candidate_snapshots:middleHistory,...middleRow}=middleRows[index];assert.deepEqual(middleRow,oldRow);assert.equal(middleRow.execution.bound_to_current_head,false);\n  assert.deepEqual((middleHistory??[]).slice(0,oldHistory?.length??0),oldHistory??[]);\n  if(oldSha!==middleSha){changed++;const prior=middleHistory.find(row=>row.candidate_sha256===oldSha);assert.ok(prior);assert.deepEqual(prior.execution,oldRow.execution);assert.equal(prior.adaptation,oldRow.adaptation);}\n  const {candidate_sha256:newSha,prior_candidate_snapshots:newHistory,...newRow}=newRows[index];assert.deepEqual(newRow,middleRow);assert.equal(newSha,current.get(newRow.candidate)?.sha256,newRow.candidate);\n  if(middleSha!==newSha){later++;changedLater.push(newRow.family);assert.deepEqual((newHistory??[]).slice(0,-1),middleHistory??[]);const prior=newHistory.at(-1);assert.equal(prior.candidate_sha256,middleSha);assert.equal(prior.adaptation,middleRow.adaptation);assert.deepEqual(prior.execution,middleRow.execution);assert.equal(prior.current_source_binding,false);}else assert.deepEqual(newRows[index],middleRows[index]);\n"
+        },
+        {
+          "offset": 6595,
+          "before": " assert.equal(changed,8);\n",
+          "after": " assert.equal(changed,8);assert.equal(later,7);assert.deepEqual(changedLater,['autocomplete','core','menu','select','table','tabs','tooltip']);\n"
+        },
+        {
+          "offset": 7283,
+          "before": " assertCurrent();return Object.freeze({runnerReference,assertCurrent,assertBuildChecker,\n  current_testing_files:163,changed_inventory_candidates:8,execution_claims_changed:false,g11_claim:'not-passed'});\n",
+          "after": " assertCurrent();return Object.freeze({runnerReference,assertCurrent:()=>consolidationTransaction(assertCurrent),assertBuildChecker:()=>consolidationTransaction(assertBuildChecker),\n  current_testing_files:163,changed_inventory_candidates:8,subsequent_inventory_candidates:7,execution_claims_changed:false,g11_claim:'not-passed'});\n"
+        }
+      ]
+    }
+  ]
+}

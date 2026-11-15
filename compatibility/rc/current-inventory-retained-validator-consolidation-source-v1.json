@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "role": "current-inventory-retained-validator-consolidation-source-successor",
+  "source_parent": "fd55b5545d229783e9a95d1a6fbac55510674685",
+  "source_commit": "79284e48afe4b75b8d51487071c75dbc11c3a4a4",
+  "source_only": true,
+  "historical_programs_executed": false,
+  "historical_packets_rewritten": false,
+  "artifact_or_audit_admission_granted": false,
+  "g11_claim": "not-passed",
+  "transitions": [
+    {
+      "path": "scripts/retained-validator-program-source.mjs",
+      "before": {
+        "path": "scripts/retained-validator-program-source.mjs",
+        "sha256": "b575ec6d7fa336f62490852d86c500fff3d940ed95b044c93dab662d72c3539d",
+        "bytes": 13439
+      },
+      "after": {
+        "path": "scripts/retained-validator-program-source.mjs",
+        "sha256": "986940ad9a42e428c84672f84baf6908ac0e2defecefd6649ce3c31bb0e822db",
+        "bytes": 17792
+      },
+      "edits": [
+        {
+          "offset": 1358,
+          "before": "",
+          "after": "const BUILD_CONTINUATION={path:'compatibility/rc/retained-validator-build-context-successor-3ac.json',sha256:'44477a92abc7e9edc3a91722d846450d3a7c0719ee80c24b80208d87a8f76cf6',bytes:937};\nconst CONSOLIDATION_CONTINUATION={path:'compatibility/rc/retained-validator-consolidation-source-fd55-v1.json',sha256:'27300dcc8c0fd1f71855de34a35b6727bcda7e6f9980ac33b160db00d6144715',bytes:4098};\n"
+        },
+        {
+          "offset": 9880,
+          "before": "",
+          "after": " const buildRaw=physical(BUILD_CONTINUATION.path);exact(buildRaw,BUILD_CONTINUATION);const build=JSON.parse(buildRaw),buildParent='6f134e962163d84257468e6539f1f2e4c9f539e2',buildCommit='3ac10c5438c5636504f7dd909bf7c50387c649d7';assert.equal(build.schema_version,1);assert.equal(build.role,'retained-validator-build-context-source-continuation');assert.equal(build.source_parent,buildParent);assert.equal(build.source_commit,buildCommit);for(const [key,value]of Object.entries({source_only:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(build[key],value,key);assert.equal(git(['rev-list','--parents','-n','1',buildCommit]).toString().trim(),buildCommit+' '+buildParent);git(['merge-base','--is-ancestor',buildCommit,'HEAD']);assert.equal(build.transition.path,'scripts/retained-current-build-context.mjs');assert.deepEqual(build.transition.before,packet.support.find(ref=>ref.path===build.transition.path));assert.equal(build.transition.after.path,build.transition.path);verifyGit(buildParent,[build.transition.before]);verifyGit(buildCommit,[build.transition.after]);\n const consolidationRaw=physical(CONSOLIDATION_CONTINUATION.path);exact(consolidationRaw,CONSOLIDATION_CONTINUATION);const consolidation=JSON.parse(consolidationRaw),consolidationParent='e74f9b96f0ea8b25d3455d7447602d32bdbd838d',consolidationCommit='fd55b5545d229783e9a95d1a6fbac55510674685';assert.equal(consolidation.schema_version,1);assert.equal(consolidation.role,'retained-validator-consolidation-source-continuation');assert.equal(consolidation.source_parent,consolidationParent);assert.equal(consolidation.source_commit,consolidationCommit);for(const [key,value]of Object.entries({source_only:true,historical_programs_executed:false,artifact_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(consolidation[key],value,key);assert.equal(git(['rev-list','--parents','-n','1',consolidationCommit]).toString().trim(),consolidationCommit+' '+consolidationParent);git(['merge-base','--is-ancestor',consolidationCommit,'HEAD']);assert.deepEqual(consolidation.transitions.map(row=>row.path),['scripts/upstream-test-consolidation-evidence.mjs','scripts/retained-current-consolidation-context.mjs']);assert.deepEqual(consolidation.transitions[0].before,packet.programs[1].current);assert.deepEqual(consolidation.transitions[1].before,packet.support.find(ref=>ref.path===consolidation.transitions[1].path));for(const row of consolidation.transitions){assert.equal(row.before.path,row.path);assert.equal(row.after.path,row.path);}verifyGit(consolidationParent,consolidation.transitions.map(row=>row.before));verifyGit(consolidationCommit,consolidation.transitions.map(row=>row.after));assert.deepEqual(consolidation.support.map(row=>row.reference.path),['scripts/retained-f10-build-source-context.mjs','compatibility/rc/retained-f10-build-source-context-696.json','scripts/harness-animation-preparation-evidence.mjs','compatibility/rc/harness-animation-preparation-owned-mode-2c51.json','scripts/retained-f10-inventory-source-context.mjs','compatibility/rc/retained-f10-inventory-source-context-ce9.json','compatibility/rc/retained-main-consolidation-source-continuation-3ac.json']);assert.deepEqual(consolidation.support.map(row=>row.commit),[...Array(4).fill(buildCommit),...Array(3).fill(consolidationCommit)]);for(const row of consolidation.support)verifyGit(row.commit,[row.reference]);\n"
+        },
+        {
+          "offset": 10608,
+          "before": "  const known=new Map();for(const ref of [row.before,row.intermediate,row.current]){const prior=known.get(ref.sha256);if(prior)assert.deepEqual(prior,clean(ref));else known.set(ref.sha256,clean(ref));}\n  identities.set(row.path,{known,current:clean(row.current)});add(row.current);\n",
+          "after": "  const known=new Map();for(const ref of [row.before,row.intermediate,row.current,...(row.path===consolidation.transitions[0].path?[consolidation.transitions[0].after]:[])]){const prior=known.get(ref.sha256);if(prior)assert.deepEqual(prior,clean(ref));else known.set(ref.sha256,clean(ref));}\n  const current=row.path===consolidation.transitions[0].path?consolidation.transitions[0].after:row.current;identities.set(row.path,{known,current:clean(current)});add(current);\n"
+        },
+        {
+          "offset": 10893,
+          "before": " for(const ref of packet.support)add(ref.path===successorPaths[0]?metadata.transitions[0].after:ref);\n add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);add(METADATA_CONTINUATION);for(const row of metadata.transitions.slice(1))add(row.after);\n",
+          "after": " for(const ref of packet.support)add(ref.path===successorPaths[0]?metadata.transitions[0].after:ref.path===build.transition.path?build.transition.after:ref.path===consolidation.transitions[1].path?consolidation.transitions[1].after:ref);\n add(CONTEXT_SUCCESSOR);add(CONTEXT_CONTINUATION);add(METADATA_CONTINUATION);add(BUILD_CONTINUATION);add(CONSOLIDATION_CONTINUATION);for(const row of consolidation.support)add(row.reference);for(const row of metadata.transitions.slice(1))add(row.after);\n"
+        },
+        {
+          "offset": 12880,
+          "before": "  get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(packet.programs.map(row=>({path:row.path,before:clean(row.before),intermediate:clean(row.intermediate),current:clean(row.current)})));},\n",
+          "after": "  get bound(){return structuredClone([...bound.values()]);},get transitions(){return structuredClone(packet.programs.map(row=>({path:row.path,before:clean(row.before),intermediate:clean(row.intermediate),current:clean(row.path===consolidation.transitions[0].path?consolidation.transitions[0].after:row.current)})));},\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/retained_validator_program_source_probe.mjs",
+      "before": {
+        "path": "tests/retained_validator_program_source_probe.mjs",
+        "sha256": "52000ebe635600e6768d71df7df3763b248b1511e114c93da26272a6d9f5797c",
+        "bytes": 6945
+      },
+      "after": {
+        "path": "tests/retained_validator_program_source_probe.mjs",
+        "sha256": "9053ceb0f90b036eea2ea5ebb63d2c7b02d4eee9d0c15c5eff6e56adc64aae24",
+        "bytes": 7985
+      },
+      "edits": [
+        {
+          "offset": 559,
+          "before": "assert.equal(live.transitions.length,3);assert.equal(live.bound.length,25);\n",
+          "after": "assert.equal(live.transitions.length,3);assert.equal(live.bound.length,34);\n"
+        },
+        {
+          "offset": 851,
+          "before": "",
+          "after": "const buildReceipt=JSON.parse(physical('compatibility/rc/retained-validator-build-context-successor-3ac.json'));\nconst consolidationReceipt=JSON.parse(physical('compatibility/rc/retained-validator-consolidation-source-fd55-v1.json'));\n"
+        },
+        {
+          "offset": 955,
+          "before": "const expectedPaths=new Set(['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json',originalPacket.source_input.path,...originalPacket.programs.map(row=>row.path),...originalPacket.support.map(row=>row.path),'compatibility/rc/retained-validator-context-successor-4015.json','compatibility/rc/retained-validator-context-successor-149de.json','compatibility/rc/retained-validator-context-successor-a0b77.json',...receipt.transitions.map(row=>row.path)]);\n",
+          "after": "const expectedPaths=new Set(['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json',originalPacket.source_input.path,...originalPacket.programs.map(row=>row.path),...originalPacket.support.map(row=>row.path),'compatibility/rc/retained-validator-context-successor-4015.json','compatibility/rc/retained-validator-context-successor-149de.json','compatibility/rc/retained-validator-context-successor-a0b77.json','compatibility/rc/retained-validator-build-context-successor-3ac.json','compatibility/rc/retained-validator-consolidation-source-fd55-v1.json',...consolidationReceipt.support.map(row=>row.reference.path),...receipt.transitions.map(row=>row.path)]);\n"
+        },
+        {
+          "offset": 1819,
+          "before": "",
+          "after": "const {blob_oid,...oldConsolidation}=originalPacket.programs.find(row=>row.path===consolidationReceipt.transitions[0].path).current;assert.deepEqual(live.qualifyMetadata(oldConsolidation),live.transitions.find(row=>row.path===oldConsolidation.path).current);\n"
+        },
+        {
+          "offset": 2474,
+          "before": "for(const target of ['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json','tests/retained_current_context_identity_probe.mjs','tests/test_current_reader_source_successors.py','compatibility/rc/retained-validator-context-successor-149de.json','compatibility/rc/retained-validator-context-successor-a0b77.json']){\n",
+          "after": "for(const target of ['scripts/retained-validator-program-source.mjs','compatibility/rc/main-retained-validator-programs-v1.json','tests/retained_current_context_identity_probe.mjs','tests/test_current_reader_source_successors.py','compatibility/rc/retained-validator-context-successor-149de.json','compatibility/rc/retained-validator-context-successor-a0b77.json','compatibility/rc/retained-validator-build-context-successor-3ac.json','compatibility/rc/retained-validator-consolidation-source-fd55-v1.json']){\n"
+        },
+        {
+          "offset": 5095,
+          "before": " for(const row of [...receipt.transitions,...metadataReceipt.transitions]){\n",
+          "after": " for(const row of [...receipt.transitions,...metadataReceipt.transitions,buildReceipt.transition,...consolidationReceipt.transitions]){\n"
+        },
+        {
+          "offset": 5238,
+          "before": "  const before=execFileSync('git',['show',`${metadataReceipt.transitions.includes(row)?metadataReceipt.source_parent:receipt.source_parent}:${row.path}`],{cwd:root});\n",
+          "after": "  const before=execFileSync('git',['show',`${consolidationReceipt.transitions.includes(row)?consolidationReceipt.source_parent:row===buildReceipt.transition?buildReceipt.source_parent:metadataReceipt.transitions.includes(row)?metadataReceipt.source_parent:receipt.source_parent}:${row.path}`],{cwd:root});\n"
+        },
+        {
+          "offset": 6405,
+          "before": "console.log(JSON.stringify({result:'pass',programs:3,bound:25,cold_rejections:25,late_rejections:25,recoveries:25,whole_predecessor_bodies_rejected_and_recovered:true,exact_program_source_union:true,self_source_physical_rejected_and_recovered:true,\n",
+          "after": "console.log(JSON.stringify({result:'pass',programs:3,bound:34,cold_rejections:34,late_rejections:34,recoveries:34,whole_predecessor_bodies_rejected_and_recovered:true,exact_program_source_union:true,self_source_physical_rejected_and_recovered:true,\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_retained_validator_program_source.py",
+      "before": {
+        "path": "tests/test_retained_validator_program_source.py",
+        "sha256": "1bcf0014ed88dee3720512ae55fd43262863f58049b9677863890c8c79433f2e",
+        "bytes": 1459
+      },
+      "after": {
+        "path": "tests/test_retained_validator_program_source.py",
+        "sha256": "3abde91d46b0a36d3f50bdd82efd29d70b207095d1882204b5a48ff312c9509d",
+        "bytes": 1459
+      },
+      "edits": [
+        {
+          "offset": 745,
+          "before": "        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (25, 25, 25))\n",
+          "after": "        self.assertEqual((report['cold_rejections'], report['late_rejections'], report['recoveries']), (34, 34, 34))\n"
+        }
+      ]
+    }
+  ],
+  "support": [
+    {
+      "path": "compatibility/rc/retained-validator-build-context-successor-3ac.json",
+      "sha256": "44477a92abc7e9edc3a91722d846450d3a7c0719ee80c24b80208d87a8f76cf6",
+      "bytes": 937
+    },
+    {
+      "path": "compatibility/rc/retained-validator-consolidation-source-fd55-v1.json",
+      "sha256": "27300dcc8c0fd1f71855de34a35b6727bcda7e6f9980ac33b160db00d6144715",
+      "bytes": 4098
+    }
+  ]
+}
