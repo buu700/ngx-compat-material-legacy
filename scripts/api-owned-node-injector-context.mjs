@@ -1,6 +1,6 @@
 /** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
 /** Two exact current constructor additions, separate from historical DI inputs. */
-import {qualifyCombinedArtifactSubject,API_COMBINED_D70_SHA,API_COMBINED_INPUT_FIRSTCHECK_SHA} from './api-combined-d70-image.mjs';
+import {qualifyCombinedArtifactSubject,API_COMBINED_D70_SHA,API_COMBINED_INPUT_FIRSTCHECK_SHA,API_COMBINED_PSEUDO_DISABLED_SHA} from './api-combined-d70-image.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -60,7 +60,7 @@ export function finishOwnedNodeInjector(factory,fixture,core){
 }
 
 function expectedContext(symbolId,artifact=API_V8_ARTIFACT_SHA){
- const profile=profiles[symbolId];assert.ok(profile);assert.ok([API_V8_ARTIFACT_SHA,API_HINT_ID_ARTIFACT_SHA,API_NODE_COMBINED_SHA,API_COMBINED_D70_SHA,API_COMBINED_INPUT_FIRSTCHECK_SHA].includes(artifact));const bundle=[API_NODE_COMBINED_SHA,API_COMBINED_D70_SHA,API_COMBINED_INPUT_FIRSTCHECK_SHA].includes(artifact)?API_NODE_COMBINED_BUNDLES[profile.family]:artifact===API_HINT_ID_ARTIFACT_SHA&&symbolId==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
+ const profile=profiles[symbolId];assert.ok(profile);assert.ok([API_V8_ARTIFACT_SHA,API_HINT_ID_ARTIFACT_SHA,API_NODE_COMBINED_SHA,API_COMBINED_D70_SHA,API_COMBINED_INPUT_FIRSTCHECK_SHA,API_COMBINED_PSEUDO_DISABLED_SHA].includes(artifact));const bundle=[API_NODE_COMBINED_SHA,API_COMBINED_D70_SHA,API_COMBINED_INPUT_FIRSTCHECK_SHA,API_COMBINED_PSEUDO_DISABLED_SHA].includes(artifact)?API_NODE_COMBINED_BUNDLES[profile.family]:artifact===API_HINT_ID_ARTIFACT_SHA&&symbolId==='legacy-form-field/primary/MatLegacyFormField'?API_HINT_ID_FORM_BUNDLE_SHA:profile.bundle_sha256;
  return {symbol_id:symbolId,artifact_sha256:artifact,bundle_sha256:bundle,parameter:parameter(profile),original_arity:profile.original_arity,current_arity:profile.original_arity+1,constructor_calls:1,stored_input_identical:true,node_element_matched:true,application_matched:true,child_scope_matched:true,parent_scope_distinct:true};
 }
 export function ownedNodeInjectorObservationProblems(row,{tarball}={}){

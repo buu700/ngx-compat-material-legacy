@@ -1,4 +1,5 @@
 /** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
+import {pseudoCorePredecessor} from './api-pseudo-core-continuation.mjs';
 /** Finite 877c predecessor to 0409 packed source and strict-program transition. */
 import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
 import {readFileSync} from 'node:fs';import {join,dirname} from 'node:path';import {fileURLToPath} from 'node:url';import {gunzipSync} from 'node:zlib';import {createHash} from 'node:crypto';import {isDeepStrictEqual} from 'node:util';
@@ -10,10 +11,10 @@ const profiles={'legacy-paginator':{names:['core','select','tooltip'],count:331,
 export function qualifyPaginatorTabBodyClosure(rows,family){try{const p=profiles[family];if(!p||!Array.isArray(rows)||rows.length!==p.count)return false;const priorRows=rows.slice();for(const name of p.names){const [ob,oh,nb,nh]=delta[name],path='types/ngx-compat-material-legacy-legacy-'+name+'.d.ts',indexes=rows.flatMap((r,i)=>r.package===base.package&&r.path===path?[i]:[]);if(indexes.length!==1||!isDeepStrictEqual(rows[indexes[0]],{...base,path,bytes:nb,sha256:nh}))return false;priorRows[indexes[0]]={...base,path,bytes:ob,sha256:oh};}return inputHarnessClosureFingerprint(priorRows)===p.prior;}catch{return false;}}
 function apply(prior,transitions){let result='',offset=0;for(const [start,end,oldText,newText] of transitions){if(start<offset||prior.slice(start,end)!==oldText)throw Error('transition differs');result+=prior.slice(offset,start)+newText;offset=end;}return result+prior.slice(offset);}
 export function qualifyPaginatorTabBodyCombined(context,family){try{
- if(!profiles[family]||!qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot))return false;
+ const subject=qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot);if(!profiles[family]||!subject)return false;
  const dataBytes=readFileSync(join(root,'compatibility/rc/qualification/api-paginator-tabbody-combined-v1/transitions.json.gz'));if(sha(dataBytes)!=='089262767279149e07bff45695d3a90b00457ce4a677d040490126a3d28ad4de')return false;const data=JSON.parse(gunzipSync(dataBytes)),x=data[family],bundle=join(context.packageRoot,'fesm2022/ngx-compat-material-legacy-'+family+'.mjs'),mapBytes=readFileSync(bundle+'.map'),map=JSON.parse(mapBytes);
  if(sha(readFileSync(bundle))!==x.current_bundle||sha(mapBytes)!==x.current_map||!isDeepStrictEqual(map.sources,x.sources)||map.sourcesContent.length!==x.prior.length)return false;
  for(let i=0;i<x.sources.length;i++)if(apply(x.prior[i],x.transitions[x.sources[i]]||[])!==map.sourcesContent[i])return false;
- for(const name of profiles[family].names){const d=data[name+'-declaration'],current=readFileSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-'+name+'.d.ts'));if(sha(d.prior)!==d.prior_sha||sha(current)!==d.current_sha||apply(d.prior,d.transitions)!==current.toString())return false;}
+ for(const name of profiles[family].names){const d=data[name+'-declaration'],current=name==='core'&&subject.profile==='combined-pseudo-disabled'?pseudoCorePredecessor(context):readFileSync(join(context.packageRoot,'types/ngx-compat-material-legacy-legacy-'+name+'.d.ts'));if(sha(d.prior)!==d.prior_sha||sha(current)!==d.current_sha||apply(d.prior,d.transitions)!==current.toString())return false;}
  return true;
 }catch{return false;}}

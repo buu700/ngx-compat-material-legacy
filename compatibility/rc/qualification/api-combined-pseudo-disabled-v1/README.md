@@ -1,0 +1,5 @@
+# Pseudo-checkbox disabled-input packed successor
+
+The finite `25365d61d3caf5a3adb933e7ee84ea12e5d1facf9e574a1c7607a565680860c5` artifact succeeds `f31f87a06321fdd10c16c4d65b433e2c4f1ea3c7dc82fb2a79bf75bd40b71efc`. It changes four legacy-core members among 512. The qualifier reconstructs and checks the complete f31 predecessor, authenticates both sides of each changed member, compares exact emitted and declaration edits, and verifies source map mappings and unchanged sources. The untouched tagged pseudo-checkbox source comes from Angular Components commit `df60e733c60e572ba538f6ad0ceff3e63e527b53`, path `src/material/core/selection/pseudo-checkbox/pseudo-checkbox.ts`; its plain disabled input declaration is compared structurally with the emitted source map. Exact core bundle replacement preserves all other source and helper bodies.
+
+This evidence binds artifact identity and finite source transitions. Lifecycle, runtime, compiler, peer, historical ledger, packed acceptance and release claims remain separately assessed.

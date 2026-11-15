@@ -5,6 +5,8 @@
  *
  * Exact three-row, artifact-bound API qualification; new images require review.
  */
+import {normalizePseudoCoreRows} from './api-pseudo-core-continuation.mjs';
+import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
 import {qualifyApiV8Archive as qualifyOldApiV8Archive} from './api-v8-artifact-successor.mjs';
@@ -55,7 +57,7 @@ function peerImage(req,name){
 }
 
 const OLD='a488b8b42440baa553650766a5c4a969458e7add843ff5d500aeb20913c74fc2', V7='66449e62f2fe13232107cba6a7cdf744a67d941fe52987253546fbceb3bc35ca';
-function strictDeclaration(ts,file,p,image,combined){
+function strictDeclaration(ts,file,p,image,combined,context){
  const texts={
   'legacy-paginator':"import {MatLegacyPaginator} from './ngx-compat-material-legacy-legacy-paginator'; abstract class P extends MatLegacyPaginator { test(e: MouseEvent): void { this._handlePageSizeTargetClick(e); } } void P;",
   'legacy-tabs':"import {_MatLegacyTabBodyBase} from './ngx-compat-material-legacy-legacy-tabs'; abstract class T extends _MatLegacyTabBodyBase { test(): boolean { super.ngAfterViewInit(); return this._contentIsVisible; } } void T;"};
@@ -65,7 +67,7 @@ function strictDeclaration(ts,file,p,image,combined){
  const sources=program.getSourceFiles().filter(f=>f.fileName!==fixture).map(f=>{const real=realpathSync(f.fileName);let dir=dirname(real);while(dir!==dirname(dir)&&!existsSync(join(dir,'package.json')))dir=dirname(dir);const pb=readFileSync(join(dir,'package.json')),pkg=JSON.parse(pb),path=relative(dir,real).split('\\').join('/'),bytes=readFileSync(real);if(!pkg.name||!pkg.version||!path||path.startsWith('../')||isAbsolute(path)||!bytes.equals(Buffer.from(f.text,'utf8')))throw Error('unbound source');return {package:pkg.name,version:pkg.version,package_sha256:hash(pb),path,bytes:bytes.length,sha256:hash(bytes)};});
  const expected=p.family==='legacy-tabs'?'f445d9c82890f13bb412f77e24605478ae6ca3e53766af0583e8a94f54a3d1f6':image===OLD?'bf8117fe8e8685ff6733c1fabfab995ab03f3206ca37c5754b3e0fa9f7d46805':'10fa39b3929b84428138697106da94aa203bade0912e4208faaa0ef23acc51a1';
  const fingerprint=inputHarnessClosureFingerprint(sources);
- if(sources.length!==(p.family==='legacy-tabs'?307:331)||(combined?!qualifyPaginatorTabBodyClosure(sources,p.family):fingerprint!==expected)||program.getSourceFile(file.fileName)?.text!==file.text)return null;
+ if(sources.length!==(p.family==='legacy-tabs'?307:331)||(combined?!qualifyPaginatorTabBodyClosure(qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot)?.profile==='combined-pseudo-disabled'?normalizePseudoCoreRows(sources,context):sources,p.family):fingerprint!==expected)||program.getSourceFile(file.fileName)?.text!==file.text)return null;
  return {sources:sources.length,closure_sha256:fingerprint,strict:true,skipLibCheck:false};
 }
 const profiles={
@@ -92,7 +94,7 @@ export function paginatorTabBodyProof(symbol,file,context){
   const exports=sf.statements.flatMap(n=>ts.isExportDeclaration(n)&&!n.moduleSpecifier&&n.exportClause&&ts.isNamedExports(n.exportClause)?[...n.exportClause.elements]:[]).filter(e=>e.name.text===p.name&&(e.propertyName||e.name).text===p.cls);if(exports.length!==1)return null;
   if(p.family==='legacy-paginator'&&!cls.members.find(m=>m.name?.getText(sf)==='ɵcmp')?.getText(sf).includes('"click": "_handlePageSizeTargetClick($event)"'))return null;
   const req=createRequire(bundle);for(const [name,expected] of Object.entries(peers))if(peerImage(req,name)!==expected)return null;
-  const declaration=strictDeclaration(ts,file,p,image,combined);if(!declaration)return null;
+  const declaration=strictDeclaration(ts,file,p,image,combined,context);if(!declaration)return null;
   return {artifact_sha256:image,source_sha256:p.sourceHash,bundle_sha256:hash(readFileSync(bundle)),declaration,dts_sha256:dtsHash,shape_sha256:p.shape,proof:'exact image, tagged source, minimum-peer images and direct FESM AST export',evidence_sha256:'f674dd6a96e055c7c1b0e74b8450faa781c62a67700fbc668174fdd8590b3ebc'};
  }catch{return null;}
 }

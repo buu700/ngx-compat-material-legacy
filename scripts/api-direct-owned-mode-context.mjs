@@ -4,11 +4,13 @@ import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
+import {PSEUDO_CORE_BUNDLE_SHA} from './api-pseudo-core-continuation.mjs';
 import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
 import {originalContextDi} from './api-original-factory-contexts.mjs';
 import {ownedMotionSourceScope as scope,ownedMotionHelperOrigin as origin,assertOwnedMotionRequests as check,serializeOwnedMotionRequests as serialize,ownedSelectMotionProblems} from './api-owned-motion-context.mjs';
 const hash=x=>createHash('sha256').update(x).digest('hex');
 const coreHash='4172a40fb470f20e62322fec159a4ab12559ac5d900a62ae02d02ee59f7327a9';
+function contextualCoreHash(context){try{return context?.tarball&&context?.packageRoot&&qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot)?.profile==='combined-pseudo-disabled'?PSEUDO_CORE_BUNDLE_SHA:coreHash;}catch{return coreHash;}}
 const helperHashes=['85d05a3f59d6ab1323a63329dbb689d7985c49151339e9308113008d890cb0c7','ce37ae5419bed0f2c1df57e17459b39da55e2a3b759efb373b2e31ce73e46996','4b206f01ce7468d370352ec69f82d07f282775b3bc303318a0b3bfb5aaade126'];
 const profiles={
  'legacy-button/primary/MatLegacyAnchor':[4,2,2,'e73690e82e64f8a8c79a7a93d99bbc5704592f3fe74a564ee2275f7aca55cd51','e43aa41dbf463cdff115d1b3fbec47a676a0e5e5f33eed787d3a69a42f81b330',['53e32cd98509da81138b2b9f403863deba6d32c10c2e32e53f3e2c4a763d6a54','d7607154624e71a9607a34f6d73dfc5e237cb9d022fa7634a1973ddf97f100c4']],
@@ -26,8 +28,9 @@ for(const p of Object.values(profiles)){Object.freeze(p[5]);Object.freeze(p);}Ob
 export const directOwnedModeProfile=id=>profiles[id]||null;
 function imageProfile(id,context){
  const prior=profiles[id];if(!prior)return null;
- if(!['legacy-progress-bar/primary/MatLegacyProgressBar','legacy-tooltip/primary/LegacyTooltipComponent'].includes(id)||!context?.tarball||!context?.packageRoot)return {profile:prior,subject:null};
- try{const subject=qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot);if(!['combined-d70','combined-input-firstcheck'].includes(subject?.profile))return {profile:prior,subject:null};
+ if(!['legacy-progress-bar/primary/MatLegacyProgressBar','legacy-tooltip/primary/LegacyTooltipComponent','legacy-core/primary/MatLegacyPseudoCheckbox'].includes(id)||!context?.tarball||!context?.packageRoot)return {profile:prior,subject:null};
+ try{const subject=qualifyCombinedArtifactSubject(readFileSync(context.tarball),context.packageRoot);if(!['combined-d70','combined-input-firstcheck','combined-pseudo-disabled'].includes(subject?.profile))return {profile:prior,subject:null};
+ if(id==='legacy-core/primary/MatLegacyPseudoCheckbox'){if(subject.profile!=='combined-pseudo-disabled')return {profile:prior,subject:null};const profile=[...prior];profile[4]=PSEUDO_CORE_BUNDLE_SHA;profile[5]=['0b93a6e34a6acd34a7ca1c7b8629549d8ed1eb52692c7ac0a83e8a642f00d061'];return {profile,subject};}
  const profile=[...prior];profile[4]=id.includes('progress-bar')?'b4a371702f8745fea9d3c7f1a1794e6eb240d6e8ab61426673771d0cbdae68ad':'4cf49b3c2774efd82ae4093e13d6ad535c5eea0a7b0e9210b405ce331bddb334';if(id.includes('progress-bar'))profile[5]=['068b8c3f09f60f1578255118201cbacee4ff6805f6373a758f5ca1c34c9bbcf3'];return {profile,subject};
  }catch{return {profile:prior,subject:null};}}
 export function directOwnedModeCandidate(symbol,packageRoot,artifactContext){const image=imageProfile(symbol?.symbol_id,artifactContext),p=image?.profile;if(!p)return false;try{return hash(JSON.stringify(symbol.shape))===p[3]&&hash(readFileSync(join(packageRoot,'fesm2022',`ngx-compat-material-legacy-${symbol.family}.mjs`)))===p[4]&&(!image.subject||packageRoot===artifactContext.packageRoot);}catch{return false;}}
@@ -46,7 +49,7 @@ export function directOwnedModeToken({symbol,Type,exports,owned,core,material,in
 }
 export function partitionDirectOwnedMode({requests,core,owned,layout,material,Type,exports,symbol,files,runFactory,injector,value,capture,artifactContext}){
  const token=directOwnedModeToken({symbol,Type,exports,owned,core,material,injector,capture,file:files.caller,requests,artifactContext}),state=scope(files.core,owned.getLegacyAnimationsState),disabled=scope(files.core,owned.legacyAnimationsDisabled),resolver=scope(files.core,owned.resolveLegacyAnimationMode);
- if([state,disabled,resolver].some((x,i)=>x.proof.sha256!==coreHash||x.proof.function_text_sha256!==helperHashes[i])||requests.some(r=>r.token===core.ANIMATION_MODULE_TYPE))throw Error('direct mode helper or old token differs');
+ if([state,disabled,resolver].some((x,i)=>x.proof.sha256!==contextualCoreHash(artifactContext)||x.proof.function_text_sha256!==helperHashes[i])||requests.some(r=>r.token===core.ANIMATION_MODULE_TYPE))throw Error('direct mode helper or old token differs');
  const retained=[],classified=[];for(const r of requests)(token.callers.some(c=>origin(r,state,disabled,c,null,resolver))?classified:retained).push(r);
  const expected=[{ident:'LEGACY_ANIMATIONS_TEST_OVERRIDE',token:owned.LEGACY_ANIMATIONS_TEST_OVERRIDE,optional:true},{ident:'MATERIAL_ANIMATIONS',token:material.MATERIAL_ANIMATIONS,optional:true},{ident:'LEGACY_ANIMATION_MODE',token:owned.LEGACY_ANIMATION_MODE,optional:true},{ident:'MediaMatcher',token:layout.MediaMatcher,optional:false}];
  const control=runFactory(owned.getLegacyAnimationsState,core.Injector,core.runInInjectionContext,{injector,captureStack:true});if(control.outcome!=='returned'||!control.requests.length)throw Error('direct mode control incomplete');check(control.requests,expected.slice(0,control.requests.length));
@@ -55,7 +58,7 @@ export function partitionDirectOwnedMode({requests,core,owned,layout,material,Ty
  const spinner=symbol.symbol_id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner';
  const actual=spinner?value._noopAnimations:value._animationMode,expectedValue=spinner?expectedMode==='NoopAnimations'&&!!capture.inputs[4]&&!capture.inputs[4]._forceAnimations:expectedMode;
  if(actual!==expectedValue)throw Error('direct mode effective state differs');
- return {requests:retained,observation:{...token.receipt,protocol:'direct-owned-motion-v1',helper_core_sha256:coreHash,helper_function_hashes:[...helperHashes],old_token_requested:false,ambient_state:control.value,constructor_mode:mode??null,effective_mode:expectedMode??null,spinner_noop:spinner?actual:null,spinner_force:spinner?Boolean(capture.inputs[4]?._forceAnimations):null,spinner_defaults:spinner?Boolean(capture.inputs[4]):null,helper_calls:mode==='NoopAnimations'?0:1,classified_requests:classified.length,control_requests:serialize(control.requests,expected)}};
+ return {requests:retained,observation:{...token.receipt,protocol:'direct-owned-motion-v1',helper_core_sha256:contextualCoreHash(artifactContext),helper_function_hashes:[...helperHashes],old_token_requested:false,ambient_state:control.value,constructor_mode:mode??null,effective_mode:expectedMode??null,spinner_noop:spinner?actual:null,spinner_force:spinner?Boolean(capture.inputs[4]?._forceAnimations):null,spinner_defaults:spinner?Boolean(capture.inputs[4]):null,helper_calls:mode==='NoopAnimations'?0:1,classified_requests:classified.length,control_requests:serialize(control.requests,expected)}};
 }
 export function directOwnedModeProblems(x,id,artifactContext){
  const image=imageProfile(id,artifactContext),p=image?.profile,bad=['direct owned mode evidence incomplete'];if(!p||!x||(image.subject?x.artifact_sha256!==image.subject.artifact_sha256:Object.hasOwn(x,'artifact_sha256'))||x.symbol_id!==id||!['direct-owned-token-v1','direct-owned-motion-v1'].includes(x.protocol)||x.shape_sha256!==p[3]||x.bundle_sha256!==p[4]||!isDeepStrictEqual(x.constructor_hashes,p[5])||x.constructor_arity!==p[0]||x.constructor_index!==p[1]||x.di_index!==p[2]||x.owned_token_distinct!==true||x.actual_input_matched!==true||x.optional!==true||x.old_token_requested!==false||flags.slice(1).some(f=>x[f]!==false))return bad;
@@ -63,7 +66,7 @@ export function directOwnedModeProblems(x,id,artifactContext){
  if(existing)return x.protocol==='direct-owned-token-v1'?[]:bad;
  if(x.protocol!=='direct-owned-motion-v1')return bad;
  const mode=x.constructor_mode,expected=mode==='NoopAnimations'||x.ambient_state!=='enabled'?'NoopAnimations':mode,names=['LEGACY_ANIMATIONS_TEST_OVERRIDE','MATERIAL_ANIMATIONS','LEGACY_ANIMATION_MODE','MediaMatcher'];
- if(x.helper_core_sha256!==coreHash||!isDeepStrictEqual(x.helper_function_hashes,helperHashes)||x.old_token_requested!==false||!['enabled','di-disabled','reduced-motion'].includes(x.ambient_state)||x.effective_mode!==expected||x.helper_calls!==(mode==='NoopAnimations'?0:1)||!Array.isArray(x.control_requests)||x.control_requests.length<1||x.control_requests.length>4||x.classified_requests!==x.helper_calls*x.control_requests.length||x.control_requests.some((r,i)=>!isDeepStrictEqual(r,{ident:names[i],identity_matched:true,unresolved:false,optional:i<3,self:false,skipSelf:false,host:false})))return bad;
+ if(x.helper_core_sha256!==contextualCoreHash(artifactContext)||!isDeepStrictEqual(x.helper_function_hashes,helperHashes)||x.old_token_requested!==false||!['enabled','di-disabled','reduced-motion'].includes(x.ambient_state)||x.effective_mode!==expected||x.helper_calls!==(mode==='NoopAnimations'?0:1)||!Array.isArray(x.control_requests)||x.control_requests.length<1||x.control_requests.length>4||x.classified_requests!==x.helper_calls*x.control_requests.length||x.control_requests.some((r,i)=>!isDeepStrictEqual(r,{ident:names[i],identity_matched:true,unresolved:false,optional:i<3,self:false,skipSelf:false,host:false})))return bad;
  if(id==='legacy-progress-spinner/primary/MatLegacyProgressSpinner'){if(typeof x.spinner_noop!=='boolean'||typeof x.spinner_force!=='boolean'||typeof x.spinner_defaults!=='boolean'||x.spinner_noop!==(expected==='NoopAnimations'&&x.spinner_defaults&&!x.spinner_force))return bad;}else if(x.spinner_noop!==null||x.spinner_force!==null||x.spinner_defaults!==null)return bad;
  return [];
 }

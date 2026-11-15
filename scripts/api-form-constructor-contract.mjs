@@ -5,6 +5,7 @@
  *
  * Finite declaration-only qualification of the reviewed v7 constructor pair.
  */
+import {normalizePseudoCoreRows} from './api-pseudo-core-continuation.mjs';
 import {qualifyCombinedArtifactSubject} from './api-combined-d70-image.mjs';
 import {createRequire} from 'node:module';
 import {createHash} from 'node:crypto';
@@ -40,12 +41,12 @@ function combinedClosure(sources){
  const selected=sources.filter(x=>x.package===core.package&&x.version===core.version&&x.path===core.path);
  return sources.length===309&&selected.length===1&&isDeepStrictEqual(selected[0],current)&&inputHarnessClosureFingerprint(sources.map(x=>x===selected[0]?prior:x))==='fb4d846d3e355461e7c301e4d8013b39c8f8590a0f8375d5673bfce4d497f08c';
 }
-function strict(ts,file,combined=false){
+function strict(ts,file,combined=false,context){
  const options={strict:true,skipLibCheck:false,noEmit:true,module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,target:ts.ScriptTarget.ES2022},fixture=join(dirname(file.fileName),'__form_constructor_contract__.ts'),host=ts.createCompilerHost(options),original=host.getSourceFile.bind(host);
  host.getSourceFile=(name,...args)=>name===fixture?ts.createSourceFile(name,fixtureText,ts.ScriptTarget.Latest,true):original(name,...args);
  const program=ts.createProgram([file.fileName,fixture],options,host);if(ts.getPreEmitDiagnostics(program).length||program.getSourceFile(file.fileName)?.text!==file.text)return null;
  const sources=program.getSourceFiles().filter(f=>f.fileName!==fixture).map(f=>{const real=realpathSync(f.fileName);let dir=dirname(real);while(dir!==dirname(dir)&&!existsSync(join(dir,'package.json')))dir=dirname(dir);const pb=readFileSync(join(dir,'package.json')),pkg=JSON.parse(pb),path=relative(dir,real).split('\\').join('/'),bytes=readFileSync(real);if(!pkg.name||!pkg.version||!path||path.startsWith('../')||isAbsolute(path)||!bytes.equals(Buffer.from(f.text,'utf8')))throw Error('unbound source');return {package:pkg.name,version:pkg.version,package_sha256:hash(pb),path,bytes:bytes.length,sha256:hash(bytes)}});
- const closure=inputHarnessClosureFingerprint(sources);return (combined?combinedClosure(sources):sources.length===309&&closure==='fb4d846d3e355461e7c301e4d8013b39c8f8590a0f8375d5673bfce4d497f08c')?{strict:true,skipLibCheck:false,sources:309,closure_sha256:closure,...(combined?{predecessor_closure_sha256:'fb4d846d3e355461e7c301e4d8013b39c8f8590a0f8375d5673bfce4d497f08c',changed_declarations:['types/ngx-compat-material-legacy-legacy-core.d.ts']}:{} )}:null;
+ const closure=inputHarnessClosureFingerprint(sources);return (combined?combinedClosure(combined.profile==='combined-pseudo-disabled'?normalizePseudoCoreRows(sources,context):sources):sources.length===309&&closure==='fb4d846d3e355461e7c301e4d8013b39c8f8590a0f8375d5673bfce4d497f08c')?{strict:true,skipLibCheck:false,sources:309,closure_sha256:closure,...(combined?{predecessor_closure_sha256:'fb4d846d3e355461e7c301e4d8013b39c8f8590a0f8375d5673bfce4d497f08c',changed_declarations:['types/ngx-compat-material-legacy-legacy-core.d.ts']}:{} )}:null;
 }
 export function settleFormConstructor(symbol,file,signature,context){
  try{
@@ -58,7 +59,7 @@ export function settleFormConstructor(symbol,file,signature,context){
   for(const [path,sha] of Object.entries({'legacy-form-field/public-api.ts':'28347cd0d8d48a1c4bc4921972361098ac52932464192b9e3d76d3349ba9ee51','legacy-form-field/form-field.ts':'c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726'}))if(hash(readFileSync(join(context.referenceRoot,path)))!==sha)return signature;
   const source=readFileSync(join(ROOT,'projects/ngx-material-legacy/legacy-form-field/form-field.ts'));const oldSource='e6204762c0899cfc038d28c7eb3918d291766b3179b6a7bf0b4630f59c6cd657';if(combined?hash(source)!=='e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931':isHint?hash(source)!==API_HINT_ID_FORM_SOURCE_SHA:(hash(source)!==oldSource&&!qualifyApiHintIdSources()))return signature;
   const map=JSON.parse(readFileSync(join(context.packageRoot,Object.keys(members)[2]))),indexes=map.sources.flatMap((x,i)=>x.endsWith('/legacy-form-field/form-field.ts')?[i]:[]);if(indexes.length!==1||hash(map.sourcesContent[indexes[0]])!==(combined?'e0fe0631a6adde57f515b82b43156d5da0ab0c2730872df5b792fc27dab14931':isHint?API_HINT_ID_FORM_SOURCE_SHA:oldSource))return signature;
-  const declaration=strict(ts,file,combined);if(!declaration)return signature;
+  const declaration=strict(ts,file,combined,context);if(!declaration)return signature;
   const rows=signature.rows.filter(r=>r.status==='mismatch'&&(r.historical===OLD&&r.owned===null||r.historical===null&&r.owned===NEW));if(rows.length!==2||signature.blocking.length!==2||!signature.blocking.includes(OLD)||!signature.blocking.includes(NEW))return signature;
   return {...signature,blocking:[],rows:signature.rows.filter(r=>!rows.includes(r)).concat([{status:'intentional-legacy-difference',historical:OLD,owned:NEW,rationale:'The declaration retains the reviewed optional Injector parameter; strict seven-argument and subclass consumers remain valid. The combined image separately authenticates the motion-token source change and core declaration transition.',proof:{artifact_sha256:hash(tar),declaration}}])};
  }catch{return signature;}
