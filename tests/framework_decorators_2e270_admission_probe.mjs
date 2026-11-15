@@ -1,0 +1,22 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/** Structural review admission only, not behavior or runtime qualification. */
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {existsSync,readFileSync} from 'node:fs';
+import {authoredUseReviewEvidence} from '../scripts/authored-use-inventory.mjs';
+const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex'),key=x=>JSON.stringify([x.file,x.module,x.symbol]);
+const path='compatibility/f10/authored-use-reviews/framework-decorators-2e270-successor.json',review=JSON.parse(read(path)),roster=JSON.parse(read('compatibility/f10/authored-dependency-dispositions.json')),prior=JSON.parse(execFileSync('git',['--no-replace-objects','show','2e2701eb7:compatibility/f10/authored-dependency-dispositions.json'],{maxBuffer:16*1024*1024})),roles=JSON.parse(read('compatibility/rc/framework-decorators-2e270-roles.json'));
+assert.equal(prior.symbol_uses.length,1736);assert.equal(roster.symbol_uses.length,1736);assert.equal(roles.results.length,60);assert.equal(roles.mutations.length,3);assert.equal(review.reviews.length,42);assert.equal(review.held.length,18);
+const selected=new Set(review.reviews.map(key));assert.equal(selected.size,42);let changed=0;
+for(let i=0;i<1736;i++){const old=prior.symbol_uses[i],now=roster.symbol_uses[i];assert.equal(key(old),key(now));if(!selected.has(key(now))){assert.deepEqual(now,old);continue}changed++;assert.deepEqual({...now,source_review:old.source_review},old);assert.equal(now.source_review.path,path);assert.equal(now.source_review.sha256,hash(read(path)));const rr=review.reviews.find(r=>key(r)===key(now)),role=roles.results.find(r=>key(r)===key(now));assert.ok(role.same&&role.after.roles?.length);assert.deepEqual(rr.prior_source_review,old.source_review);const oldBytes=read(old.source_review.path);assert.equal(hash(oldBytes),old.source_review.sha256);const prev=JSON.parse(oldBytes).reviews.find(r=>key(r)===key(now));assert.equal(hash(read('projects/ngx-material-legacy/'+now.file)),rr.candidate_source_sha256);for(const e of prev.independent_evidence){const valid=existsSync(e.path)&&hash(read(e.path))===e.sha256;assert.ok((valid?rr.independent_evidence:rr.historical_evidence_not_current).some(x=>x.path===e.path&&x.sha256===e.sha256));}}
+assert.equal(changed,42);const cp=JSON.parse(read('compatibility/rc/class-decorators-2e270-diagnostic.json')),pp=JSON.parse(read('compatibility/rc/property-decorators-2e270-diagnostic.json')),ep=JSON.parse(read('compatibility/rc/framework-enum-2e270-diagnostic.json'));assert.equal(cp.current_uses,126);assert.equal(cp.mutations.length,27);assert.equal(pp.current_uses,104);assert.equal(pp.mutations.length,25);assert.equal(ep.cases.length,76);assert.equal(ep.mutations.length,26);assert.ok(review.held.some(x=>x.file==='legacy-tabs/internal/tab-nav-bar-base.ts'&&x.symbol==='Input'));
+for(const x of review.reviews){let p=['Component','Directive'].includes(x.symbol)?cp:['ChangeDetectionStrategy','ViewEncapsulation'].includes(x.symbol)?ep:pp;assert.equal(p.cases.filter(y=>key(y)===key(x)).length,1)}
+const rows=roster.symbol_uses.filter(x=>selected.has(key(x))),run=(rs,line='main',reader=read)=>authoredUseReviewEvidence({symbol_uses:rs},line,reader,hash);assert.deepEqual(run(rows),{reviewed:42,insufficient:0,insufficient_uses:[]});assert.equal(run(rows,'21.x').insufficient,42);assert.equal(run([{...rows[0],symbol:'Wrong'}]).insufficient,1);assert.equal(run([rows[0]],'main',p=>p==='projects/ngx-material-legacy/'+rows[0].file?Buffer.from('wrong'):read(p)).insufficient,1);assert.equal(run([rows[0]],'main',p=>p==='compatibility/rc/framework-decorators-2e270-roles.json'?Buffer.from('wrong'):read(p)).insufficient,1);
+const altered=JSON.parse(read(path));altered.reviews[0].decision='Unsupported runtime and G11 claim. '.repeat(4);const bytes=Buffer.from(JSON.stringify(altered)),rewritten=rows.map(r=>({...r,source_review:{path,sha256:hash(bytes)}}));assert.deepEqual(run(rewritten,'main',p=>p===path?bytes:read(p)),run(rows));console.log(JSON.stringify({selected:42,unchanged:1694,held:18,wrong_line:42,wrong_symbol:1,wrong_source:1,wrong_evidence:1,structural_output_only:true,semantic_review_required:true}));
