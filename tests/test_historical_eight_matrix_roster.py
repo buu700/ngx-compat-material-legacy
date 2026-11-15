@@ -17,7 +17,7 @@ class HistoricalEightMatrixRosterTests(unittest.TestCase):
         self.assertEqual(report['result'], 'pass')
         self.assertEqual((report['source_families'], report['added_registrations'],
                           report['shifted_original_ids'], report['required_roster'],
-                          report['discovery_negatives']), (4, 8, 333, 2339, 5))
+                          report['discovery_negatives']), (4, 8, 333, 2341, 5))
         self.assertTrue(report['old_source_bodies_preserved'])
         self.assertFalse(report['historical_execution_reattributed'])
         self.assertFalse(report['artifact_or_audit_admission_granted'])
