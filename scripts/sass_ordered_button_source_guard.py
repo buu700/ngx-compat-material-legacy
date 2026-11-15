@@ -83,6 +83,21 @@ def _successors(line,rows):
             data=subprocess.check_output([_GIT,'--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',rev+':'+row['path']],cwd=_ROOT,env=env)
             if (hashlib.sha256(data).hexdigest(),len(data))!=(image['sha256'],image['bytes']):raise ValueError('696 image')
         result[row['path']]=row['after']
+    ypath=_ROOT/'fixtures/sass/ordered-aggregate-consumer-1bf-source-successor.json'
+    if ypath.is_symlink():raise ValueError('linked consumer successor')
+    yraw=ypath.read_bytes()
+    if hashlib.sha256(yraw).hexdigest()!='3873207eed3ac551f54904d1eaf6284d8ac57f462a6afb37564a244135be20fd' or len(yraw)!=1478:raise ValueError('consumer successor packet')
+    y=json.loads(yraw)
+    if y['schema_version']!=1 or y['role']!='main-ordered-aggregate-consumer-source-continuation' or y['line']!='main' or y['source_parent']!='3ac10c5438c5636504f7dd909bf7c50387c649d7' or y['source_commit']!='1bf13daaa006c43d73897011b1966fab1432f010' or y['source_scope_only'] is not True or y['artifact_or_audit_admission_granted'] is not False or y['previous_packet']!=dict(path='fixtures/sass/ordered-aggregate-density-696-source-successor.json',sha256=hashlib.sha256(xraw).hexdigest(),bytes=len(xraw)) or [v['path'] for v in y['updates']]!=names[:2]:raise ValueError('consumer successor scope')
+    parent=subprocess.check_output([_GIT,'--no-replace-objects','rev-list','--parents','-n','1',y['source_commit']],cwd=_ROOT,env=env,text=True).strip()
+    if parent!=y['source_commit']+' '+y['source_parent']:raise ValueError('consumer commit parent')
+    subprocess.check_call([_GIT,'--no-replace-objects','merge-base','--is-ancestor',y['source_commit'],'HEAD'],cwd=_ROOT,env=env)
+    for row in y['updates']:
+        if result[row['path']]!=row['before'] or row['after']['path']!=row['path']:raise ValueError('consumer predecessor')
+        for rev,image in ((y['source_parent'],row['before']),(y['source_commit'],row['after'])):
+            data=subprocess.check_output([_GIT,'--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',rev+':'+row['path']],cwd=_ROOT,env=env)
+            if (hashlib.sha256(data).hexdigest(),len(data))!=(image['sha256'],image['bytes']):raise ValueError('consumer image')
+        result[row['path']]=row['after']
     if (_ROOT/'scripts').is_symlink() or (_ROOT/'scripts/sass-aggregate-source-successor-v2.mjs').is_symlink():raise ValueError('linked successor helper')
     if hashlib.sha256((_ROOT/'scripts/sass-aggregate-source-successor-v2.mjs').read_bytes()).hexdigest()!='76af116336b7c0669f32a9ca3caeaad17c32391da54e79fae1074cddf9e5026b':raise ValueError('successor helper changed')
     return result
