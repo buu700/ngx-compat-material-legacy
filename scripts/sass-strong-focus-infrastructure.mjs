@@ -8,7 +8,9 @@
 import {createHash} from 'node:crypto';
 import {readFileSync,lstatSync} from 'node:fs';
 import {isDeepStrictEqual,types} from 'node:util';
+import {fileURLToPath} from 'node:url';
 import {measureM2PeerProgram,peerMeasurementMatches} from './sass-current-companion-peer.mjs';
+import {createCurrentSassSource} from './current-sass-source.mjs';
 const sha=x=>createHash('sha256').update(x).digest('hex');
 const helperUrls=[new URL(import.meta.url),new URL('./sass_strong_focus_infrastructure.py',import.meta.url)];
 const helperImages=helperUrls.map(p=>readFileSync(p));
@@ -31,15 +33,19 @@ function expected(c,p){
  const prefix=c.selector+' {';if(!c.original_css.startsWith(prefix)||!c.original_css.endsWith('}')||!p.css.startsWith(prefix))return null;
  const single=c.original_css.slice(0,-2)+p.css.slice(prefix.length);return Array(c.count).fill(single).join('\n');
 }
-function sourceOk(m){
+function sourceOk(m,currentSources){
  if(!m||m.line!=='main'||typeof m.css!=='string'||m.css_sha256!==sha(m.css)||m.css_bytes!==Buffer.byteLength(m.css)||!m.sass_version?.startsWith('dart-sass\t1.104.1\t')||!Array.isArray(m.sources)||!m.sources.length)return false;
  const required=[['_index.scss',null],['styles/core/focus-indicators/_focus-indicators.scss','e2ad7e073a9dd1954dc85a5816cc5f9c05644b9d441abc1359847b31b30f7f73'],['styles/core/focus-indicators/_private.scss','308b728b247ebfa673527ab6a3023e26fc818f40eb0e0d65b134eda97d6ccd8f']];
- return isDeepStrictEqual(m.sources,catalog.measurement_sources)&&required.every(([path,digest])=>m.sources.some(s=>s.root===0&&s.path===path&&(!digest||s.sha256===digest)))&&new Set(m.sources.map(s=>`${s.root}/${s.path}`)).size===m.sources.length&&m.sources.every(s=>[0,1,2].includes(s.root)&&typeof s.path==='string'&&s.path&&!s.path.startsWith('/')&&!s.path.includes('..')&&!s.path.includes('\\')&&/^[0-9a-f]{64}$/.test(s.sha256)&&Number.isInteger(s.bytes)&&s.bytes>0);
+ return isDeepStrictEqual(m.sources,currentSources)&&required.every(([path,digest])=>m.sources.some(s=>s.root===0&&s.path===path&&(!digest||s.sha256===digest)))&&new Set(m.sources.map(s=>`${s.root}/${s.path}`)).size===m.sources.length&&m.sources.every(s=>[0,1,2].includes(s.root)&&typeof s.path==='string'&&s.path&&!s.path.startsWith('/')&&!s.path.includes('..')&&!s.path.includes('\\')&&/^[0-9a-f]{64}$/.test(s.sha256)&&Number.isInteger(s.bytes)&&s.bytes>0);
 }
 export function focusResultsMatch(actual,contract){try{
  if(!helpersCurrent()||[new URL('../fixtures/',import.meta.url),new URL('../fixtures/sass/',import.meta.url),catalogUrl].some(p=>lstatSync(p).isSymbolicLink())||sha(readFileSync(catalogUrl))!==sha(raw))return false;
+ const source=createCurrentSassSource({root:fileURLToPath(new URL('..',import.meta.url))});
+ const sets=Object.values(source.source_sets);if(source.line!=='main'||sets.length!==1)return false;
+ const currentSources=sets[0];
+ if(sha(JSON.stringify(catalog.measurement_sources))!=='107fbea0ce4c8529c98cd243232ba833787e18cfc99b22300083d5a9f6b62eb0'||sha(JSON.stringify(currentSources))!=='9e9644112b2451b42b1f91d84fc00c963714e433d5b0c03fe3c1a9f2c6c2b56f')return false;
  [actual,contract]=[plain(actual),plain(contract)];
- const m=actual?.actual_measurement;if(!sourceOk(m)||m.program_sha256!==catalog.default_program_sha256||actual.css!==m.css||actual.sha256!==m.css_sha256||contract?.classification!=='conforming-current-infrastructure'||contract.contract!==STRONG_FOCUS_CONTRACT||!Array.isArray(contract.variants)||contract.variants.length!==catalog.cases.length||!Array.isArray(contract.peers)||contract.peers.length!==catalog.cases.length)return false;
- for(let i=0;i<catalog.cases.length;i++){const c=catalog.cases[i],v=contract.variants[i],e=expected(c,contract.peers[i]);if(!e||v?.name!==c.name||!sourceOk(v.measurement)||v.measurement.program_sha256!==c.program_sha256||!isDeepStrictEqual(v.measurement.sources,m.sources)||v.measurement.css!==e)return false;}
- return m.css===expected(catalog.cases[0],contract.peers[0])&&helpersCurrent();
+ const m=actual?.actual_measurement;if(!sourceOk(m,currentSources)||m.program_sha256!==catalog.default_program_sha256||actual.css!==m.css||actual.sha256!==m.css_sha256||contract?.classification!=='conforming-current-infrastructure'||contract.contract!==STRONG_FOCUS_CONTRACT||!Array.isArray(contract.variants)||contract.variants.length!==catalog.cases.length||!Array.isArray(contract.peers)||contract.peers.length!==catalog.cases.length)return false;
+ for(let i=0;i<catalog.cases.length;i++){const c=catalog.cases[i],v=contract.variants[i],e=expected(c,contract.peers[i]);if(!e||v?.name!==c.name||!sourceOk(v.measurement,currentSources)||v.measurement.program_sha256!==c.program_sha256||!isDeepStrictEqual(v.measurement.sources,m.sources)||v.measurement.css!==e)return false;}
+ source.assertCurrent();return m.css===expected(catalog.cases[0],contract.peers[0])&&helpersCurrent();
 }catch{return false}}

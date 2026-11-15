@@ -11,7 +11,25 @@ class AggregateSourceSuccessorTests(unittest.TestCase):
     def test_projection_and_negative_controls(self):
         root=Path(__file__).resolve().parents[1]
         result=subprocess.run(['node','tests/sass_aggregate_successor_probe.mjs'],cwd=root,text=True,capture_output=True,check=True,timeout=120)
-        self.assertIn('three source mutations, symlink, rehashed peer and wrong-line',result.stdout)
+        self.assertIn('five source mutations, symlink, rehashed peer and wrong-line',result.stdout)
+
+    def test_git_toolchain_and_offline_environment(self):
+        import os, shlex, shutil, tempfile
+        root=Path(__file__).resolve().parents[1]
+        git=shutil.which('git');node=shutil.which('node')
+        self.assertTrue(git and node)
+        self.assertEqual(subprocess.check_output([git,'--version'],text=True).strip(),'git version 2.55.0')
+        code="import {aggregateProjectedSources} from './scripts/sass-aggregate-source-successor-v2.mjs';process.env.PATH='/usr/bin:/bin';console.log(aggregateProjectedSources(process.cwd()).length);"
+        with tempfile.TemporaryDirectory(prefix='ngx-aggregate-git-control-') as temp:
+            directory=Path(temp);log=directory/'git.log';wrapper=directory/'git'
+            wrapper.write_text('#!/bin/sh\nprintf \"%s|%s\\n\" \"$1\" \"${GIT_NO_LAZY_FETCH-}\" >> '+shlex.quote(str(log))+'\nexec '+shlex.quote(git)+' \"$@\"\n')
+            wrapper.chmod(0o755);env=dict(os.environ,PATH=str(directory)+os.pathsep+os.environ['PATH'])
+            run=subprocess.run([node,'--input-type=module','-e',code],cwd=root,env=env,text=True,capture_output=True,timeout=60)
+            self.assertEqual(run.returncode,0,run.stderr);self.assertEqual(run.stdout.strip(),'472')
+            rows=log.read_text().splitlines();self.assertTrue(any(row=='--no-replace-objects|1' for row in rows));self.assertTrue(all(row.endswith('|1') for row in rows if not row.startswith('--version|')))
+            wrapper.write_text('#!/bin/sh\nprintf \"git version 2.43.0\\n\"\n');wrapper.chmod(0o755)
+            run=subprocess.run([node,'--input-type=module','-e',code],cwd=root,env=env,text=True,capture_output=True,timeout=60)
+            self.assertNotEqual(run.returncode,0);self.assertIn('pinned Git 2.55.0 required',run.stderr)
 
     def test_full_css_admission_and_js_python_reject_rehashed_changes(self):
         import copy, hashlib, json, sys
@@ -21,7 +39,7 @@ class AggregateSourceSuccessorTests(unittest.TestCase):
         from sass_ordered_aggregate_fixture import ordered_aggregate_receipt
         active=SimpleNamespace(binding={'source_line':'main'},manifest={'run_id':'run','artifacts':[{'id':'library','sha256':'a'*64}]})
         body=ordered_aggregate_receipt(active,'06-aggregate-and-companions','inv');peers=body['current_companion']['peers']
-        program="""import {readFileSync} from 'node:fs';import {aggregateExpectedSuccessor,aggregateProjectedSources} from './scripts/sass-aggregate-source-successor.mjs';const p=JSON.parse(readFileSync(0,'utf8'));process.stdout.write(JSON.stringify({out:aggregateExpectedSuccessor(process.cwd(),'main',p),sources:aggregateProjectedSources(process.cwd())}));"""
+        program="""import {readFileSync} from 'node:fs';import {aggregateExpectedSuccessor,aggregateProjectedSources} from './scripts/sass-aggregate-source-successor-v2.mjs';const p=JSON.parse(readFileSync(0,'utf8'));process.stdout.write(JSON.stringify({out:aggregateExpectedSuccessor(process.cwd(),'main',p),sources:aggregateProjectedSources(process.cwd())}));"""
         call=subprocess.run(['node','--input-type=module','-e',program],cwd=root,input=json.dumps(peers),text=True,capture_output=True,check=True,timeout=120)
         computed=json.loads(call.stdout);m=body['actual_measurement'];m.update(css=computed['out']['css'],css_sha256=computed['out']['css_sha256'],css_bytes=computed['out']['css_bytes'],sources=computed['sources']);body['candidate_sha256']=m['css_sha256']
         self.assertTrue(ordered_aggregate_assertion_ok(body));cases=[body]

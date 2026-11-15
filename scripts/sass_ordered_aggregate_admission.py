@@ -1,5 +1,5 @@
 """One whole ordered aggregate: historical sequence and exact public contributions."""
-import hashlib,json,re,subprocess,shutil
+import hashlib,json,re,subprocess,shutil,os
 from pathlib import Path
 from sass_stepper_historical_model import historical_stepper_peer_css
 from sass_ordered_button_composition import compose_ordered_aggregate_button
@@ -8,6 +8,7 @@ from sass_current_companion_admission import peer_measurement_ok
 from sass_ordered_core_admission import ordered_core_expected_css
 from sass_ripple_color_admission import insert_ripple_color_in_expected_model, ripple_color_measurement_ok
 ROOT=Path(__file__).resolve().parents[1]
+_TOOL_PATH=os.environ.get('PATH','');_NODE=shutil.which('node',path=_TOOL_PATH);_GIT=shutil.which('git',path=_TOOL_PATH)
 _EXPECTED_ENGINE='356337aa30fed58fcc25afeaabca5ebb3695623c0f17a0aff497a3bd92b4a383'
 def _expected_plain(value):
     if value is None or type(value) in (str,bool):return value
@@ -19,7 +20,7 @@ def _isolated_expected_computation(root,line,operation,value):
     if not __debug__:raise ValueError('assertions required')
     payload=_expected_plain(value);path=Path(root)/'scripts/sass-expected-snapshot-engine.mjs';raw=path.read_bytes()
     if hashlib.sha256(raw).hexdigest()!=_EXPECTED_ENGINE:raise ValueError('trusted expected bootstrap changed')
-    node=shutil.which('node')
+    node=_NODE
     if not node:raise ValueError('pinned Node unavailable')
     result=subprocess.run([node,'--input-type=module','--eval',raw.decode(),str(root),line,operation],input=json.dumps(payload,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=root,env={'LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
     if result.returncode!=0:raise ValueError('expected isolation failed: '+result.stderr[:1000])
@@ -30,12 +31,12 @@ def _isolated_expected_computation(root,line,operation,value):
 
 def _isolated_aggregate_matches(line,sources,peers,actual_css):
     if line == 'main':
-        helper=ROOT/'scripts/sass-aggregate-source-successor.mjs';raw_helper=helper.read_bytes()
-        if hashlib.sha256(raw_helper).hexdigest()!='7a8d81b439bf0c3677e8be8fbfc710c68b449fdee717c38dba9cf67905f99c0c':return False
+        helper=ROOT/'scripts/sass-aggregate-source-successor-v2.mjs';raw_helper=helper.read_bytes()
+        if hashlib.sha256(raw_helper).hexdigest()!='76af116336b7c0669f32a9ca3caeaad17c32391da54e79fae1074cddf9e5026b':return False
         code=raw_helper.decode()+"\nconst __root=process.argv[1],__input=JSON.parse(readFileSync(0,'utf8'));process.stdout.write(JSON.stringify({result:aggregateExpectedSuccessor(__root,'main',__input),sources:aggregateProjectedSources(__root)}));"
-        node=shutil.which('node')
+        node=_NODE
         if not node:return False
-        result=subprocess.run([node,'--input-type=module','-e',code,str(ROOT)],input=json.dumps(peers,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=ROOT,env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
+        result=subprocess.run([node,'--input-type=module','-e',code,str(ROOT)],input=json.dumps(peers,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=ROOT,env={'PATH':_TOOL_PATH,'LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
         if result.returncode!=0 or helper.read_bytes()!=raw_helper:return False
         projected=json.loads(result.stdout);out=projected['result'];expected=projected['sources']
     else:

@@ -8,14 +8,15 @@ from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from sass_strong_focus_infrastructure import C,CASE,CONTRACT,expected,focus_assertion_ok,focus_envelope_ok
+from current_sass_source import CurrentSassSource
 sha=lambda s:hashlib.sha256(s.encode()).hexdigest()
 
 def sample():
-    peers=[];variants=[]
+    peers=[];variants=[];current_sources=list(CurrentSassSource(ROOT).source_sets.values())[0]
     for c in C['cases']:
         p=dict(line='main',peer_version=C['peer_version'],peer_package_json_sha256=C['peer_package_json_sha256'],program=c['peer_program'],program_sha256=c['peer_program_sha256'],css=c['peer_css'],css_sha256=c['peer_css_sha256'],css_bytes=len(c['peer_css'].encode()),sources=copy.deepcopy(C['peer_sources']))
         peers.append(p);css=expected(c,p);assert css is not None
-        m=dict(line='main',css=css,css_sha256=sha(css),css_bytes=len(css.encode()),program_sha256=c['program_sha256'],sass_version='dart-sass\t1.104.1\t(Sass Compiler)',sources=copy.deepcopy(C['measurement_sources']))
+        m=dict(line='main',css=css,css_sha256=sha(css),css_bytes=len(css.encode()),program_sha256=c['program_sha256'],sass_version='dart-sass\t1.104.1\t(Sass Compiler)',sources=copy.deepcopy(current_sources))
         variants.append(dict(name=c['name'],measurement=m))
     m=copy.deepcopy(variants[0]['measurement']);m['program_sha256']=C['default_program_sha256']
     return dict(case_id=CASE,line='main',comparison=CONTRACT,current_infrastructure=dict(classification='conforming-current-infrastructure',contract=CONTRACT,variants=variants,peers=peers),actual_measurement=m,expected_sha256=C['cases'][0]['original_sha256'],expected_bytes=len(C['cases'][0]['original_css'].encode()),actual_sha256=m['css_sha256'],actual_bytes=m['css_bytes'])
@@ -50,8 +51,16 @@ class StrongFocusInfrastructureTests(unittest.TestCase):
     def test_loaded_helper_images_and_accessors_fail_closed(self):
         body=sample()
         with tempfile.TemporaryDirectory() as temp:
-            root=Path(temp);shutil.copytree(ROOT/'scripts',root/'scripts');(root/'fixtures/sass').mkdir(parents=True)
-            shutil.copy2(ROOT/'fixtures/sass/strong-focus-infrastructure-contract.json',root/'fixtures/sass')
+            root=Path(temp);shutil.copytree(ROOT/'scripts',root/'scripts')
+            # Copy both real physical source populations; Git history is read-only.
+            js="import {createCurrentSassSource} from './scripts/current-sass-source.mjs';console.log(JSON.stringify(createCurrentSassSource({root:process.cwd()}).bound));"
+            rows=CurrentSassSource(ROOT).bound+json.loads(subprocess.check_output(['node','--input-type=module','-e',js],cwd=ROOT,text=True,timeout=60))
+            for row in rows:
+                source=ROOT/row['path'];data=source.read_bytes()
+                self.assertEqual((len(data),hashlib.sha256(data).hexdigest()),(row['bytes'],row['sha256']))
+                target=root/row['path'];target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+            target=root/'fixtures/sass/strong-focus-infrastructure-contract.json';target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(ROOT/'fixtures/sass/strong-focus-infrastructure-contract.json',target)
+            git_dir=subprocess.check_output(['git','rev-parse','--absolute-git-dir'],cwd=ROOT,text=True).strip();(root/'.git').write_text('gitdir: '+git_dir+'\n');(root/'.git').chmod(0o444)
             py="""import json,sys
 from pathlib import Path
 sys.path.insert(0,'scripts')
@@ -62,7 +71,7 @@ p=Path(sys.argv[1]);old=p.read_bytes();p.write_bytes(old+b'\\n# changed')
 assert not focus_assertion_ok(b)
 """
             js="""import {readFileSync,writeFileSync} from 'node:fs';import {focusResultsMatch} from './scripts/sass-strong-focus-infrastructure.mjs';const b=JSON.parse(readFileSync(0,'utf8'));const a={css:b.actual_measurement.css,sha256:b.actual_measurement.css_sha256,actual_measurement:b.actual_measurement},c=b.current_infrastructure;if(!focusResultsMatch(a,c))throw Error('baseline');const p=process.argv[1],old=readFileSync(p);writeFileSync(p,Buffer.concat([old,Buffer.from('\\n// changed')]));if(focusResultsMatch(a,c))throw Error('stale source accepted');"""
-            for path in ('scripts/sass_strong_focus_infrastructure.py','scripts/sass-strong-focus-infrastructure.mjs'):
+            for path in ('scripts/sass_strong_focus_infrastructure.py','scripts/sass-strong-focus-infrastructure.mjs','projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss','projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss'):
                 original=(root/path).read_bytes()
                 for cmd in ([sys.executable,'-c',py,path],['node','--input-type=module','-e',js,path]):
                     subprocess.run(cmd,cwd=root,input=json.dumps(body),text=True,capture_output=True,check=True,timeout=60)

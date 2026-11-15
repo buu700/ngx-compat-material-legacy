@@ -6,6 +6,7 @@
 import hashlib,json,re
 from pathlib import Path
 from sass_current_companion_admission import peer_measurement_ok
+from current_sass_source import CurrentSassSource
 ROOT=Path(__file__).resolve().parents[1]
 _HELPERS=(Path(__file__),ROOT/'scripts/sass-strong-focus-infrastructure.mjs')
 _IMAGES=tuple(p.read_bytes() for p in _HELPERS)
@@ -27,24 +28,30 @@ def expected(c,p):
     prefix=c['selector']+' {';old=c['original_css'];peer=p['css']
     if not old.startswith(prefix) or not old.endswith('}') or not peer.startswith(prefix):return None
     return '\n'.join([old[:-2]+peer[len(prefix):]]*c['count'])
-def source_ok(m):
+def source_ok(m,current_sources):
     try:
         if type(m) is not dict or m['line']!='main' or type(m['css']) is not str or m['css_sha256']!=sha(m['css']) or m['css_bytes']!=len(m['css'].encode()) or not m['sass_version'].startswith('dart-sass\t1.104.1\t') or type(m['sources']) is not list or not m['sources']:return False
         ss=m['sources'];required=[('_index.scss',None),('styles/core/focus-indicators/_focus-indicators.scss','e2ad7e073a9dd1954dc85a5816cc5f9c05644b9d441abc1359847b31b30f7f73'),('styles/core/focus-indicators/_private.scss','308b728b247ebfa673527ab6a3023e26fc818f40eb0e0d65b134eda97d6ccd8f')]
-        return ss==C['measurement_sources'] and len({(s['root'],s['path']) for s in ss})==len(ss) and all(any(s['root']==0 and s['path']==path and (digest is None or s['sha256']==digest) for s in ss) for path,digest in required) and all(type(s['root']) is int and s['root'] in (0,1,2) and type(s['path']) is str and s['path'] and not s['path'].startswith('/') and '..' not in s['path'] and '\\' not in s['path'] and re.fullmatch('[0-9a-f]{64}',s['sha256']) and type(s['bytes']) is int and s['bytes']>0 for s in ss)
+        return ss==current_sources and len({(s['root'],s['path']) for s in ss})==len(ss) and all(any(s['root']==0 and s['path']==path and (digest is None or s['sha256']==digest) for s in ss) for path,digest in required) and all(type(s['root']) is int and s['root'] in (0,1,2) and type(s['path']) is str and s['path'] and not s['path'].startswith('/') and '..' not in s['path'] and '\\' not in s['path'] and re.fullmatch('[0-9a-f]{64}',s['sha256']) and type(s['bytes']) is int and s['bytes']>0 for s in ss)
     except (KeyError,TypeError,ValueError):return False
 def focus_assertion_ok(body):
     try:
         path=ROOT/'fixtures/sass/strong-focus-infrastructure-contract.json'
         if not helpers_current() or any(p.is_symlink() for p in (ROOT/'fixtures',ROOT/'fixtures/sass',path)) or sha(path.read_bytes())!=sha(raw) or sha(json.dumps(C,sort_keys=True,separators=(',',':')))!=FINGERPRINT:return False
+        source=CurrentSassSource(ROOT);sets=list(source.source_sets.values())
+        if source.line!='main' or len(sets)!=1:return False
+        current_sources=sets[0]
+        compact=lambda x:json.dumps(x,separators=(',',':'),ensure_ascii=False)
+        if sha(compact(C['measurement_sources']))!='107fbea0ce4c8529c98cd243232ba833787e18cfc99b22300083d5a9f6b62eb0' or sha(compact(current_sources))!='9e9644112b2451b42b1f91d84fc00c963714e433d5b0c03fe3c1a9f2c6c2b56f':return False
         body=plain(body)
         m=body['actual_measurement'];c=body['current_infrastructure']
-        if body['case_id']!=CASE or body['line']!='main' or body['comparison']!=CONTRACT or c['classification']!='conforming-current-infrastructure' or c['contract']!=CONTRACT or not source_ok(m) or m['program_sha256']!=C['default_program_sha256'] or body['expected_sha256']!=C['cases'][0]['original_sha256'] or body['expected_bytes']!=len(C['cases'][0]['original_css'].encode()) or body['actual_sha256']!=m['css_sha256'] or body['actual_bytes']!=m['css_bytes'] or len(c['variants'])!=8 or len(c['peers'])!=8:return False
+        if body['case_id']!=CASE or body['line']!='main' or body['comparison']!=CONTRACT or c['classification']!='conforming-current-infrastructure' or c['contract']!=CONTRACT or not source_ok(m,current_sources) or m['program_sha256']!=C['default_program_sha256'] or body['expected_sha256']!=C['cases'][0]['original_sha256'] or body['expected_bytes']!=len(C['cases'][0]['original_css'].encode()) or body['actual_sha256']!=m['css_sha256'] or body['actual_bytes']!=m['css_bytes'] or len(c['variants'])!=8 or len(c['peers'])!=8:return False
         for i,case in enumerate(C['cases']):
             v=c['variants'][i];e=expected(case,c['peers'][i]);vm=v['measurement']
-            if e is None or v['name']!=case['name'] or not source_ok(vm) or vm['program_sha256']!=case['program_sha256'] or vm['sources']!=m['sources'] or vm['css']!=e:return False
+            if e is None or v['name']!=case['name'] or not source_ok(vm,current_sources) or vm['program_sha256']!=case['program_sha256'] or vm['sources']!=m['sources'] or vm['css']!=e:return False
+        source.assert_current()
         return m['css']==expected(C['cases'][0],c['peers'][0]) and helpers_current()
-    except (KeyError,TypeError,ValueError,AttributeError,OSError,RecursionError):return False
+    except (KeyError,TypeError,ValueError,AttributeError,OSError,RecursionError,AssertionError):return False
 def focus_envelope_ok(active,body,invocation,oracle_sha):
     try:
         if oracle_sha!='76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2d':return False
@@ -52,4 +59,4 @@ def focus_envelope_ok(active,body,invocation,oracle_sha):
         if any(body.get(k)!=v or type(body.get(k))!=type(v) for k,v in envelope.items()) or 'current_companion' in body:return False
         library=[a for a in active.manifest['artifacts'] if a['id']=='library']
         return len(library)==1 and body['tarball_sha256']==library[0]['sha256'] and focus_assertion_ok(body)
-    except (KeyError,TypeError,ValueError,AttributeError,OSError,RecursionError):return False
+    except (KeyError,TypeError,ValueError,AttributeError,OSError,RecursionError,AssertionError):return False

@@ -14,6 +14,7 @@ import {spawnSync} from 'node:child_process';
 import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {isDeepStrictEqual,types} from 'node:util';
+const toolPath=process.env.PATH||'';
 const expectedSha=b=>createHash('sha256').update(b).digest('hex'),expectedEngineHash='356337aa30fed58fcc25afeaabca5ebb3695623c0f17a0aff497a3bd92b4a383';
 function expectedPlain(v){
  if(v===null||['string','boolean'].includes(typeof v))return v;
@@ -37,10 +38,10 @@ function isolatedExpectedComputation(root,line,operation,input){
 }
 
 function mainSuccessor(root,peers){
- const path=join(root,'scripts/sass-aggregate-source-successor.mjs'),raw=readFileSync(path),digest='7a8d81b439bf0c3677e8be8fbfc710c68b449fdee717c38dba9cf67905f99c0c';
+ const path=join(root,'scripts/sass-aggregate-source-successor-v2.mjs'),raw=readFileSync(path),digest='76af116336b7c0669f32a9ca3caeaad17c32391da54e79fae1074cddf9e5026b';
  if(expectedSha(raw)!==digest)throw Error('aggregate successor changed');
  const suffix="\nconst __root=process.argv[1],__input=JSON.parse(readFileSync(0,'utf8'));process.stdout.write(JSON.stringify({result:aggregateExpectedSuccessor(__root,'main',__input),sources:aggregateProjectedSources(__root)}));";
- const result=spawnSync(process.execPath,['--input-type=module','--eval',raw.toString('utf8')+suffix,root],{cwd:root,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8',TZ:'UTC'},input:JSON.stringify(expectedPlain(peers)),encoding:'utf8',timeout:150000,maxBuffer:20*1024*1024});
+ const result=spawnSync(process.execPath,['--input-type=module','--eval',raw.toString('utf8')+suffix,root],{cwd:root,env:{PATH:toolPath,LANG:'C.UTF-8',LC_ALL:'C.UTF-8',TZ:'UTC'},input:JSON.stringify(expectedPlain(peers)),encoding:'utf8',timeout:150000,maxBuffer:20*1024*1024});
  if(result.error||result.status!==0||result.signal||expectedSha(readFileSync(path))!==digest)throw Error('aggregate successor failed: '+String(result.stderr).slice(0,1000));
  return expectedPlain(JSON.parse(result.stdout));
 }

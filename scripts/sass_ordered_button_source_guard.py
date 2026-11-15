@@ -2,11 +2,12 @@
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
 """Bound full source closure and immutable finite 06 inputs."""
-import hashlib,json,subprocess,shutil
+import hashlib,json,subprocess,shutil,os
 from pathlib import Path
 from sass_ordinary_density_gate import OrdinaryDensityGateContext
 from current_sass_spinner_snack_admission import CurrentSpinnerSnackContract
 _ROOT=Path(__file__).resolve().parents[1]
+_TOOL_PATH=os.environ.get('PATH','');_NODE=shutil.which('node',path=_TOOL_PATH);_GIT=shutil.which('git',path=_TOOL_PATH)
 _SELF=Path(__file__).read_bytes()
 _HASHES={'21.x':'1a3ad05466e55fe0b5779a9d38956871b2759a1e1d1c34e4f42e8dfb30234b42','main':'f746c5da35afa3a4cfe124026bd908768402c9b668fe4ec3def38fee922250d6'}
 def _successors(line,rows):
@@ -19,14 +20,15 @@ def _successors(line,rows):
     if hashlib.sha256(raw).hexdigest()!='a0be2676905a677fab5e470880226449ea425de226c7312fb64f0f9fe6827fbd' or len(raw)!=2268:raise ValueError('successor packet changed')
     packet=json.loads(raw);names=['scripts/sass-ordered-aggregate-contract.mjs','scripts/sass_ordered_aggregate_admission.py','scripts/sass-ordinary-density-gate.mjs','scripts/sass_ordinary_density_gate.py']
     if packet['schema_version']!=1 or packet['role']!='main-ordered-aggregate-exact-source-successor' or packet['source_parent']!='42d02491648097656ccb3c590dbaaea066c3e603' or packet['base_commit']!='8baa761eca624c9d71293c3d31750a2b3fdeebf0' or packet['scope_only'] is not True or [r['path'] for r in packet['updates']]!=names:raise ValueError('successor scope')
-    env={'PATH':'/usr/bin:/bin','LANG':'C','LC_ALL':'C','GIT_CONFIG_GLOBAL':'/dev/null','GIT_CONFIG_SYSTEM':'/dev/null','GIT_TERMINAL_PROMPT':'0','GIT_NO_LAZY_FETCH':'1'};result={}
+    env={'PATH':_TOOL_PATH,'LANG':'C','LC_ALL':'C','GIT_CONFIG_GLOBAL':'/dev/null','GIT_CONFIG_SYSTEM':'/dev/null','GIT_TERMINAL_PROMPT':'0','GIT_NO_LAZY_FETCH':'1'};result={}
+    if not _GIT or subprocess.check_output([_GIT,'--version'],env=env,text=True).strip()!='git version 2.55.0':raise ValueError('pinned Git 2.55.0 required')
     for row in packet['updates']:
-        old=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet['source_parent']+':'+row['path']],cwd=_ROOT,env=env)
+        old=subprocess.check_output([_GIT,'--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet['source_parent']+':'+row['path']],cwd=_ROOT,env=env)
         entry=next(x for x in rows if x['path']==row['path'])
         if entry!=row['before'] or hashlib.sha256(old).hexdigest()!=row['before']['sha256'] or len(old)!=row['before']['bytes'] or row['after']['path']!=row['path']:raise ValueError('successor preimage')
         if row['after_git']:
             if row['after_git']!=packet['base_commit']:raise ValueError('successor commit')
-            data=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',row['after_git']+':'+row['path']],cwd=_ROOT,env=env)
+            data=subprocess.check_output([_GIT,'--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',row['after_git']+':'+row['path']],cwd=_ROOT,env=env)
             if hashlib.sha256(data).hexdigest()!=row['after']['sha256'] or len(data)!=row['after']['bytes']:raise ValueError('successor afterimage')
         result[row['path']]=row['after']
     vpath=_ROOT/'fixtures/sass/ordered-aggregate-density-source-successor.json'
@@ -37,7 +39,7 @@ def _successors(line,rows):
     if v['schema_version']!=1 or v['role']!='main-ordered-aggregate-current-density-source-successor' or v['line']!='main' or v['source_scope_only'] is not True or v['previous_packet']!=dict(path='fixtures/sass/ordered-aggregate-source-successor.json',sha256=hashlib.sha256(raw).hexdigest(),bytes=len(raw)) or [x['path'] for x in v['updates']]!=names[2:]:raise ValueError('density successor scope')
     for row in v['updates']:
         if result[row['path']]!=row['before']:raise ValueError('density predecessor')
-        before=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet['base_commit']+':'+row['path']],cwd=_ROOT,env=env)
+        before=subprocess.check_output([_GIT,'--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet['base_commit']+':'+row['path']],cwd=_ROOT,env=env)
         if hashlib.sha256(before).hexdigest()!=row['before']['sha256'] or len(before)!=row['before']['bytes']:raise ValueError('density predecessor changed')
         at=0;parts=[]
         for e in row['edits']:
@@ -54,10 +56,10 @@ def _successors(line,rows):
     if hashlib.sha256(wraw).hexdigest()!='9e50df5f927dcdd529f3868a4a98a331d66afb380f4ab4e9d59d777954ff0bd0' or len(wraw)!=10530:raise ValueError('resource successor packet')
     w=json.loads(wraw)
     if w['schema_version']!=1 or w['role']!='main-ordered-density-resource-source-continuation' or w['line']!='main' or w['source_parent']!='c2c58388e0777e580fd76234b57c271de0cb4115' or w['source_scope_only'] is not True or w['artifact_or_audit_admission_granted'] is not False or w['previous_packet']!=dict(path='fixtures/sass/ordered-aggregate-density-source-successor.json',sha256=hashlib.sha256(vraw).hexdigest(),bytes=len(vraw)) or [r['path'] for r in w['updates']]!=names[2:]:raise ValueError('resource successor scope')
-    subprocess.check_call(['git','--no-replace-objects','merge-base','--is-ancestor',w['source_parent'],'HEAD'],cwd=_ROOT,env=env)
+    subprocess.check_call([_GIT,'--no-replace-objects','merge-base','--is-ancestor',w['source_parent'],'HEAD'],cwd=_ROOT,env=env)
     for row in w['updates']:
         if result[row['path']]!=row['before']:raise ValueError('resource predecessor')
-        before=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',w['source_parent']+':'+row['path']],cwd=_ROOT,env=env)
+        before=subprocess.check_output([_GIT,'--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',w['source_parent']+':'+row['path']],cwd=_ROOT,env=env)
         if (hashlib.sha256(before).hexdigest(),len(before))!=(row['before']['sha256'],row['before']['bytes']):raise ValueError('resource predecessor image')
         at=0;parts=[]
         for e in row['edits']:
@@ -68,8 +70,21 @@ def _successors(line,rows):
         after=b''.join([*parts,before[at:]])
         if row['after']['path']!=row['path'] or (hashlib.sha256(after).hexdigest(),len(after))!=(row['after']['sha256'],row['after']['bytes']):raise ValueError('resource successor afterimage')
         result[row['path']]=row['after']
-    if (_ROOT/'scripts').is_symlink() or (_ROOT/'scripts/sass-aggregate-source-successor.mjs').is_symlink():raise ValueError('linked successor helper')
-    if hashlib.sha256((_ROOT/'scripts/sass-aggregate-source-successor.mjs').read_bytes()).hexdigest()!='7a8d81b439bf0c3677e8be8fbfc710c68b449fdee717c38dba9cf67905f99c0c':raise ValueError('successor helper changed')
+    xpath=_ROOT/'fixtures/sass/ordered-aggregate-density-696-source-successor.json'
+    if xpath.is_symlink():raise ValueError('linked 696 successor')
+    xraw=xpath.read_bytes()
+    if hashlib.sha256(xraw).hexdigest()!='152c62810453a0224d7655e82be5c9c52346b52b47b651e769a413ec2a6e738f' or len(xraw)!=1442:raise ValueError('696 successor packet')
+    x=json.loads(xraw)
+    if x['schema_version']!=1 or x['role']!='main-ordered-density-696-source-continuation' or x['line']!='main' or x['source_parent']!='ae9e395e2fa36afcabfd9461ddf42bcff4d79071' or x['source_commit']!='696e434b94a9711b5262b28e6ec6ccea7d4a036b' or x['source_scope_only'] is not True or x['artifact_or_audit_admission_granted'] is not False or x['previous_packet']!=dict(path='fixtures/sass/ordered-aggregate-density-resource-successor-v2.json',sha256=hashlib.sha256(wraw).hexdigest(),bytes=len(wraw)) or [v['path'] for v in x['updates']]!=names[2:]:raise ValueError('696 successor scope')
+    subprocess.check_call([_GIT,'--no-replace-objects','merge-base','--is-ancestor',x['source_commit'],'HEAD'],cwd=_ROOT,env=env)
+    for row in x['updates']:
+        if result[row['path']]!=row['before'] or row['after']['path']!=row['path']:raise ValueError('696 predecessor')
+        for rev,image in ((x['source_parent'],row['before']),(x['source_commit'],row['after'])):
+            data=subprocess.check_output([_GIT,'--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',rev+':'+row['path']],cwd=_ROOT,env=env)
+            if (hashlib.sha256(data).hexdigest(),len(data))!=(image['sha256'],image['bytes']):raise ValueError('696 image')
+        result[row['path']]=row['after']
+    if (_ROOT/'scripts').is_symlink() or (_ROOT/'scripts/sass-aggregate-source-successor-v2.mjs').is_symlink():raise ValueError('linked successor helper')
+    if hashlib.sha256((_ROOT/'scripts/sass-aggregate-source-successor-v2.mjs').read_bytes()).hexdigest()!='76af116336b7c0669f32a9ca3caeaad17c32391da54e79fae1074cddf9e5026b':raise ValueError('successor helper changed')
     return result
 def _check(line):
     if Path(__file__).read_bytes()!=_SELF: raise ValueError('guard changed')
@@ -98,17 +113,17 @@ def _isolated_expected_computation(root,line,operation,value):
     if not __debug__:raise ValueError('assertions required')
     payload=_expected_plain(value)
     if line=='main' and operation=='ordered-aggregate-06':
-        path=Path(root)/'scripts/sass-aggregate-source-successor.mjs';raw=path.read_bytes();digest='7a8d81b439bf0c3677e8be8fbfc710c68b449fdee717c38dba9cf67905f99c0c'
+        path=Path(root)/'scripts/sass-aggregate-source-successor-v2.mjs';raw=path.read_bytes();digest='76af116336b7c0669f32a9ca3caeaad17c32391da54e79fae1074cddf9e5026b'
         if hashlib.sha256(raw).hexdigest()!=digest:raise ValueError('successor helper changed')
-        node=shutil.which('node')
+        node=_NODE
         if not node:raise ValueError('pinned Node unavailable')
         suffix="\nconst __root=process.argv[1],__input=JSON.parse(readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(aggregateExpectedSuccessor(__root,'main',__input.peers)));"
-        result=subprocess.run([node,'--input-type=module','--eval',raw.decode()+suffix,str(root)],input=json.dumps(payload,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=root,env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
+        result=subprocess.run([node,'--input-type=module','--eval',raw.decode()+suffix,str(root)],input=json.dumps(payload,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=root,env={'PATH':_TOOL_PATH,'LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
         if result.returncode!=0 or hashlib.sha256(path.read_bytes()).hexdigest()!=digest:raise ValueError('successor expected failed: '+result.stderr[:1000])
         return _expected_plain(json.loads(result.stdout))
     path=Path(root)/'scripts/sass-expected-snapshot-engine.mjs';raw=path.read_bytes()
     if hashlib.sha256(raw).hexdigest()!=_EXPECTED_ENGINE:raise ValueError('trusted expected bootstrap changed')
-    node=shutil.which('node')
+    node=_NODE
     if not node:raise ValueError('pinned Node unavailable')
     result=subprocess.run([node,'--input-type=module','--eval',raw.decode(),str(root),line,operation],input=json.dumps(payload,separators=(',',':'),ensure_ascii=False),text=True,capture_output=True,cwd=root,env={'LANG':'C.UTF-8','LC_ALL':'C.UTF-8','TZ':'UTC'},timeout=150)
     if result.returncode!=0:raise ValueError('expected isolation failed: '+result.stderr[:1000])
