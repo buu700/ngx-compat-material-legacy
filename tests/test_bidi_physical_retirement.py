@@ -199,6 +199,21 @@ class PhysicalBidiRetirementTests(unittest.TestCase):
                 'tests/bidi_physical_retirement_probe.mjs'}
             for path in sorted(paths):
                 src=ROOT/path;dest=f/path;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dest)
+            # Run the preserved old 55-control program against its actual
+            # historical owner and 7e9 product frame, not today's new owner.
+            # Current physical behavior is tested separately above and by the
+            # f9 successor fixture; this historical run is not current credit.
+            historical_owner=subprocess.check_output(
+                ['git','--no-replace-objects','-c','gc.auto=0','show',
+                 '1c358b126719df5b5bfa1ddcbe44248814d7275e:scripts/authored-use-inventory.mjs'],cwd=ROOT)
+            self.assertEqual(hashlib.sha256(historical_owner).hexdigest(),
+                             'ddb81b80bee36204322587db6e1583de5987919697c45414bb22c2d5aa5bee12')
+            (f/'scripts/authored-use-inventory.mjs').write_bytes(historical_owner)
+            for path,expected_hash in pin['product_ts_snapshot'].items():
+                body=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','show',
+                    '7e9ecb0a8fe31d44c1f37b8a509fc58c6ab705ad:'+path],cwd=ROOT)
+                self.assertEqual(hashlib.sha256(body).hexdigest(),expected_hash,path)
+                (f/path).write_bytes(body)
             roster=json.loads((f/ROSTER).read_text())
             prior={(r['file'],r['module'],r['symbol']):r['prior_row'] for r in reviewed['reviews']}
             self.assertEqual(len(prior),25)
