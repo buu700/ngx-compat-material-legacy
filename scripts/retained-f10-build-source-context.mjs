@@ -1,0 +1,68 @@
+/** @license Copyright Google LLC All Rights Reserved. Copyright (c) 2026 Ryan Lester. MIT. */
+/** Historical f10 build-scope data and independent current main applicability. */
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {resolve} from 'node:path';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {retainedCurrentBuildContext} from './retained-current-build-context.mjs';
+import {buildScopeEvidenceOk,BUILD_SCOPE_PATCHES} from './upstream-build-scope-evidence.mjs';
+const SELF='scripts/retained-f10-build-source-context.mjs',image=readFileSync(fileURLToPath(import.meta.url));
+const RECEIPT={path:'compatibility/rc/retained-f10-build-source-context-696.json',sha256:'5584f69863a38d665e612f5d626e37c876d1395d14e6ae61c547e7a54e5f04e0',bytes:2372};
+const MAIN_REPORT='compatibility/rc/packed-upstream-source-build-main-e184.json',MAIN_HASH='ffe8ee63051473d9adf28142e30dcbaddb5ed156f71de92a8e1dc2e43efbed6d',DELTA='compatibility/rc/packed-upstream-source-build-main-e184-ledger-delta.json',DELTA_HASH='964baf4c85bc75e5cd33962482911776e3d7277bc882f7d2921cc76322cd7b62';
+const sha=b=>createHash('sha256').update(b).digest('hex'),oid=(kind,b)=>createHash('sha1').update(Buffer.from(`${kind} ${b.length}\0`)).update(b).digest('hex');
+let f10TransactionActive=false,f10TransactionReentered=false;
+function f10Transaction(fn){if(f10TransactionActive){f10TransactionReentered=true;throw new Error('f10 build source reentry');}f10TransactionActive=true;f10TransactionReentered=false;try{const result=fn();assert.equal(f10TransactionReentered,false,'f10 build source reentry');return result;}finally{f10TransactionActive=false;}}
+export function retainedF10BuildSourceContext(options={}){return f10Transaction(()=>createRetainedF10BuildSourceContext(options));}
+function createRetainedF10BuildSourceContext({root=process.cwd(),read,body,currentProductPaths}={}){
+ root=resolve(root);const physical=p=>readEvidenceMember(root,p);read??=physical;const bound=new Map();
+ const observe=p=>{const raw=physical(p),supplied=read(p);assert.ok(Buffer.isBuffer(supplied)&&raw.equals(supplied),'nonphysical f10 build source '+p);assert.ok(raw.equals(physical(p)));const ref={sha256:sha(raw),bytes:raw.length},prior=bound.get(p);if(prior)assert.deepEqual(prior,ref,'mixed f10 source '+p);else bound.set(p,ref);return raw;};
+ const exact=(p,digest,bytes)=>{const raw=observe(p);assert.equal(sha(raw),digest,p);if(bytes!==undefined)assert.equal(raw.length,bytes,p);return raw;};
+ assert.ok(physical(SELF).equals(image));exact(SELF,sha(image),image.length);
+ const packet=JSON.parse(exact(RECEIPT.path,RECEIPT.sha256,RECEIPT.bytes));
+ for(const [key,value]of Object.entries({schema_version:1,role:'finite-historical-f10-build-source-context-comparison',historical_context_commit:'e89625fa8145b1d746f24728a83ba25bbfe81871',historical_context_tree:'18df0b38d09a2b7cb86ef67d43f989aaba6f115e',historical_report_commit:'4221697247dc7e06478a9397d9b31b6c5253e9ff',current_commit:'696e434b94a9711b5262b28e6ec6ccea7d4a036b',source_only:true,historical_programs_executed:false,historical_reports_rewritten:false,runtime_artifact_floor_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(packet[key],value,key);
+ const env={PATH:process.env.PATH,LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0'};
+ const git=(args,input)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,input,maxBuffer:128*1024*1024});
+ for(const [a,b]of [[packet.historical_context_commit,packet.historical_report_commit],[packet.historical_report_commit,packet.current_commit],[packet.current_commit,'HEAD']])git(['merge-base','--is-ancestor',a,b]);
+ assert.equal(git(['rev-parse',packet.historical_context_commit+'^{tree}']).toString().trim(),packet.historical_context_tree);
+ const gitBody=(commit,ref)=>{assert.equal(git(['rev-parse',commit+':'+ref.path]).toString().trim(),ref.blob_oid);const b=git(['show',commit+':'+ref.path]);assert.equal(sha(b),ref.sha256,ref.path);assert.equal(b.length,ref.bytes,ref.path);return b;};
+ const oldRaw=gitBody(packet.historical_report_commit,packet.original_report);assert.ok(exact(packet.original_report.path,packet.original_report.sha256,packet.original_report.bytes).equals(oldRaw));
+ const historical=JSON.parse(oldRaw);assert.deepEqual(body,historical);const oldLedger=JSON.parse(gitBody(packet.historical_report_commit,packet.original_ledger));
+ const oldConsolidationRaw=exact(packet.original_consolidation.path,packet.original_consolidation.sha256,packet.original_consolidation.bytes);assert.ok(oldConsolidationRaw.equals(gitBody(packet.historical_report_commit,packet.original_consolidation)));
+ const oldConsolidation=JSON.parse(oldConsolidationRaw);assert.deepEqual(oldConsolidation.candidate_context,{path:packet.original_report.path,sha256:packet.original_report.sha256});
+ const context=historical.candidate_context;assert.equal(context.source_commit,packet.historical_context_commit);assert.equal(context.source_tree,packet.historical_context_tree);
+ assert.equal(context.product_members.length,1141);assert.equal(context.tracked_product_paths.length,1141);assert.deepEqual(context.product_members.map(r=>r.path),context.tracked_product_paths);
+ assert.deepEqual(git(['ls-tree','-r','--name-only',packet.historical_context_commit,'--','projects/ngx-material-legacy']).toString().trim().split('\n'),context.tracked_product_paths);
+ assert.equal(sha(Buffer.from(context.tracked_product_paths.join('\n')+'\n')),context.tracked_product_paths_sha256);
+ const inputPaths=['package.json','pnpm-lock.yaml','pnpm-workspace.yaml','projects/ngx-material-legacy/package.json','projects/ngx-material-legacy/ng-package.json','projects/ngx-material-legacy/tsconfig.lib.json','scripts/pack-library.mjs','chainman.toml','chainman.lock','flake.nix','.github/workflows/ci.yml'];
+ assert.equal(context.line,'main');assert.deepEqual(context.files.map(r=>r.path).sort(),[...inputPaths].sort());assert.equal(new Set(context.files.map(r=>r.path)).size,inputPaths.length);assert.deepEqual(context.bazel_product_members,[]);
+ assert.ok(context.tracked_product_paths.every(path=>path.startsWith('projects/ngx-material-legacy/')&&!path.endsWith('.bazel')&&!path.endsWith('.bzl')&&!['WORKSPACE','.bazelrc'].includes(path.split('/').at(-1))));
+ const oldPackage=JSON.parse(git(['show',packet.historical_context_commit+':package.json'])),oldProduct=JSON.parse(git(['show',packet.historical_context_commit+':projects/ngx-material-legacy/package.json']));
+ assert.ok(oldProduct.version.startsWith('22.'));assert.equal(oldPackage.scripts['build:lib'],'node scripts/pack-library.mjs');assert.ok(!oldPackage.pnpm?.patchedDependencies);assert.equal(context.pnpm_patched_dependencies,null);
+ for(const [field,name]of [['compiler_cli','@angular/compiler-cli'],['ng_packagr','ng-packagr'],['jasmine_core','jasmine-core'],['jasmine_types','@types/jasmine']])assert.equal(context[field],oldPackage.devDependencies[name]);
+ const before=gitBody(packet.historical_context_commit,packet.autocomplete_before),after=gitBody(packet.historical_report_commit,packet.autocomplete_after),transition=historical.autocomplete_empty_selection_context_requalification;
+ assert.equal(transition.reviewed_test_delta.path,packet.autocomplete_before.path);assert.equal(transition.reviewed_test_delta.before_sha256,sha(before));assert.equal(transition.reviewed_test_delta.after_sha256,sha(after));assert.equal(transition.other_product_members_unchanged,1140);assert.equal(transition.original_source_decisions_unchanged,true);exact(transition.path,transition.sha256);
+ const refs=[...context.files,...context.product_members];const requests=refs.map(ref=>(ref.path===packet.autocomplete_after.path?packet.historical_report_commit:packet.historical_context_commit)+':'+ref.path+'\n').join('');
+ const batch=git(['cat-file','--batch'],Buffer.from(requests));let off=0;
+ for(const ref of refs){const e=batch.indexOf(10,off);assert.ok(e>=off);const h=batch.subarray(off,e).toString().split(' ');off=e+1;assert.equal(h.length,3);assert.equal(h[1],'blob');const size=Number(h[2]);assert.ok(Number.isSafeInteger(size)&&size>=0&&off+size<batch.length);const b=batch.subarray(off,off+size);assert.equal(oid('blob',b),h[0]);assert.equal(sha(b),ref.sha256,ref.path);assert.equal(b.length,ref.bytes,ref.path);off+=size;assert.equal(batch[off++],10);}assert.equal(off,batch.length);
+ const mainRaw=exact(MAIN_REPORT,MAIN_HASH),main=JSON.parse(mainRaw),delta=JSON.parse(exact(DELTA,DELTA_HASH)),ledger=JSON.parse(observe('compatibility/f10/disposition-ledger/ledger.json'));
+ assert.equal(historical.role,main.role);assert.equal(historical.scope_format,undefined);assert.equal(historical.g11_claim,'not-passed');assert.equal(new Set(historical.reviews.map(r=>r.sha)).size,14);assert.equal(new Set(main.reviews.map(r=>r.sha)).size,14);assert.equal(historical.line,'main');assert.equal(main.line,'main');assert.deepEqual(historical.scope_sha_ids,main.scope_sha_ids);assert.equal(historical.reviews.length,14);assert.equal(main.reviews.length,14);assert.deepEqual([...historical.scope_sha_ids].sort(),Object.keys(BUILD_SCOPE_PATCHES).sort());
+ const oldRows=new Map(),currentRows=new Map();
+ for(const oldReview of historical.reviews){
+  const shaId=oldReview.sha,newReview=main.reviews.find(r=>r.sha===shaId),oldEntry=oldLedger.entries.find(e=>e.sha===shaId),matches=delta.rows.filter(e=>e.sha===shaId),currentEntry=ledger.entries.find(e=>e.sha===shaId);
+  assert.ok(newReview&&oldEntry&&currentEntry);assert.equal(oldLedger.entries.filter(e=>e.sha===shaId).length,1);assert.equal(ledger.entries.filter(e=>e.sha===shaId).length,1);assert.equal(matches.length,1);assert.deepEqual(currentEntry,matches[0]);
+  const {affected_branches:oldBranches,...oldRest}=oldReview,{affected_branches:newBranches,historical_decision_scope_note:scopeNote,main_source_judgment:mainJudgment,...newRest}=newReview;assert.deepEqual(oldBranches,['main','21.x']);assert.deepEqual(newBranches,['main']);assert.equal(typeof scopeNote,'string');assert.ok(scopeNote.length>80);assert.equal(typeof mainJudgment,'string');assert.ok(mainJudgment.length>80);assert.deepEqual(oldRest,newRest);
+  assert.equal(oldEntry.evidence_report,packet.original_report.path);assert.equal(oldEntry.source_check.evidence_report_sha256,packet.original_report.sha256);assert.deepEqual(oldEntry.affected_branches,oldBranches);assert.equal(oldEntry.final_disposition,'not-applicable');assert.equal(oldReview.final_disposition,oldEntry.final_disposition);assert.equal(oldEntry.reason,oldReview.decision);assert.deepEqual(oldEntry.files,oldReview.patch_paths);assert.equal(oldEntry.review_depth,'individual-compatibility');
+  assert.equal(oldEntry.source_check.diff_sha256,oldReview.diff_sha256);assert.equal(oldEntry.source_check.patch_path,oldReview.patch_file);assert.equal(oldEntry.source_check.review_membership,shaId);assert.deepEqual(oldEntry.individual_proof,{diff_sha256:oldReview.diff_sha256,review_depth:'individual-compatibility',proof_kind:'individual-source-scope',affected_branches:oldBranches,decision:oldReview.decision});
+  assert.equal(oldReview.diff_sha256,BUILD_SCOPE_PATCHES[shaId]);
+  const patch=exact(oldReview.patch_file,BUILD_SCOPE_PATCHES[shaId],oldReview.patch_bytes);assert.ok(patch.equals(git(['show',packet.historical_report_commit+':'+oldReview.patch_file])));const patchPaths=patch.toString().split('\n').filter(s=>s.startsWith('diff --git ')).map(s=>s.split(' b/')[1]);assert.ok(patchPaths.length);assert.equal(new Set(patchPaths).size,patchPaths.length);assert.deepEqual(patchPaths,oldReview.patch_paths);assert.equal(oldReview.path_count,patchPaths.length);const isBazel=p=>p.endsWith('.bazel')||p.endsWith('.bzl')||p==='.bazelrc';assert.deepEqual(oldReview.bazel_graph_paths,patchPaths.filter(isBazel));assert.deepEqual(oldReview.other_paths,patchPaths.filter(p=>!isBazel(p)));
+  const commit=Buffer.from(oldReview.upstream_commit_object);assert.equal(sha(commit),oldReview.upstream_commit_object_sha256);assert.equal(oid('commit',commit),shaId);oldRows.set(shaId,oldEntry);currentRows.set(shaId,currentEntry);
+ }
+ const current=retainedCurrentBuildContext({root,read:observe,body:main,currentProductPaths});
+ let checking=false,reentered=false;const guard=fn=>{if(checking){reentered=true;throw new Error('f10 build source reentry');}checking=true;reentered=false;try{const result=fn();for(const [path,ref]of bound){const b=physical(path);assert.equal(sha(b),ref.sha256,path);assert.equal(b.length,ref.bytes,path);}assert.equal(reentered,false,'f10 build source reentry');return result;}finally{checking=false;}};
+ const assertCurrent=()=>guard(()=>{for(const [path,ref]of bound)exact(path,ref.sha256,ref.bytes);current.assertCurrent();});
+ const assertEntry=(shaId,entry)=>guard(()=>{const expected=currentRows.get(shaId);assert.ok(expected&&oldRows.has(shaId));assert.deepEqual(entry,expected);assert.equal(buildScopeEvidenceOk(main,expected,observe,currentProductPaths),true,'current main build predicate rejected '+shaId);current.assertCurrent();return true;});
+ assertCurrent();return Object.freeze({assertEntry:(...args)=>f10Transaction(()=>assertEntry(...args)),assertCurrent:()=>f10Transaction(assertCurrent),reviewed_shas:14,historical_products:1141,historical_programs_executed:false,runtime_or_audit_admission_granted:false,g11_claim:'not-passed'});
+}

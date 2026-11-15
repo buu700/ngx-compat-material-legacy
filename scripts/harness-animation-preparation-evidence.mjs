@@ -10,9 +10,15 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
-import {posix} from 'node:path';
+import {posix,resolve} from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {HISTORICAL_CONSOLIDATION_CAPSULE,HISTORICAL_CONSOLIDATION_SHA256,retainedConsolidationSources} from './upstream-test-consolidation-historical.mjs';
 const ts=createRequire(import.meta.url)('typescript'),hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+const selfPath='scripts/harness-animation-preparation-evidence.mjs',selfImage=readFileSync(fileURLToPath(import.meta.url));
+const continuation={path:'compatibility/rc/harness-animation-preparation-owned-mode-2c51.json',sha256:'a1fe6e879f2cdb8d6b2a57f1fdd9c15fcdba65fd1c6a786f75d5feae2013a2e1',bytes:2291};
 const providerPath='projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts';
 export const HARNESS_PREPARATION_INPUTS='compatibility/rc/harness-animation-preparation-current-inputs.json';
 export const HARNESS_PREPARATION_INPUTS_SHA256='c6a7cf8d01a03cc5f620f49a396bf7156290ec39baba5450e51cd7d2646836ce';
@@ -51,7 +57,7 @@ export function normalizeHarnessPreparation(text,side,path){
 }
 
 /** Recompute source checks; no saved pass bit or candidate runtime expectation is trusted. */
-export function inspectHarnessPreparation(readRepo){
+function inspectOriginalHarnessPreparation(readRepo){
  const product=JSON.parse(readRepo('projects/ngx-material-legacy/package.json')),line=product.version.startsWith('21.')?'21.x':'main';
  const inputBytes=readRepo(HARNESS_PREPARATION_INPUTS);assert.equal(hash(inputBytes),HARNESS_PREPARATION_INPUTS_SHA256);
  const inputs=JSON.parse(inputBytes),beforeBytes=readRepo(beforePath);assert.equal(hash(beforeBytes),originPins[line][0]);
@@ -89,7 +95,51 @@ export function inspectHarnessPreparation(readRepo){
   producer:{path:'scripts/harness-animation-preparation-evidence.mjs',sha256:hash(readRepo('scripts/harness-animation-preparation-evidence.mjs'))},
   actual_browser_native_renderer_focus_lifetime_or_floor_qualified:false,g11_claim:'not-passed'};
 }
-export function qualifiedCurrentConsolidationSources(readRepo,reference){
- assert.equal(reference.path,HARNESS_PREPARATION_QUALIFICATION);const bytes=readRepo(reference.path);assert.equal(hash(bytes),reference.sha256);
- const report=JSON.parse(bytes),actual=inspectHarnessPreparation(readRepo);assert.deepEqual(report,actual,'current preparation qualification does not match actual inputs');return actual.current_facts;
+// Reconstruct the original qualification using only Git-authenticated before
+// images as comparison data. Current consumers receive no historical reader.
+let active=false,reentered=false;
+function harnessTransaction(fn){if(active){reentered=true;throw new Error('harness preparation reentry');}active=true;reentered=false;try{const result=fn();assert.equal(reentered,false,'harness preparation reentry');return result;}finally{active=false;}}
+export function inspectHarnessPreparation(readRepo){return harnessTransaction(()=>inspectCurrentHarnessPreparation(readRepo));}
+function inspectCurrentHarnessPreparation(readRepo){
+ const packageBytes=readRepo('projects/ngx-material-legacy/package.json');
+ assert.ok(packageBytes.equals(readEvidenceMember(resolve(process.cwd()),'projects/ngx-material-legacy/package.json')),'nonphysical harness preparation package');
+ if(JSON.parse(packageBytes).version.startsWith('21.'))return inspectOriginalHarnessPreparation(readRepo);
+ {
+  const root=resolve(process.cwd()),physical=path=>readEvidenceMember(root,path),bound=new Map();
+  const checked=(path,expected)=>{const raw=physical(path);assert.equal(hash(raw),expected.sha256,path);assert.equal(raw.length,expected.bytes,path);assert.ok(raw.equals(readRepo(path)),'nonphysical harness preparation '+path);assert.ok(raw.equals(physical(path)));const ref={sha256:expected.sha256,bytes:expected.bytes},prior=bound.get(path);if(prior)assert.deepEqual(prior,ref,'changed harness preparation image '+path);else bound.set(path,ref);return raw;};
+  assert.ok(physical(selfPath).equals(selfImage));checked(selfPath,{sha256:hash(selfImage),bytes:selfImage.length});
+  assert.ok(checked('projects/ngx-material-legacy/package.json',{sha256:hash(packageBytes),bytes:packageBytes.length}).equals(packageBytes));
+  const packet=JSON.parse(checked(continuation.path,continuation));
+  assert.equal(packet.schema_version,1);assert.equal(packet.role,'harness-owned-mode-provider-current-source-continuation');
+  assert.equal(packet.before_commit,'768dfecc21b297e9c4d89940283c63c31a03dab2');assert.equal(packet.current_commit,'2c51dc4e31c4dd08d2ec15af0c360bfdddd676ce');
+  for(const [key,value] of Object.entries({source_only:true,historical_reports_rewritten:false,runtime_or_audit_admission_granted:false,g11_claim:'not-passed'}))assert.equal(packet[key],value,key);
+  const paths=[packet.current_provider,packet.current_mode,packet.current_public_api,packet.current_mode_probe];
+  assert.deepEqual(paths.map(r=>r.path),[providerPath,'projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts','projects/ngx-material-legacy/legacy-core/public-api.ts','tests/legacy_animation_config_probe.mjs']);
+  const env={PATH:process.env.PATH,LC_ALL:'C',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_NO_REPLACE_OBJECTS:'1',GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0'};
+  const git=args=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,maxBuffer:8*1024*1024});
+  git(['merge-base','--is-ancestor',packet.before_commit,packet.current_commit]);git(['merge-base','--is-ancestor',packet.current_commit,'HEAD']);
+  const gitBody=(commit,ref)=>{assert.equal(git(['rev-parse',commit+':'+ref.path]).toString().trim(),ref.blob_oid);const raw=git(['show',commit+':'+ref.path]);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);return raw;};
+  assert.equal(packet.old_provider.path,providerPath);assert.equal(packet.old_producer.path,selfPath);
+  const oldProvider=gitBody(packet.before_commit,packet.old_provider),oldProducer=gitBody(packet.before_commit,packet.old_producer);
+  const fresh=paths.map(ref=>{const old=gitBody(packet.current_commit,ref),now=checked(ref.path,ref);assert.ok(now.equals(old));return now;});
+  const file=parse(fresh[0].toString()),imports=file.statements.filter(ts.isImportDeclaration);
+  assert.deepEqual(imports.map(n=>n.moduleSpecifier.text),['@angular/core','@ngx-compat/material-legacy/legacy-core']);
+  assert.deepEqual(imports.map(n=>n.importClause.namedBindings.elements.map(e=>e.getText(file))),[['Provider'],['LEGACY_ANIMATION_MODE']]);
+  for(const [name,value]of [['LEGACY_NOOP_ANIMATIONS','NoopAnimations'],['LEGACY_ENABLED_ANIMATIONS','BrowserAnimations']]){
+   const declarations=collect(file,n=>ts.isVariableDeclaration(n)&&n.name.getText(file)===name);assert.equal(declarations.length,1);const init=declarations[0].initializer;assert.ok(ts.isObjectLiteralExpression(init));assert.deepEqual(init.properties.map(n=>n.name.getText(file)),['provide','useValue']);assert.equal(init.properties[0].initializer.getText(file),'LEGACY_ANIMATION_MODE');assert.equal(init.properties[1].initializer.text,value);
+  }
+  const modeFile=parse(fresh[1].toString()),apiFile=parse(fresh[2].toString());
+  assert.equal(collect(modeFile,n=>ts.isVariableDeclaration(n)&&n.name.getText(modeFile)==='LEGACY_ANIMATION_MODE').length,1);
+  assert.ok(apiFile.statements.some(n=>ts.isExportDeclaration(n)&&n.moduleSpecifier?.text==='./internal/legacy-animations'&&n.exportClause&&ts.isNamedExports(n.exportClause)&&n.exportClause.elements.some(e=>e.name.text==='LEGACY_ANIMATION_MODE')));
+  for(const name of ['getLegacyAnimationsState','legacyAnimationsDisabled','resolveLegacyAnimationMode'])assert.equal(collect(modeFile,n=>ts.isFunctionDeclaration(n)&&n.name?.getText(modeFile)===name).length,1);
+  const historicalRead=path=>{if(path===providerPath)return oldProvider;if(path===selfPath)return oldProducer;const raw=physical(path);return checked(path,{sha256:hash(raw),bytes:raw.length});};
+  const report=inspectOriginalHarnessPreparation(historicalRead),reportPhysical=physical(HARNESS_PREPARATION_QUALIFICATION),actual=checked(HARNESS_PREPARATION_QUALIFICATION,{sha256:hash(reportPhysical),bytes:reportPhysical.length});
+  assert.deepEqual(report,JSON.parse(actual),'immutable historical qualification changed');
+  for(const [path,ref]of bound){const raw=physical(path);assert.equal(hash(raw),ref.sha256,path);assert.equal(raw.length,ref.bytes,path);}
+  assert.equal(reentered,false,'harness preparation reentry');return report;
+ }
 }
+export function qualifiedCurrentConsolidationSources(readRepo,reference){return harnessTransaction(()=>{
+ assert.equal(reference.path,HARNESS_PREPARATION_QUALIFICATION);const bytes=readRepo(reference.path);assert.equal(hash(bytes),reference.sha256);
+ const report=JSON.parse(bytes),actual=inspectCurrentHarnessPreparation(readRepo);assert.deepEqual(report,actual,'current preparation qualification does not match actual inputs');return actual.current_facts;
+});}
