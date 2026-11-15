@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Full-file historical source transitions; no component behavior or animation-token qualification",
+  "git_version": "git version 2.55.0",
+  "transitions": [
+    {
+      "file": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+      "prior_commit": "85dbd48cceafa17d3e2923d08999d22b63212414",
+      "prior_sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+      "current_commit": "4903a80fc76cd3b57b806a9b89003f5b1545baa5",
+      "current_sha256": "072e0061972bde4529ba5151444f6ec3f69de326ee9f56941b229fe06366807f",
+      "full_diff_sha256": "5ff116f3743b3d12a1644df127c9a928e51c06df2758d1114995b0daf6c59429",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts b/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\nindex fb57b56a0..502712b1c 100644\n--- a/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\n+++ b/projects/ngx-material-legacy/legacy-checkbox/checkbox.ts\n@@ -7,9 +7,10 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterViewInit,\n   Attribute,\n   ChangeDetectionStrategy,\n@@ -100,12 +101,12 @@ export class MatLegacyCheckbox\n     private _focusMonitor: FocusMonitor,\n     ngZone: NgZone,\n     @Attribute('tabindex') tabIndex: string,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n     @Optional()\n     @Inject(MAT_CHECKBOX_DEFAULT_OPTIONS)\n     options?: MatCheckboxDefaultOptions,\n   ) {\n-    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, animationMode, options);\n+    super('mat-checkbox-', elementRef, changeDetectorRef, ngZone, tabIndex, resolveLegacyAnimationMode(animationMode), options);\n   }\n \n   protected _createChangeEvent(isChecked: boolean) {\n"
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-button/button.ts",
+      "prior_commit": "58093db5f98ca98d8d8489fd2c0fbc5e8151c844",
+      "prior_sha256": "6d37f01619672b62496d5ffb8bec6df6dfe32214893191644d46012424ff5bb4",
+      "current_commit": "4903a80fc76cd3b57b806a9b89003f5b1545baa5",
+      "current_sha256": "ea16775994ad396442d6c3a62cc7b0eba2c08bc51e999e56597c666b81a49964",
+      "full_diff_sha256": "5c08eed144c2f5992ac3eb868abfd2874049f2858d4d97f04443f821b7066b01",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-button/button.ts b/projects/ngx-material-legacy/legacy-button/button.ts\nindex fc27014ff..506af2f5f 100644\n--- a/projects/ngx-material-legacy/legacy-button/button.ts\n+++ b/projects/ngx-material-legacy/legacy-button/button.ts\n@@ -7,9 +7,10 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusableOption, FocusOrigin} from '@angular/cdk/a11y';\n import {\n-  ANIMATION_MODULE_TYPE,\n   AfterViewInit,\n   ChangeDetectionStrategy,\n   Component,\n@@ -100,9 +101,10 @@ export class MatLegacyButton\n   constructor(\n     elementRef: ElementRef,\n     private _focusMonitor: FocusMonitor,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode: string,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n \n     // For each of the variant selectors that is present in the button's host\n     // attributes, add the correct corresponding class.\n@@ -185,7 +187,7 @@ export class MatLegacyAnchor extends MatLegacyButton implements AfterViewInit, O\n   constructor(\n     focusMonitor: FocusMonitor,\n     elementRef: ElementRef,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode: string,\n     /** @breaking-change 14.0.0 _ngZone will be required. */\n     @Optional() private _ngZone?: NgZone,\n   ) {\n"
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "prior_commit": "42b55b2f3f9fe9c5d543e7206325c1d1c3d7ab65",
+      "prior_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+      "current_commit": "4903a80fc76cd3b57b806a9b89003f5b1545baa5",
+      "current_sha256": "584d648acc358a46e0ceaf2ffd48d528eedd9536eb3e6ab7c3b30b485ae70aad",
+      "full_diff_sha256": "6982f7e397a67329636f7cbd9f665649d43cd96014eb42dd7110da5798ff7824",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-slider/slider.ts b/projects/ngx-material-legacy/legacy-slider/slider.ts\nindex d46f61ffa..4a6f9e78d 100644\n--- a/projects/ngx-material-legacy/legacy-slider/slider.ts\n+++ b/projects/ngx-material-legacy/legacy-slider/slider.ts\n@@ -7,6 +7,8 @@\n  * found in the LICENSE file at https://angular.io/license\n  */\n \n+import {LEGACY_ANIMATION_MODE, resolveLegacyAnimationMode} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';\n import {Directionality} from '@angular/cdk/bidi';\n import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';\n@@ -24,7 +26,6 @@ import {\n   hasModifierKey,\n } from '@angular/cdk/keycodes';\n import {\n-  ANIMATION_MODULE_TYPE,\n   Attribute,\n   ChangeDetectionStrategy,\n   ChangeDetectorRef,\n@@ -528,9 +529,10 @@ export class MatLegacySlider\n     @Attribute('tabindex') tabIndex: string,\n     private _ngZone: NgZone,\n     @Inject(DOCUMENT) _document: any,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) public _animationMode?: string,\n   ) {\n     super(elementRef);\n+    this._animationMode = resolveLegacyAnimationMode(this._animationMode);\n     this._document = _document;\n     this.tabIndex = parseInt(tabIndex) || 0;\n \n"
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts",
+      "prior_commit": "7e6f754ceaccfc4d71b3c57e693ff52efe11b709",
+      "prior_sha256": "eb75b2bf760e70744c3c85fee76dd2164cbb6b3242cb47f023300ebad0ce2b7e",
+      "current_commit": "4903a80fc76cd3b57b806a9b89003f5b1545baa5",
+      "current_sha256": "c6c5e4da287d930bd14a86643152894c7a1d960fe617def6ad01e2a440d98e50",
+      "full_diff_sha256": "d81c5ed7b3c8a1315928e90f4eb68bdcbaf018e229349f0da9629d365e2e8341",
+      "full_diff": "diff --git a/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts b/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts\nindex 1fc0e42cf..48aa18354 100644\n--- a/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts\n+++ b/projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts\n@@ -9,11 +9,13 @@\n  * Owned Material-16 `_MatTabHeaderBase`.\n  */\n \n+import {LEGACY_ANIMATION_MODE} from '@ngx-compat/material-legacy/legacy-core';\n+\n import {\n   AfterContentChecked,\n   AfterContentInit,\n   AfterViewInit,\n-  ANIMATION_MODULE_TYPE,\n+\n   ChangeDetectorRef,\n   Directive,\n   ElementRef,\n@@ -54,7 +56,7 @@ export abstract class _MatTabHeaderBase\n     @Optional() dir: Directionality,\n     ngZone: NgZone,\n     platform: Platform,\n-    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n+    @Optional() @Inject(LEGACY_ANIMATION_MODE) animationMode?: string,\n   ) {\n     super(elementRef, changeDetectorRef, viewportRuler, dir, ngZone, platform, animationMode);\n   }\n"
+    }
+  ],
+  "review": "The full textual deltas above replace ANIMATION_MODULE_TYPE wiring with owned legacy animation mode. They do not change these four files lifecycle imports, implements clauses, or lifecycle methods. Only the type binding is qualified."
+}
