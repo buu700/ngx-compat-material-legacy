@@ -403,6 +403,31 @@ describe('MatInput without forms', () => {
     expect(labelEl.nativeElement.textContent).toContain('Enter a name');
   }));
 
+  it('removes a static native placeholder promoted to a legacy label on first check', () => {
+    const fixture = createComponent(MatInputStaticPromotedPlaceholder);
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(input.hasAttribute('placeholder')).toBe(false);
+    expect(input.getAttribute('data-placeholder')).toBe('Static hint');
+    expect(fixture.nativeElement.querySelector('label').textContent).toContain('Static hint');
+  });
+
+  it('keeps bound promoted placeholders out of the native attribute through changes', () => {
+    const fixture = createComponent(MatInputPlaceholderAttrTestComponent);
+    fixture.componentInstance.placeholder = 'First hint';
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    for (const value of ['First hint', 'Next hint', '', 'Restored hint']) {
+      fixture.componentInstance.placeholder = value;
+      fixture.detectChanges();
+      expect(input.hasAttribute('placeholder')).toBe(false);
+      expect(input.getAttribute('data-placeholder')).toBe(value);
+    }
+    input.setAttribute('placeholder', 'Consumer write');
+    fixture.detectChanges();
+    expect(input.getAttribute('placeholder')).toBe('Consumer write');
+  });
+
   it('supports placeholder element', fakeAsync(() => {
     const fixture = createComponent(MatInputPlaceholderElementTestComponent);
     fixture.detectChanges();
@@ -1960,6 +1985,11 @@ class MatInputPlaceholderElementTestComponent {
 class MatInputWithFormControl {
   formControl = new FormControl('');
 }
+
+@Component({
+  template: `<mat-form-field appearance="legacy"><input matInput placeholder="Static hint"></mat-form-field>`,
+})
+class MatInputStaticPromotedPlaceholder {}
 
 @Component({
   template: `<mat-form-field><input matInput [placeholder]="placeholder"></mat-form-field>`,

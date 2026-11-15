@@ -52,6 +52,7 @@ import {
 export class MatLegacyInput extends BaseMatInput {
   private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});
   private readonly _legacyElement = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>>(ElementRef);
+  private _legacyPlaceholderChecked = false;
   /** @docs-private Host binding preserves the consumer-supplied aria-disabled value. */
   protected _legacyAriaDisabled: string | null = null;
 
@@ -59,6 +60,14 @@ export class MatLegacyInput extends BaseMatInput {
     // The frozen legacy control has always been natively disabled.
     this.disabledInteractive = false;
     super.ngDoCheck();
+    // The peer initializes its placeholder cache to null. The historical peer's
+    // first check also removed an authored placeholder promoted to a label.
+    if (!this._legacyPlaceholderChecked) {
+      this._legacyPlaceholderChecked = true;
+      if (this._legacyFormField?.appearance === 'legacy' && !this._legacyFormField._hasLabel?.()) {
+        this._legacyElement.nativeElement.removeAttribute('placeholder');
+      }
+    }
     this._legacyAriaDisabled = this._legacyElement.nativeElement.getAttribute('aria-disabled');
   }
 
