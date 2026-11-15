@@ -1,0 +1,109 @@
+{
+  "sha": "a24081f2bd66fd686c2751f9a429131ae0ff0acc",
+  "role": "C04 small Material individual contextual source review",
+  "line": "main",
+  "diff_sha256": "d27ac2ee005a0e0d61bc92bffc53686c0e2b8b0bcc507d0255c0e24090b03cca",
+  "diff": "diff --git a/src/material/dialog/_m2-dialog.scss b/src/material/dialog/_m2-dialog.scss\nindex d4f21b102..abee3b35a 100644\n--- a/src/material/dialog/_m2-dialog.scss\n+++ b/src/material/dialog/_m2-dialog.scss\n@@ -1,4 +1,3 @@\n-@use '../core/tokens/m2-utils';\n @use '../core/style/elevation';\n @use '../core/style/sass-utils';\n @use '../core/theming/inspection';\n@@ -26,13 +25,7 @@\n // Tokens that can be configured through Angular Material's color theming API.\n @function get-color-tokens($theme) {\n   $is-dark: inspection.get-theme-type($theme) == dark;\n-\n-  // Ideally we would derive all values directly from the theme, but it causes a lot of regressions\n-  // internally. For now we fall back to the old hardcoded behavior only for internal apps.\n-  $text-base: if(m2-utils.$private-is-internal-build,\n-    if($is-dark, #fff, #000),\n-    inspection.get-theme-color($theme, foreground, text, 1)\n-  );\n+  $text-base: inspection.get-theme-color($theme, foreground, text, 1);\n \n   @return (\n     dialog-container-color: inspection.get-theme-color($theme, system, surface),\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+      "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+      "bytes": 3938
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/dialog/_dialog-theme.scss",
+      "sha256": "bbd63bc2b103786eb4209e083a01f6fc60120a63e21f6bcf1fb88c6effd34af8",
+      "bytes": 1327
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_dialog.scss",
+      "sha256": "4c43a9d4070ee35f26c387f7511b9ad0469026e4474f595e341aa5ed42d669c7",
+      "bytes": 4787
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/_dialog-theme.scss",
+      "sha256": "fa7cfa3a67e8422fe5cd9c995de0b0197cb7a9e8c1aae2c7f5ca82e746571d22",
+      "bytes": 1921
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-dialog/_dialog-theme.scss",
+      "sha256": "d993c371f7fb7daae14a0adce512ab336e253237b1de8d017cd9e87951568903",
+      "bytes": 1893
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "Do not transplant the later MDC dialog text-base change into the owned Material 16 theme model. The exported legacy theme derives dialog text from foreground.text, while the exported companion theme emits its own historical dark/light MDC token calculations; the upstream patch addresses a newer MDC token branch. Installed peer dialog styling and coexistence remain separate runtime and visual obligations.",
+  "review_context": {
+    "original_subject": "fix(material/dialog): remove internal-only M2 styles (#31020)",
+    "upstream_patch_summary": "MDC M2 dialog tokens remove private internal-build branch and take foreground text from theme before applying alpha.",
+    "installed_peer_source_observation": "Installed peer M2 dialog token file now maps supporting text to system on-surface-variant; its present structure differs from the patch-era implementation.",
+    "owned_reachability": "Facade exports dialog and legacy-dialog themes; the all-component mixin includes the companion. Companion dialog color calls owned MDC dialog tokens, where dark/light selects white/black for subhead and supporting text. The tagged reference token file has the same color formula. The upstream patch removes the newer MDC internal branch and derives foreground text from the theme. Historical color retention and companion override reachability require custom-palette output review before a whole-boundary disposition.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "base": "/home/parallels/tmp/material16-reference-verified/src/material/",
+      "files": [
+        {
+          "path": "dialog/_dialog-theme.scss",
+          "sha256": "620a2e6b3eeda66a81539e05da07e4f83e5960efef4cf86fbf9d188a312abc02",
+          "bytes": 1323
+        },
+        {
+          "path": "core/tokens/m2/mdc/_dialog.scss",
+          "sha256": "4c43a9d4070ee35f26c387f7511b9ad0469026e4474f595e341aa5ed42d669c7",
+          "bytes": 4787
+        },
+        {
+          "path": "legacy-dialog/_dialog-theme.scss",
+          "sha256": "d993c371f7fb7daae14a0adce512ab336e253237b1de8d017cd9e87951568903",
+          "bytes": 1893
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      },
+      {
+        "path": "node_modules/@angular/material/dialog/_m2-dialog.scss",
+        "sha256": "fb12ccd9151d1f19a8adb41151d0e19b37a08396869a33e061d61faeb54bdd21",
+        "bytes": 1748
+      }
+    ],
+    "predecessor": {
+      "sha": "a24081f2bd66fd686c2751f9a429131ae0ff0acc",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/dialog): remove internal-only M2 styles (#31020)",
+      "files": [
+        "src/material/dialog/_m2-dialog.scss"
+      ],
+      "diff_sha256": "0bec8d378195e47a9f38547ee27184bdc514ca54893f9f208d4e34fb44d08f8f",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/a24081f2bd66fd686c2751f9a429131ae0ff0acc.json",
+      "batch_id": "unread-seed-content-review-2026-10-02",
+      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "g11_claim": "not-passed",
+      "final_disposition": "inherited",
+      "read_note_disposition": "inherited",
+      "reason": "The diff in src/material/dialog/_m2-dialog.scss changes `@use '../core/tokens/m2-utils';`. That line is not in the legacy sources. @angular/material/dialog is exercised by projects/ngx-material-legacy/legacy-dialog/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "peer_floor": {
+        "package": "@angular/material",
+        "installed": "22.1.7",
+        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+        "delegation": "@angular/material/dialog imported by projects/ngx-material-legacy/legacy-dialog/public-api.ts"
+      }
+    },
+    "targeted_runtime_evidence_not_claimed": "Compare legacy and companion dialog text/background with tagged 16 output for light, dark and custom foreground colors; exercise coexistence with peer dialog in the actual supported configurations.",
+    "limits": "Source judgment only; no runtime, style golden, peer floor execution, security clearance or G11 pass."
+  }
+}

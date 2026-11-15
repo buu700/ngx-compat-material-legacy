@@ -1,0 +1,109 @@
+{
+  "sha": "eb9abc366fcda8057d5b958231f518435f965e1e",
+  "role": "C04 small Material individual contextual source review",
+  "line": "main",
+  "diff_sha256": "5a2c00c6111ea703a5f27ad35e06a612e547127d8cc8d4e8abda9c700449bfb6",
+  "diff": "diff --git a/src/material/checkbox/_m2-checkbox.scss b/src/material/checkbox/_m2-checkbox.scss\nindex 2dced64c2..3db4cbf7c 100644\n--- a/src/material/checkbox/_m2-checkbox.scss\n+++ b/src/material/checkbox/_m2-checkbox.scss\n@@ -36,18 +36,8 @@\n       inspection.get-theme-color($theme, foreground, base), $alpha: 0.54);\n   $active-border-color:\n     m2-theming.get-color-from-palette(m2-palette.$gray-palette, if($is-dark, 200, 900));\n-  $selected-checkmark-color: null;\n-\n-  // Ideally we would derive all values directly from the theme, but it causes a lot of regressions\n-  // internally. For now we fall back to the old hardcoded behavior only for internal apps.\n-  @if (m2-utils.$private-is-internal-build) {\n-    $contrast-tone: m2-utils.contrast-tone($palette-selected, $is-dark);\n-    $selected-checkmark-color: if($contrast-tone == 'dark', #000, #fff);\n-  }\n-  @else {\n-    $selected-checkmark-color:\n-      inspection.get-theme-color($theme, $palette-name, default-contrast, 1);\n-  }\n+  $selected-checkmark-color:\n+    inspection.get-theme-color($theme, $palette-name, default-contrast, 1);\n \n   $tokens: (\n     checkbox-disabled-label-color: inspection.get-theme-color($theme, foreground, disabled-text),\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+      "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+      "bytes": 3938
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+      "sha256": "97d4de28beacfa9229c148463b16436f5fdbf5e8905d9dc6c463c5e534da17a9",
+      "bytes": 7155
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_checkbox.scss",
+      "sha256": "5b3924089e17121d456084ff1b0eaaa20a6c301bd88c28503cd058a888944819",
+      "bytes": 6427
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/_checkbox-theme.scss",
+      "sha256": "9eed531b2fd66dc8960f99efdbf3542b50581b5897e2c717473510ba136aeb7f",
+      "bytes": 4517
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-checkbox/_checkbox-theme.scss",
+      "sha256": "f50e3f7ec838c204e1ef92c4ceed4b6b4f4aae38602fc3a69b58e5e5c796d3f1",
+      "bytes": 4496
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "Do not transplant the later MDC checkbox selected-contrast change into the owned Material 16 theme model. The exported legacy theme uses the background palette for its mark; the exported companion emits historical contrast-tone tokens and passes them into peer overrides. The peer token calculation and custom-palette rendering remain separate coexistence and visual obligations.",
+  "review_context": {
+    "original_subject": "fix(material/checkbox): remove internal-only M2 styles (#31019)",
+    "upstream_patch_summary": "MDC M2 checkbox removes internal contrast-tone branch; selected checkmark derives palette default-contrast.",
+    "installed_peer_source_observation": "Installed peer M2 checkbox token file now maps selected checkmark to system on-secondary; the patch-era default-contrast expression is not in this current file.",
+    "owned_reachability": "Facade exports both checkbox themes; all-component includes the companion. Companion feeds owned token values into MDC theme and public checkbox overrides; selected checkmark is computed by owned _contrast-tone from the selected color. Tagged reference uses that calculation. The patch instead replaces an internal contrast branch with selected-palette default contrast. Custom contrast palettes and public peer override interactions remain unresolved; the legacy mark alone does not settle the companion boundary.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "base": "/home/parallels/tmp/material16-reference-verified/src/material/",
+      "files": [
+        {
+          "path": "checkbox/_checkbox-theme.scss",
+          "sha256": "856a480f6fd480f5b720dba992fa0eb630ea8a2c004476a91e3795f0cb514c80",
+          "bytes": 3356
+        },
+        {
+          "path": "core/tokens/m2/mdc/_checkbox.scss",
+          "sha256": "8a51236695e9db931bbc315ded26bdb855b9a44b77a14e8a71b3420cc9d11c1b",
+          "bytes": 6414
+        },
+        {
+          "path": "legacy-checkbox/_checkbox-theme.scss",
+          "sha256": "f50e3f7ec838c204e1ef92c4ceed4b6b4f4aae38602fc3a69b58e5e5c796d3f1",
+          "bytes": 4496
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      },
+      {
+        "path": "node_modules/@angular/material/checkbox/_m2-checkbox.scss",
+        "sha256": "ec310b1fa2b324045ca2cc6f7772e55ba84c38159394084e46bee2c7b2a0b6ce",
+        "bytes": 3456
+      }
+    ],
+    "predecessor": {
+      "sha": "eb9abc366fcda8057d5b958231f518435f965e1e",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/checkbox): remove internal-only M2 styles (#31019)",
+      "files": [
+        "src/material/checkbox/_m2-checkbox.scss"
+      ],
+      "diff_sha256": "937c960892f0a9323ed99c0b0551d1fcb8f985e43ad6ccc62f42bd6cec8c88b7",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/eb9abc366fcda8057d5b958231f518435f965e1e.json",
+      "batch_id": "unread-seed-content-review-2026-10-02",
+      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "g11_claim": "not-passed",
+      "final_disposition": "inherited",
+      "read_note_disposition": "inherited",
+      "reason": "The diff in src/material/checkbox/_m2-checkbox.scss changes `$selected-checkmark-color: null;`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "peer_floor": {
+        "package": "@angular/material",
+        "installed": "22.1.7",
+        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+        "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+      }
+    },
+    "targeted_runtime_evidence_not_claimed": "Compare tagged 16 and owned legacy and companion outputs under custom accent, primary and warn palettes including deliberately different default contrast and dark/light themes; verify mixed peer and legacy state styles.",
+    "limits": "Source judgment only; no runtime, style golden, peer floor execution, security clearance or G11 pass."
+  }
+}

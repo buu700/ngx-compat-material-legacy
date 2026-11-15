@@ -1,0 +1,134 @@
+{
+  "sha": "b3131a6f998ce358a423bba4f69437a34c2ded52",
+  "role": "C04 small Material individual contextual source review",
+  "line": "main",
+  "diff_sha256": "5a683e17aff5db9ace54a7817e1e570b69c53e125061a3d806ca9aa89e70c79f",
+  "diff": "diff --git a/src/material/divider/_m3-divider.scss b/src/material/divider/_m3-divider.scss\nindex bd86da2d9..88e7c6715 100644\n--- a/src/material/divider/_m3-divider.scss\n+++ b/src/material/divider/_m3-divider.scss\n@@ -11,7 +11,7 @@\n       divider-width: 1px,\n     ),\n     color: (\n-      divider-color: map.get($system, outline),\n+      divider-color: map.get($system, outline-variant),\n     ),\n     typography: (),\n     density: (),\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/divider/_divider-theme.scss",
+      "sha256": "15a6239799cd29263ad2e336205bbebe4d31c9997464aa041483e0856e420361",
+      "bytes": 2087
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_divider.scss",
+      "sha256": "7b6f935769f6d8e997fb039c6ca253b2c45e2b7425ebf91945602534d33dae48",
+      "bytes": 1392
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "sha256": "3bd939280b1d80fd10f6c0ece8c434cfe2f0f369746cca7b2b3e9f8c153755ee",
+      "bytes": 35009
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bridges/_m2-system.scss",
+      "sha256": "6c9da785ea2449d2629af75e3078fde08631c59db87a3f423198444dc5b8b84d",
+      "bytes": 8191
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "572b01d580e4a9c12c72278bbe11d111faafbd6a5534c1fafec0cd77a9ab5208",
+      "bytes": 1679
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list.scss",
+      "sha256": "c3c4e1ee2d36547d323c661dd2737e65d5150d414223e75a620a389a7a0b8168",
+      "bytes": 8834
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+      "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+      "bytes": 3938
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-list/_list-theme.scss",
+      "sha256": "f77bb9e621f938d24bdfdbb70f6a135164e24997acfa729bce4933cbe92f8d93",
+      "bytes": 3792
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+      "bytes": 6954
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "Do not copy the peer M3 outline-variant token into the owned Material 16 M2 divider theme. The facade exports that theme, which emits foreground.divider and calls a companion bridge mapping the owned M2 system outline through the peer override. The peer M3 divider remains reachable via legacy list; its M3 behavior and mixed-theme cascade require separate visual validation.",
+  "review_context": {
+    "original_subject": "fix(material/divider): update color to spec (#31650)",
+    "upstream_patch_summary": "M3 divider color changes system outline to outline-variant.",
+    "installed_peer_source_observation": "Installed divider/_m3-divider.scss and bundled divider styles use outline-variant.",
+    "owned_reachability": "Facade exports divider theme; owned theme emits historical M2 foreground.divider tokens and calls companion bridge. The bridge maps its owned M2 system outline to the public peer divider override; its system outline is generated as translucent white/black. The patch changes peer M3 divider outline to outline-variant. Although M2 and M3 systems are distinct, actual mixed-theme cascade and coexistence are not established; retain this entry open instead of treating the peer M3 change as unreachable.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "base": "/home/parallels/tmp/material16-reference-verified/src/material/",
+      "files": [
+        {
+          "path": "divider/_divider-theme.scss",
+          "sha256": "dbd408cd4d00e79c93195ae1bfc1cf1380376e0f88b633bffc4a11d55ac8b9a3",
+          "bytes": 1068
+        },
+        {
+          "path": "core/tokens/m2/mat/_divider.scss",
+          "sha256": "7b6f935769f6d8e997fb039c6ca253b2c45e2b7425ebf91945602534d33dae48",
+          "bytes": 1392
+        },
+        {
+          "path": "legacy-list/list.scss",
+          "sha256": "6285d9683c1c4b00cc600b9c07b840b47d34d5480c108061711b5d77d61e2fa3",
+          "bytes": 8774
+        },
+        {
+          "path": "divider/divider.ts",
+          "sha256": "94600207ceb338d51f0dc41b7d0be29a60ae74f6fa2a0e9c1d65eac36a56c6af",
+          "bytes": 1350
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      },
+      {
+        "path": "node_modules/@angular/material/divider/_m3-divider.scss",
+        "sha256": "b903fba881afefa3326ef29b989ed73771bd626a56019c0eec600d49a6161154",
+        "bytes": 389
+      }
+    ],
+    "predecessor": {
+      "sha": "b3131a6f998ce358a423bba4f69437a34c2ded52",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/divider): update color to spec (#31650)",
+      "files": [
+        "src/material/divider/_m3-divider.scss"
+      ],
+      "diff_sha256": "6ed598925e8babc31e2049b36c11d12ae1ee84b672da8e2634e68a2ae35759ed",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b3131a6f998ce358a423bba4f69437a34c2ded52.json",
+      "batch_id": "unread-seed-content-review-2026-10-02",
+      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "g11_claim": "not-passed",
+      "final_disposition": "inherited",
+      "read_note_disposition": "inherited",
+      "reason": "The diff in src/material/divider/_m3-divider.scss changes `divider-color: map.get($system, outline),`. That line is not in the legacy sources. @angular/material/divider is exercised by projects/ngx-material-legacy/legacy-list/list-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "peer_floor": {
+        "package": "@angular/material",
+        "installed": "22.1.7",
+        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+        "delegation": "@angular/material/divider imported by projects/ngx-material-legacy/legacy-list/list-module.ts"
+      }
+    },
+    "targeted_runtime_evidence_not_claimed": "Compare 16 M2 foreground.divider output and geometry in legacy list/card, then exercise mixed M2/M3 peer divider placement, inset and colors with and without the companion bridge.",
+    "limits": "Source judgment only; no runtime, style golden, peer floor execution, security clearance or G11 pass."
+  }
+}

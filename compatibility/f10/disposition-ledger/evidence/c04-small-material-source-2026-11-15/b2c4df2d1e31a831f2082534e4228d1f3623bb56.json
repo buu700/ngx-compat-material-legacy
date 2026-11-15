@@ -1,0 +1,122 @@
+{
+  "sha": "b2c4df2d1e31a831f2082534e4228d1f3623bb56",
+  "role": "C04 small Material individual contextual source review",
+  "line": "main",
+  "diff_sha256": "b860966c67e769133c161218e18d5fee66bae313f2e27decf8249f4f4bf5cb85",
+  "diff": "diff --git a/goldens/material/checkbox/index.api.md b/goldens/material/checkbox/index.api.md\nindex 27e043353..292e4300b 100644\n--- a/goldens/material/checkbox/index.api.md\n+++ b/goldens/material/checkbox/index.api.md\n@@ -21,9 +21,6 @@ import { Validator } from '@angular/forms';\n // @public\n export const MAT_CHECKBOX_DEFAULT_OPTIONS: InjectionToken<MatCheckboxDefaultOptions>;\n \n-// @public @deprecated\n-export function MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY(): MatCheckboxDefaultOptions;\n-\n // @public (undocumented)\n export class MatCheckbox implements AfterViewInit, OnChanges, ControlValueAccessor, Validator, FocusableOption {\n     constructor(...args: unknown[]);\ndiff --git a/src/material/checkbox/checkbox-config.ts b/src/material/checkbox/checkbox-config.ts\nindex 984894c10..6f5d0dc31 100644\n--- a/src/material/checkbox/checkbox-config.ts\n+++ b/src/material/checkbox/checkbox-config.ts\n@@ -26,28 +26,21 @@ export interface MatCheckboxDefaultOptions {\n   disabledInteractive?: boolean;\n }\n \n+export const checkboxDefaults: MatCheckboxDefaultOptions = {\n+  color: 'accent',\n+  clickAction: 'check-indeterminate',\n+  disabledInteractive: false,\n+};\n+\n /** Injection token to be used to override the default options for `mat-checkbox`. */\n export const MAT_CHECKBOX_DEFAULT_OPTIONS = new InjectionToken<MatCheckboxDefaultOptions>(\n   'mat-checkbox-default-options',\n   {\n     providedIn: 'root',\n-    factory: MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY,\n+    factory: () => checkboxDefaults,\n   },\n );\n \n-/**\n- * @docs-private\n- * @deprecated No longer used, will be removed.\n- * @breaking-change 21.0.0\n- */\n-export function MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY(): MatCheckboxDefaultOptions {\n-  return {\n-    color: 'accent',\n-    clickAction: 'check-indeterminate',\n-    disabledInteractive: false,\n-  };\n-}\n-\n /**\n  * Checkbox click action when user click on input element.\n  * noop: Do not toggle checked or indeterminate.\ndiff --git a/src/material/checkbox/checkbox.ts b/src/material/checkbox/checkbox.ts\nindex 2e1b2556e..fbfd984eb 100644\n--- a/src/material/checkbox/checkbox.ts\n+++ b/src/material/checkbox/checkbox.ts\n@@ -43,8 +43,8 @@ import {\n   _animationsDisabled,\n } from '../core';\n import {\n+  checkboxDefaults,\n   MAT_CHECKBOX_DEFAULT_OPTIONS,\n-  MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY,\n   MatCheckboxDefaultOptions,\n } from './checkbox-config';\n import {_CdkPrivateStyleLoader} from '@angular/cdk/private';\n@@ -72,9 +72,6 @@ export class MatCheckboxChange {\n   checked: boolean;\n }\n \n-// Default checkbox configuration.\n-const defaults = MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY();\n-\n @Component({\n   selector: 'mat-checkbox',\n   templateUrl: 'checkbox.html',\n@@ -248,8 +245,8 @@ export class MatCheckbox\n   constructor() {\n     inject(_CdkPrivateStyleLoader).load(_StructuralStylesLoader);\n     const tabIndex = inject(new HostAttributeToken('tabindex'), {optional: true});\n-    this._options = this._options || defaults;\n-    this.color = this._options.color || defaults.color;\n+    this._options = this._options || checkboxDefaults;\n+    this.color = this._options.color || checkboxDefaults.color;\n     this.tabIndex = tabIndex == null ? 0 : parseInt(tabIndex) || 0;\n     this.id = this._uniqueId = inject(_IdGenerator).getId('mat-mdc-checkbox-');\n     this.disabledInteractive = this._options?.disabledInteractive ?? false;\ndiff --git a/src/material/checkbox/public-api.ts b/src/material/checkbox/public-api.ts\nindex d591ca5e5..6f8cb4c78 100644\n--- a/src/material/checkbox/public-api.ts\n+++ b/src/material/checkbox/public-api.ts\n@@ -7,5 +7,9 @@\n  */\n \n export * from './checkbox';\n-export * from './checkbox-config';\n+export {\n+  MatCheckboxDefaultOptions,\n+  MAT_CHECKBOX_DEFAULT_OPTIONS,\n+  MatCheckboxClickAction,\n+} from './checkbox-config';\n export * from './checkbox-module';\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/public-api.ts",
+      "sha256": "ee7d7028843ce1ea3da51a5253501a2fe7304d6ea51cfde777c97d9eb69b823b",
+      "bytes": 1269
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/internal/checkbox-base.ts",
+      "sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+      "bytes": 16642
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+      "sha256": "072e0061972bde4529ba5151444f6ec3f69de326ee9f56941b229fe06366807f",
+      "bytes": 5636
+    },
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+      "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+      "bytes": 3938
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox-module.ts",
+      "sha256": "a1dfbaa86342a3876d3d22dcd4380d8379e85a4e046a8b2be156b6a7b48ce6d5",
+      "bytes": 907
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+      "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7",
+      "bytes": 54168
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "Do not remove the owned exported legacy default factory in response to the peer checkbox factory removal. Material 16 aliased the peer token and factory; current legacy API and component still share the peer token, while the legacy factory and fallback are locally owned. The peer token factory changed, so identity, defaults, overrides and fallback behavior remain separate runtime obligations.",
+  "review_context": {
+    "original_subject": "fix(material/checkbox): remove deprecated factory functions",
+    "upstream_patch_summary": "Removes MDC checkbox default factory export, uses shared checkboxDefaults token factory and component fallback; changes API guard.",
+    "installed_peer_source_observation": "Peer checkbox uses checkboxDefaults and no deprecated factory export.",
+    "owned_reachability": "The 16.2.14 legacy public API aliases both token and factory from @angular/material/checkbox, and the legacy component injects that shared token. Current legacy public API still aliases the peer MAT_CHECKBOX_DEFAULT_OPTIONS, and the component injects it; its exported factory is now owned locally and the owned base uses that factory for fallback. The local factory returns accent/check-indeterminate like the tagged factory. Installed peer token factory and defaults changed; neither token separation nor equivalence of injection/default behavior follows. Keep the upstream removal and shared-token behavior open pending mixed-peer identity, override, fallback and lifecycle tests.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "base": "/home/parallels/tmp/material16-reference-verified/src/material/",
+      "files": [
+        {
+          "path": "legacy-checkbox/public-api.ts",
+          "sha256": "79c3692399c72035380222607f63196d256303560cac810dc4f7667b83805867",
+          "bytes": 2774
+        },
+        {
+          "path": "legacy-checkbox/checkbox.ts",
+          "sha256": "072551993542bffeacc517777d2144cab604e174b0c38988811a3c94ab45b908",
+          "bytes": 6040
+        },
+        {
+          "path": "checkbox/checkbox-config.ts",
+          "sha256": "941622adfdff1790b39a7ad77d6df4c8117306bfa575d1e6c81a17aeed0095bf",
+          "bytes": 1484
+        },
+        {
+          "path": "checkbox/checkbox.ts",
+          "sha256": "6f362a270133996edea98bf03b6c1a212c3a3011e16562734e8ed9c1dea45e56",
+          "bytes": 18643
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      },
+      {
+        "path": "node_modules/@angular/material/fesm2022/checkbox.mjs",
+        "sha256": "f37d9ce744524ecf1ab98ff784600ecbbaeabc132bec9e5e3b132cc55bb2899f",
+        "bytes": 59961
+      }
+    ],
+    "predecessor": {
+      "sha": "b2c4df2d1e31a831f2082534e4228d1f3623bb56",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/checkbox): remove deprecated factory functions",
+      "files": [
+        "goldens/material/checkbox/index.api.md",
+        "src/material/checkbox/checkbox-config.ts",
+        "src/material/checkbox/checkbox.ts",
+        "src/material/checkbox/public-api.ts"
+      ],
+      "diff_sha256": "a47cbe52aac09406a41e96f1f0a64284605ccd53e7cdf79247033b19ff397dce",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b2c4df2d1e31a831f2082534e4228d1f3623bb56.json",
+      "batch_id": "unread-seed-content-review-2026-10-02",
+      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "g11_claim": "not-passed",
+      "final_disposition": "inherited",
+      "read_note_disposition": "inherited",
+      "reason": "The diff in src/material/checkbox/checkbox-config.ts changes `export const checkboxDefaults: MatCheckboxDefaultOptions = {`. That line is not in the legacy sources. @angular/material/checkbox is exercised by projects/ngx-material-legacy/legacy-checkbox/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "peer_floor": {
+        "package": "@angular/material",
+        "installed": "22.1.7",
+        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+        "delegation": "@angular/material/checkbox imported by projects/ngx-material-legacy/legacy-checkbox/public-api.ts"
+      }
+    },
+    "targeted_runtime_evidence_not_claimed": "Test shared token identity and overrides for mixed peer and legacy checkboxes, root and nested providers, default and partial options, click action, factory object identity and fallback behavior against the tagged 16 contract.",
+    "limits": "Source judgment only; no runtime, style golden, peer floor execution, security clearance or G11 pass."
+  }
+}

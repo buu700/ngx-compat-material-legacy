@@ -1,0 +1,189 @@
+{
+  "sha": "82ab91e58ad03207c6dfa25f5995dde1bd5760cf",
+  "role": "C04 small Material individual contextual source review",
+  "line": "main",
+  "diff_sha256": "8477b7567dbf55d7f9bc9ddc5135d3935c47289fd943a775cc16efd4f32e4b48",
+  "diff": "diff --git a/src/material/form-field/_m2-form-field.scss b/src/material/form-field/_m2-form-field.scss\nindex f5cac71a6..1c7d5b596 100644\n--- a/src/material/form-field/_m2-form-field.scss\n+++ b/src/material/form-field/_m2-form-field.scss\n@@ -1,8 +1,8 @@\n @use '../core/m2/palette' as m2-palette;\n @use '../core/style/sass-utils';\n+@use '../core/tokens/m2-utils';\n @use '../core/theming/inspection';\n @use '../core/theming/theming';\n-@use '../core/tokens/m2-utils';\n @use 'sass:color';\n @use 'sass:map';\n @use 'sass:math';\n@@ -30,16 +30,9 @@\n   $warn-color: inspection.get-theme-color($theme, warn);\n   $color-tokens: private-get-color-palette-color-tokens($theme, primary);\n   $on-surface: if($is-dark, #fff, #000);\n-\n-  // Ideally we would derive all values directly from the theme, but it causes a lot of regressions\n-  // internally. For now we fall back to the old hardcoded behavior only for internal apps.\n-  $on-surface: if($is-dark, #fff, #000);\n-  $text-color-base: if(m2-utils.$private-is-internal-build, $on-surface,\n-    inspection.get-theme-color($theme, foreground, text, 1));\n-  $disabled-text-color-base: if(m2-utils.$private-is-internal-build, $on-surface,\n-    inspection.get-theme-color($theme, foreground, disabled-text, 1));\n-  $divider-base: if(m2-utils.$private-is-internal-build, $on-surface,\n-    inspection.get-theme-color($theme, foreground, base));\n+  $text-color-base: inspection.get-theme-color($theme, system, on-surface);\n+  $disabled-text-color-base: inspection.get-theme-color($theme, foreground, disabled-text, 1);\n+  $divider-base: inspection.get-theme-color($theme, foreground, base);\n \n   @return map.merge($color-tokens, (\n     // MDC has a token for the enabled placeholder, but not for the disabled one.\n",
+  "final_disposition": "do-not-adopt",
+  "source_conclusion_only": true,
+  "execution_claim": "not-claimed",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+      "bytes": 14151
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/theming/_all-theme.scss",
+      "sha256": "460048a52813ec9de04cb90e20a067e03f013b6ee533e9f35174ef2d3512bf7e",
+      "bytes": 3938
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+      "sha256": "5bdb28f2eeb29e4decc288cfb53d95dd6aa77dcc4bde1265f10adf2bae951bf5",
+      "bytes": 5183
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_filled-text-field.scss",
+      "sha256": "353e28f911a61ab7056d782dc486cc5198865e5f76ac79d09a85bcb74d45af40",
+      "bytes": 6783
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_outlined-text-field.scss",
+      "sha256": "0eafbb209b722f228eea5d813367db2a21eb160ab5809425751f2ba3278380cb",
+      "bytes": 5994
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_form-field.scss",
+      "sha256": "c3fc633a3b4a55ab6bab6f1fbd8e6359717050a49c567d3d2d93da513bf07d4c",
+      "bytes": 3455
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/_form-field-theme.scss",
+      "sha256": "06ae94d10e8ebc90d5fa0229328be05ab4cae6c3fbe356edec2889932a22d44d",
+      "bytes": 10250
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/_form-field-outline-theme.scss",
+      "sha256": "4ade0bd1248901ab7dd7bc9c1006eba20edba4116a5db11153f367d47ae51673",
+      "bytes": 6771
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/_form-field-fill-theme.scss",
+      "sha256": "3e9cdd4722de9525d29eeebca07b6b78a2961ba5951c66539888b1ab79d92493",
+      "bytes": 5332
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/_form-field-standard-theme.scss",
+      "sha256": "b2f16b8073a6d51b3f5d2dfb5de7bdb9a0ab0133acf85fb7932938b3fd932fc2",
+      "bytes": 2202
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/_form-field-legacy-theme.scss",
+      "sha256": "8f14b551090c9ebc4509350fe7c1b1e7a0ea24b085e11ba9e836ff63eecefe8b",
+      "bytes": 9055
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+      "sha256": "3d9f82fc2196ccff48a1e0adf21fbf718cf10db117cb9db5431e78af583bc244",
+      "bytes": 10229
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-outline-theme.scss",
+      "sha256": "8c54240a46f3222cb9279cf7909fe9547d49c25d6c1788ff04ed2b5c44dd81d6",
+      "bytes": 6750
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-fill-theme.scss",
+      "sha256": "a0e144cda09659ead66eeaa7193406f08eecf02f0069b94bafc1d048a1f367e1",
+      "bytes": 5311
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-standard-theme.scss",
+      "sha256": "6df9f1ee202304ee4d8277024aff5b0a9b1c3972d37fda5ecf984c640952a7ef",
+      "bytes": 2188
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-legacy-theme.scss",
+      "sha256": "f0468140a9d22db1095a386da15f3055236d7fa2c80dbb3f738070c4619dce0b",
+      "bytes": 9027
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+      "sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e",
+      "bytes": 1518
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/form-field/_form-field-subscript.scss",
+      "sha256": "fd03751fd99faf64b49ff6bd615f503574c416006cd8fa4c061d8265ec67c9d9",
+      "bytes": 2635
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/form-field/_form-field-native-select.scss",
+      "sha256": "0a637a368e2114addf51c6dae477ecce4c989169c92bc3e86745f63c9b560851",
+      "bytes": 4858
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/form-field/_mdc-text-field-theme-variable-refresh.scss",
+      "sha256": "8b80fcce844454324123d761f71e7a4c9088d3f52b778d544e2161621d99adf1",
+      "bytes": 4648
+    }
+  ],
+  "affected_branches": [
+    "main"
+  ],
+  "decision": "Do not transplant the newer MDC form-field text and divider token changes into the owned Material 16 model. The exported legacy appearance themes and companion filled, outlined and mat token emitters retain their own historical color calculations. The peer form-field styling and custom foreground coexistence remain separate visual and runtime obligations.",
+  "review_context": {
+    "original_subject": "fix(material/form-field): remove internal-only M2 styles (#31021)",
+    "upstream_patch_summary": "MDC M2 form-field removes private internal branch: text base becomes system on-surface; disabled and divider derive foreground palette.",
+    "installed_peer_source_observation": "Installed peer M2 form-field token file now maps text colors through system colors and disabled opacity; its present structure differs from the patch-era implementation.",
+    "owned_reachability": "Facade exports companion and legacy form-field themes; all-component includes companion. Companion emits owned filled, outlined and mat token maps: for example outlined text and border colors derive from dark/light black or white. Patch changes newer MDC system text and foreground disabled/divider calculations. Historical token inputs and peer coexistence make the prior legacy-only exclusion incomplete; custom-foreground output and selector-cascade comparisons remain open.",
+    "reference_16_2_14": {
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "base": "/home/parallels/tmp/material16-reference-verified/src/material/",
+      "files": [
+        {
+          "path": "form-field/_form-field-theme.scss",
+          "sha256": "6bf99458b3c499e1d8bdd7ed8016e39a8a3c52112bc8ef9a8aab8bff7c184cea",
+          "bytes": 4940
+        },
+        {
+          "path": "core/tokens/m2/mdc/_filled-text-field.scss",
+          "sha256": "353e28f911a61ab7056d782dc486cc5198865e5f76ac79d09a85bcb74d45af40",
+          "bytes": 6783
+        },
+        {
+          "path": "core/tokens/m2/mdc/_outlined-text-field.scss",
+          "sha256": "0eafbb209b722f228eea5d813367db2a21eb160ab5809425751f2ba3278380cb",
+          "bytes": 5994
+        },
+        {
+          "path": "core/tokens/m2/mat/_form-field.scss",
+          "sha256": "c3fc633a3b4a55ab6bab6f1fbd8e6359717050a49c567d3d2d93da513bf07d4c",
+          "bytes": 3455
+        },
+        {
+          "path": "legacy-form-field/_form-field-theme.scss",
+          "sha256": "3d9f82fc2196ccff48a1e0adf21fbf718cf10db117cb9db5431e78af583bc244",
+          "bytes": 10229
+        }
+      ]
+    },
+    "peer_files": [
+      {
+        "path": "node_modules/@angular/material/package.json",
+        "sha256": "5d33c35b56f9834d36a3be0ce4dc37892e689bceb1727de0cf223f10ab8f28af",
+        "bytes": 11420
+      },
+      {
+        "path": "node_modules/@angular/material/form-field/_m2-form-field.scss",
+        "sha256": "a60c47316ebf95909c86a4d53bc4fcefb74d8f5a0d505a8608374bc0d4e9b482",
+        "bytes": 13018
+      }
+    ],
+    "predecessor": {
+      "sha": "82ab91e58ad03207c6dfa25f5995dde1bd5760cf",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): remove internal-only M2 styles (#31021)",
+      "files": [
+        "src/material/form-field/_m2-form-field.scss"
+      ],
+      "diff_sha256": "e0f2d5faa2e50c86840f908718f015dea23896da383e157cbe347b7b41d238c3",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/82ab91e58ad03207c6dfa25f5995dde1bd5760cf.json",
+      "batch_id": "unread-seed-content-review-2026-10-02",
+      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "g11_claim": "not-passed",
+      "final_disposition": "inherited",
+      "read_note_disposition": "inherited",
+      "reason": "The diff in src/material/form-field/_m2-form-field.scss changes `@use '../core/tokens/m2-utils';`. That line is not in the legacy sources. @angular/material/form-field is exercised by projects/ngx-material-legacy/legacy-form-field/public-api.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/material@22.1.7 supplies the change.",
+      "peer_floor": {
+        "package": "@angular/material",
+        "installed": "22.1.7",
+        "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+        "delegation": "@angular/material/form-field imported by projects/ngx-material-legacy/legacy-form-field/public-api.ts"
+      }
+    },
+    "targeted_runtime_evidence_not_claimed": "Compare tagged 16 legacy appearances and companion output across light, dark, custom foreground, disabled and error states; exercise peer and legacy controls under mixed themes and inspect the cascade.",
+    "limits": "Source judgment only; no runtime, style golden, peer floor execution, security clearance or G11 pass."
+  }
+}
