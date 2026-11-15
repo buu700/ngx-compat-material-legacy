@@ -108,6 +108,10 @@ const DELTA=[
 
 const CURRENT='d443a7671cb7c5bbbd20211e5806a5de61b4af9e';
 const CURRENT_TREE='308696d5d422ef266930312109c0ee14fcd476f9';
+const METADATA_PARENT='cd7830f9f2feeeb639ac0dd99efcd3dc610a22c2',METADATA_COMMIT='ce9cd3d0b76e240ad0ffc03e2a05ff41f8f363ab',METADATA_TREE='9680b88bc512cb06fcbc52c4fe4d558a9d8072f4';
+const METADATA_BEFORE={path:'testing/legacy-runner/historical-inventory.json',sha256:'912def47c1e171f9c2a01906dcc0968b91c5288d9b8f73714247b0319f3a2b15',bytes:113388,blob_oid:'4631656e660d51b1f742a8bae2e17d77ad9c67d6'};
+const METADATA_AFTER={path:METADATA_BEFORE.path,sha256:'c15f9b3b21f0ae6001246243e85be4e61155e60af50c86c9272dd6289514504b',bytes:118011,blob_oid:'487d67c9621be5266b4f98731ceb7cd2c60efe18'};
+
 // Exact committed successor-to-current transition; both bodies are verified below.
 const CURRENT_DELTA=[
  {
@@ -744,8 +748,13 @@ export function retainedCurrentContextIdentity({root=process.cwd(),read}={}){
  const continuation=new Map();for(const row of CURRENT_DELTA){assert.ok(!continuation.has(row.path));assert.deepEqual(intermediateByPath.get(row.path),row.before);assert.equal(row.after.path,row.path);continuation.set(row.path,row);}
  assert.equal(continuation.size,38);
  assert.deepEqual(git(['diff','--name-status','--no-renames',SUCCESSOR,CURRENT,'--','projects/ngx-material-legacy',...oldInputs.map(ref=>ref.path)]).toString().trim().split('\n'),CURRENT_DELTA.map(row=>'M\t'+row.path));
- const products=intermediateProducts.map(ref=>continuation.get(ref.path)?.after??ref),inputs=intermediateInputs.map(ref=>continuation.get(ref.path)?.after??ref);
- verifyGit(SUCCESSOR,intermediate,SUCCESSOR);verifyGit(CURRENT,[...products,...inputs],CURRENT);
+ const products=intermediateProducts.map(ref=>continuation.get(ref.path)?.after??ref),currentInputs=intermediateInputs.map(ref=>continuation.get(ref.path)?.after??ref);
+ verifyGit(SUCCESSOR,intermediate,SUCCESSOR);verifyGit(CURRENT,[...products,...currentInputs],CURRENT);
+ // The inventory's seven candidate identities are a committed source update;
+ // the previous receipt remains comparison data and does not grant execution.
+ assert.equal(git(['rev-list','--parents','-n','1',METADATA_COMMIT]).toString().trim(),METADATA_COMMIT+' '+METADATA_PARENT);git(['merge-base','--is-ancestor',CURRENT,METADATA_PARENT]);git(['merge-base','--is-ancestor',METADATA_COMMIT,'HEAD']);assert.equal(git(['rev-parse',METADATA_COMMIT+'^{tree}']).toString().trim(),METADATA_TREE);
+ assert.deepEqual(git(['diff','--name-status','--no-renames',CURRENT,METADATA_COMMIT,'--','projects/ngx-material-legacy',...oldInputs.map(ref=>ref.path)]).toString().trim().split('\n'),['M\t'+METADATA_BEFORE.path]);assert.deepEqual(currentInputs.find(ref=>ref.path===METADATA_BEFORE.path),METADATA_BEFORE);verifyGit(METADATA_PARENT,[METADATA_BEFORE],METADATA_PARENT);verifyGit(METADATA_COMMIT,[METADATA_AFTER],METADATA_COMMIT);identity(METADATA_BEFORE);
+ const inputs=currentInputs.map(ref=>ref.path===METADATA_BEFORE.path?METADATA_AFTER:ref);verifyGit(METADATA_COMMIT,[...products,...inputs],METADATA_COMMIT);
  for(const ref of intermediate)identity(ref);
  const productPaths=products.map(ref=>ref.path);assert.deepEqual(productPaths,[...new Set(productPaths)].sort());assert.deepEqual(git(['ls-tree','-r','--name-only',CURRENT,'--','projects/ngx-material-legacy']).toString().trim().split('\n'),productPaths);
  // The original 1120/68 frame remains authenticated history, never a current physical read.

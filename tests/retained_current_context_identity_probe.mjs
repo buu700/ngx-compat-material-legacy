@@ -53,10 +53,17 @@ for(const path of continuationPaths){
  const ref={path,sha256:createHash('sha256').update(raw).digest('hex'),bytes:raw.length},now=currentByPath.get(path);
  assert.ok(now);assert.notEqual(ref.sha256,now.sha256);assert.deepEqual(live.resolveReference(ref),{kind:'current',reference:now});intermediateBodies.set(path,raw);
 }
+// The committed historical-inventory metadata successor preserves the old
+// descriptor while all current reads and guards consume the physical image.
+const metadataPath='testing/legacy-runner/historical-inventory.json';
+const metadataBefore=execFileSync('git',['show','cd7830f9f2feeeb639ac0dd99efcd3dc610a22c2:'+metadataPath],{cwd:root});
+const metadataOld={path:metadataPath,sha256:createHash('sha256').update(metadataBefore).digest('hex'),bytes:metadataBefore.length},metadataNow=currentByPath.get(metadataPath);
+assert.notEqual(metadataOld.sha256,metadataNow.sha256);assert.deepEqual(live.resolveReference(metadataOld),{kind:'current',reference:metadataNow});
+assert.throws(()=>make({root,read:path=>path===metadataPath?metadataBefore:physical(path)}));
 let reenter=false,reentryScope;
 const reentryRead=path=>{const raw=physical(path);if(reenter&&path===deltaPaths[0]){try{reentryScope.assertCurrent();}catch{}}return raw;};
 reentryScope=make({root,read:reentryRead});reenter=true;assert.throws(()=>reentryScope.assertCurrent(),/reentry/);reenter=false;reentryScope.assertCurrent();
-const targets=[...new Set([live.bound[0].path,live.bound[1].path,...live.beforeContexts.map(row=>row.report.path),changed.path,added.path,'flake.nix','.github/workflows/ci.yml',...deltaPaths,...continuationPaths])];
+const targets=[...new Set([live.bound[0].path,live.bound[1].path,...live.beforeContexts.map(row=>row.report.path),changed.path,added.path,metadataPath,'flake.nix','.github/workflows/ci.yml',...deltaPaths,...continuationPaths])];
 assert.equal(new Set(targets).size,targets.length);
 for(const target of targets){
  let bad=false;
@@ -111,6 +118,7 @@ try{
   writeFileSync(target,fresh);clone.assertCurrent();
  }
  for(const path of continuationPaths){const target=join(scratch,path),fresh=read(path);writeFileSync(target,intermediateBodies.get(path));assert.throws(()=>clone.assertCurrent(),undefined,'intermediate physical '+path);assert.throws(()=>make({root:scratch,read}),undefined,'cold intermediate physical '+path);writeFileSync(target,fresh);clone.assertCurrent();}
+ const metadataFull=join(scratch,metadataPath),metadataFresh=read(metadataPath);writeFileSync(metadataFull,metadataBefore);assert.throws(()=>clone.assertCurrent());assert.throws(()=>make({root:scratch,read}));writeFileSync(metadataFull,metadataFresh);clone.assertCurrent();
  const changedPath=join(scratch,changed.path),original=read(changed.path);
  rmSync(changedPath);assert.throws(()=>clone.assertCurrent());writeFileSync(changedPath,original);clone.assertCurrent();
  // A callback for the final report changes a member already observed. Only a

@@ -70,7 +70,7 @@ class CurrentReaderSourceSuccessorsTests(unittest.TestCase):
 
     def test_retained_current_context_identity(self):
         report = self.run_probe('node', 'retained_current_context_identity_probe.mjs')
-        self.assertEqual(report['cold_rejections'], 50)
+        self.assertEqual(report['cold_rejections'], 51)
         self.assertEqual(report['products'], 1121)
         self.assertEqual(report['continuation_paths'], 38)
         self.assertTrue(report['intermediate_physical_bodies_tested'])
